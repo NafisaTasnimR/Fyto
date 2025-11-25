@@ -4,12 +4,31 @@ import './LoginSignup.css';
 const LoginSignup = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     username: '',
     password: '',
-    name: ''
+    confirmPassword: ''
   });
+
+  const getPasswordStrength = (password) => {
+    if (!password) return { strength: '', text: '' };
+    
+    const hasLower = /[a-z]/.test(password);
+    const hasUpper = /[A-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSymbol = /[^a-zA-Z0-9]/.test(password);
+    
+    const criteria = [hasLower, hasUpper, hasNumber, hasSymbol].filter(Boolean).length;
+    
+    if (password.length < 4) return { strength: 'weak', text: 'Password strength is Weak' };
+    if (criteria <= 2 || password.length < 8) return { strength: 'weak', text: 'Password strength is Weak' };
+    if (criteria === 3) return { strength: 'medium', text: 'Password strength is Medium' };
+    return { strength: 'strong', text: 'Password strength is Strong' };
+  };
+
+  const passwordStrengthData = !isLogin ? getPasswordStrength(formData.password) : { strength: '', text: '' };
 
   const handleChange = (e) => {
     setFormData({
@@ -29,7 +48,7 @@ const LoginSignup = () => {
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
-    setFormData({ email: '', username: '', password: '', name: '' });
+    setFormData({ email: '', username: '', password: '', confirmPassword: '' });
   };
 
   const handleGoogleLogin = () => {
@@ -41,19 +60,6 @@ const LoginSignup = () => {
       <div className="form-wrapper">
         <h2>{isLogin ? 'Login' : 'Sign In'}</h2>
         <form onSubmit={handleSubmit}>
-          {!isLogin && (
-            <div className="form-group">
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Name"
-                required
-              />
-            </div>
-          )}
           <div className="form-group">
             <input
               type="email"
@@ -92,9 +98,49 @@ const LoginSignup = () => {
               className="password-toggle" 
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? '👁️' : '👁️‍🗨️'}
+              <img 
+                src={showPassword ? "/view.png" : "/eyebrow.png"} 
+                alt="toggle password visibility"
+              />
             </span>
           </div>
+          {!isLogin && formData.password && (
+            <>
+              <div className="password-criteria">
+                <span className={formData.password && /[a-z]/.test(formData.password) ? 'active' : ''}>Lower</span>
+                <span className={formData.password && /[A-Z]/.test(formData.password) ? 'active' : ''}>Upper</span>
+                <span className={formData.password && /[0-9]/.test(formData.password) ? 'active' : ''}>Number</span>
+                <span className={formData.password && /[^a-zA-Z0-9]/.test(formData.password) ? 'active' : ''}>Symbol</span>
+              </div>
+              {passwordStrengthData.text && (
+                <div className={`password-strength ${passwordStrengthData.strength}`}>
+                  {passwordStrengthData.text}
+                </div>
+              )}
+            </>
+          )}
+          {!isLogin && (
+            <div className="form-group password-group">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                id="confirmPassword"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Confirm Password"
+                required
+              />
+              <span 
+                className="password-toggle" 
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                <img 
+                  src={showConfirmPassword ? "/view.png" : "/eyebrow.png"} 
+                  alt="toggle password visibility"
+                />
+              </span>
+            </div>
+          )}
           <button type="submit" className="submit-btn">
             Submit
           </button>
@@ -109,12 +155,12 @@ const LoginSignup = () => {
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
           </svg>
-          {isLogin ? 'Log in with Google' : 'Sign in with Google'}
+          {isLogin ? 'Log in with Google' : 'Sign up with Google'}
         </button>
         <p className="toggle-text">
           {isLogin ? "Don't have an account? " : "Already have an account? "}
           <span onClick={toggleMode} className="toggle-link">
-            {isLogin ? 'Sign In' : 'Login'}
+            {isLogin ? 'Sign Up' : 'Login'}
           </span>
         </p>
       </div>
