@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './LoginSignup.css';
 
-const LoginSignup = () => {
-  const [isLogin, setIsLogin] = useState(true);
+const LoginSignup = ({ mode = 'login' }) => {
+  const navigate = useNavigate();
+  const [isLogin, setIsLogin] = useState(mode === 'login');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -11,6 +13,10 @@ const LoginSignup = () => {
     password: '',
     confirmPassword: ''
   });
+
+  useEffect(() => {
+    setIsLogin(mode === 'login');
+  }, [mode]);
 
   const getPasswordStrength = (password) => {
     if (!password) return { strength: '', text: '' };
@@ -47,8 +53,10 @@ const LoginSignup = () => {
   };
 
   const toggleMode = () => {
-    setIsLogin(!isLogin);
+    const newMode = !isLogin;
+    setIsLogin(newMode);
     setFormData({ email: '', username: '', password: '', confirmPassword: '' });
+    navigate(newMode ? '/login' : '/signup');
   };
 
   const handleGoogleLogin = () => {

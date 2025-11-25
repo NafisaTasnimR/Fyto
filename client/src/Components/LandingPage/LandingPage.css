@@ -1,0 +1,208 @@
+/* ---- PAGE WRAPPER ---- */
+.landing-container {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: #f4f9f4; /* soft green tint */
+}
+
+/* ---- FIXED HEADER ---- */
+.fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 0;
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+}
+
+.logo {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #5a6b4d;
+  cursor: pointer;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.nav-btn {
+  padding: 10px 25px;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: transparent;
+  color: #5a6b4d;
+}
+
+.nav-btn:hover {
+  background: #f0f0f0;
+}
+
+.signup-btn {
+  background: #6b7c5e;
+  color: white;
+}
+
+.signup-btn:hover {
+  background: #5a6b4d;
+}
+
+/* ---- HERO SECTION ---- */
+.hero {
+  text-align: center;
+  padding: 150px 20px 70px;
+  background: linear-gradient(135deg, #a8d5ba 0%, #7fb69e 100%);
+  color: #034d1f;
+  margin-top: 0;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.hero-btn {
+  padding: 12px 28px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  font-size: 1rem;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.hero-btn:hover {
+  background: #3d8d40;
+}
+
+/* ---- PINTEREST MASONRY GRID ---- */
+.masonry {
+  columns: 4;
+  column-gap: 1rem;
+  padding: 20px;
+}
+
+.card {
+  break-inside: avoid;
+  background: white;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+/* ---- IMAGES ---- */
+.card img {
+  width: 100%;
+  display: block;
+  border-bottom: 1px solid #eee;
+}
+
+/* ---- TEXT ---- */
+.card p {
+  padding: 12px;
+  font-size: 1rem;
+  color: #2c3e50;
+}
+
+/* ---- RESPONSIVE GRID ---- */
+@media (max-width: 1000px) {
+  .masonry { columns: 3; }
+}
+
+@media (max-width: 700px) {
+  .masonry { columns: 2; }
+}
+
+@media (max-width: 500px) {
+  .masonry { columns: 1; }
+}
+
+/* ---- RESPONSIVE HEADER ---- */
+@media (max-width: 768px) {
+  .header-content {
+    padding: 12px 20px;
+  }
+
+  .logo {
+    font-size: 1.5rem;
+  }
+
+  .nav-btn {
+    padding: 8px 20px;
+    font-size: 0.9rem;
+  }
+
+  .hero {
+    padding: 130px 20px 60px;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+  .hero p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content {
+    padding: 10px 15px;
+  }
+
+  .logo {
+    font-size: 1.3rem;
+  }
+
+  .nav-buttons {
+    gap: 10px;
+  }
+
+  .nav-btn {
+    padding: 7px 16px;
+    font-size: 0.85rem;
+  }
+
+  .hero {
+    padding: 120px 15px 50px;
+  }
+
+  .hero h1 {
+    font-size: 1.8rem;
+  }
+
+  .hero p {
+    font-size: 0.9rem;
+  }
+}
