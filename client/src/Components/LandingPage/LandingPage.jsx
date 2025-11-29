@@ -4,14 +4,6 @@ import './LandingPage.css';
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const posts = [
-    { img: "./plant1.jpg", text: "Beautiful Monstera" },
-    { img: "./plant1.jpg", text: "Snake Plant Care Tips" },
-    { img: "./plant1.jpg", text: "Free Basil Seeds Giveaway" },
-    { img: "./plant1.jpg", text: "Looking for Money Plant Cuttings" },
-    { img: "./plant1.jpg", text: "Outdoor Succulent Collection" },
-    { img: "./plant1.jpg", text: "How to Save Dying Pothos?" },
-  ];
 
   return (
     <div className="landing-container">
@@ -27,20 +19,60 @@ export default function LandingPage() {
       </header>
 
       {/* HERO SECTION */}
-      <section className="hero">
+      <section 
+        className="hero"
+        style={{
+          backgroundImage: 'url(/bg.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
         <h1>Grow. Share. Connect.</h1>
         <p>Buy, sell, exchange, or donate plants, seeds & bulbs.</p>
         <button className="hero-btn">Explore Plants</button>
       </section>
 
-      {/* MASONRY GRID */}
-      <section className="masonry">
-        {posts.map((post, index) => (
-          <div className="card" key={index}>
-            <img src={post.img} alt={post.text} />
-            <p>{post.text}</p>
+      {/* SECONDARY SECTION */}
+      <section className="secondary-hero">
+        <div className="secondary-image" style={{
+          backgroundImage: 'url(/bg4.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}></div>
+        <div className="secondary-content">
+          <h2>Join Our Growing Community</h2>
+          <p>Connect with plant enthusiasts, share your green journey, and discover new species.</p>
+          <button className="secondary-btn">Get Started</button>
+        </div>
+      </section>
+
+      {/* THIRD SECTION - PRODUCT CARDS */}
+      <section className="third-hero">
+        <div className="product-card">
+          <div className="product-image" style={{
+            backgroundImage: 'url(/c2.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}></div>
+          <div className="product-info">
+            <p className="product-label">Big Sale Products</p>
+            <h3 className="product-title">Plants<br />For Interior</h3>
           </div>
-        ))}
+        </div>
+
+        <div className="product-card">
+          <div className="product-image" style={{
+            backgroundImage: 'url(/AfricanViolet.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}></div>
+          <div className="product-info">
+            <p className="product-label">Top Products</p>
+            <h3 className="product-title">Plants<br />For Healthy</h3>
+          </div>
+        </div>
       </section>
 
     </div>
