@@ -1,145 +1,140 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Store.css';
 
 const Store = () => {
   const [activeTab, setActiveTab] = useState('For you');
   const [visibleProjects, setVisibleProjects] = useState(8);
+  const navigate = useNavigate();
 
-  const tabs = [<button className="filter-btn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <line x1="4" y1="6" x2="20" y2="6" strokeWidth="2" strokeLinecap="round"/>
-              <line x1="4" y1="12" x2="20" y2="12" strokeWidth="2" strokeLinecap="round"/>
-              <line x1="4" y1="18" x2="20" y2="18" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-            <span className="filter-text">Filter</span>
-          </button>,'For you', 'Buy', 'Exchange', 'Donate', 'Favourites'];
+  const tabs = ['For you', 'Buy', 'Exchange', 'Donate', 'Favourites'];
 
-  // Extended projects array with more items
+  // Tree-related projects array
   const allProjects = [
     {
       id: 1,
-      image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop',
-      title: 'COTTA - Brand Identity',
-      author: 'Luis Brands',
+      image: 'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=600&h=400&fit=crop',
+      title: 'Japanese Maple Tree',
+      author: 'Sarah Johnson',
       likes: 378,
       views: '2.8K'
     },
     {
       id: 2,
-      image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&h=400&fit=crop',
-      title: 'Personal & Commercial Illustrations',
-      author: 'Anastasia Kirsanova',
+      image: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=600&h=400&fit=crop',
+      title: 'Cherry Blossom Sapling',
+      author: 'Michael Chen',
       likes: 157,
       views: '344'
     },
     {
       id: 3,
-      image: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=600&h=400&fit=crop',
-      title: 'MEET',
-      author: 'Multiple Owners',
+      image: 'https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=600&h=400&fit=crop',
+      title: 'Pine Tree Collection',
+      author: 'Garden Masters',
       likes: 545,
       views: '8.4K'
     },
     {
       id: 4,
-      image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&h=400&fit=crop',
-      title: 'Creative Photography',
-      author: 'John Smith',
+      image: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=600&h=400&fit=crop',
+      title: 'Oak Tree - Mature',
+      author: 'David Martinez',
       likes: 892,
       views: '12K'
     },
     {
       id: 5,
-      image: 'https://images.unsplash.com/photo-1550009158-9ebf69173e03?w=600&h=400&fit=crop',
-      title: 'Modern UI Design',
-      author: 'Sarah Johnson',
+      image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=400&fit=crop',
+      title: 'Birch Tree Duo',
+      author: 'Emma Wilson',
       likes: 234,
       views: '1.2K'
     },
     {
       id: 6,
-      image: 'https://images.unsplash.com/photo-1542744094-3a31f272c490?w=600&h=400&fit=crop',
-      title: 'Brand Strategy',
-      author: 'Mike Chen',
+      image: 'https://images.unsplash.com/photo-1536431311719-398b6704d4cc?w=600&h=400&fit=crop',
+      title: 'Willow Tree - Young',
+      author: 'Robert Green',
       likes: 456,
       views: '3.1K'
     },
     {
       id: 7,
-      image: 'https://images.unsplash.com/photo-1534670007418-fbb7f6cf32c3?w=600&h=400&fit=crop',
-      title: 'Digital Art Collection',
-      author: 'Emma Wilson',
+      image: 'https://images.unsplash.com/photo-1511497584788-876760111969?w=600&h=400&fit=crop',
+      title: 'Magnolia Tree',
+      author: 'Lisa Park',
       likes: 678,
       views: '5.6K'
     },
     {
       id: 8,
-      image: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600&h=400&fit=crop',
-      title: 'Abstract Concepts',
-      author: 'David Lee',
+      image: 'https://images.unsplash.com/photo-1470058869958-2a77ade41c02?w=600&h=400&fit=crop',
+      title: 'Palm Tree - Tropical',
+      author: 'James Rodriguez',
       likes: 321,
       views: '2.1K'
     },
     {
       id: 9,
-      image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=400&fit=crop',
-      title: 'Team Collaboration',
-      author: 'Rachel Green',
+      image: 'https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=600&h=400&fit=crop',
+      title: 'Evergreen Collection',
+      author: 'Rachel Brown',
       likes: 445,
       views: '3.5K'
     },
     {
       id: 10,
-      image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=400&fit=crop',
-      title: 'Tech Innovation',
+      image: 'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=600&h=400&fit=crop',
+      title: 'Red Maple Tree',
       author: 'Alex Turner',
       likes: 567,
       views: '4.2K'
     },
     {
       id: 11,
-      image: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?w=600&h=400&fit=crop',
-      title: 'Coffee Shop Branding',
+      image: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=600&h=400&fit=crop',
+      title: 'Flowering Plum Tree',
       author: 'Maria Santos',
       likes: 289,
       views: '1.8K'
     },
     {
       id: 12,
-      image: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=600&h=400&fit=crop',
-      title: 'Workspace Design',
+      image: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=600&h=400&fit=crop',
+      title: 'Ancient Oak',
       author: 'Tom Anderson',
       likes: 398,
       views: '2.9K'
     },
     {
       id: 13,
-      image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=400&fit=crop',
-      title: 'Coding Projects',
+      image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=400&fit=crop',
+      title: 'White Birch Tree',
       author: 'Lisa Chen',
       likes: 512,
       views: '4.7K'
     },
     {
       id: 14,
-      image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop',
-      title: 'Data Visualization',
+      image: 'https://images.unsplash.com/photo-1536431311719-398b6704d4cc?w=600&h=400&fit=crop',
+      title: 'Weeping Willow',
       author: 'Mark Wilson',
       likes: 423,
       views: '3.3K'
     },
     {
       id: 15,
-      image: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&h=400&fit=crop',
-      title: 'Fitness App Design',
+      image: 'https://images.unsplash.com/photo-1511497584788-876760111969?w=600&h=400&fit=crop',
+      title: 'Pink Magnolia',
       author: 'Jessica Park',
       likes: 334,
       views: '2.4K'
     },
     {
       id: 16,
-      image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&h=400&fit=crop',
-      title: 'Mountain Adventures',
+      image: 'https://images.unsplash.com/photo-1470058869958-2a77ade41c02?w=600&h=400&fit=crop',
+      title: 'Coconut Palm Tree',
       author: 'Chris Martin',
       likes: 601,
       views: '5.8K'
@@ -153,36 +148,48 @@ const Store = () => {
     setVisibleProjects(prev => Math.min(prev + 8, allProjects.length));
   };
 
+  const handleProjectClick = (projectId) => {
+    navigate(`/product/${projectId}`);
+  };
+
   return (
     <div className="portfolio-container">
       {/* Header */}
       <header className="header">
         <div className="header-left">
-  <div className="logo-container">
-    <svg className="logo-icon" width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="20" cy="20" r="18" fill="#2E7D32"/>
-      <path d="M20 8C20 8 16 14 16 18C16 20.21 17.79 22 20 22C22.21 22 24 20.21 24 18C24 14 20 8 20 8Z" fill="#81C784"/>
-      <path d="M20 18L23 22C23 22 21.5 24 20 24C18.5 24 17 22 17 22L20 18Z" fill="#A5D6A7"/>
-      <rect x="19" y="22" width="2" height="10" rx="1" fill="#6D4C41"/>
-      <circle cx="20" cy="32" r="4" fill="#4CAF50"/>
-    </svg>
-    <h1 className="logo">Fyto</h1>
-    </div>
-    </div>
+          <div className="logo-container">
+            <svg className="logo-icon" width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="20" cy="20" r="18" fill="#2E7D32"/>
+              <path d="M20 8C20 8 16 14 16 18C16 20.21 17.79 22 20 22C22.21 22 24 20.21 24 18C24 14 20 8 20 8Z" fill="#81C784"/>
+              <path d="M20 18L23 22C23 22 21.5 24 20 24C18.5 24 17 22 17 22L20 18Z" fill="#A5D6A7"/>
+              <rect x="19" y="22" width="2" height="10" rx="1" fill="#6D4C41"/>
+              <circle cx="20" cy="32" r="4" fill="#4CAF50"/>
+            </svg>
+            <h1 className="logo">Fyto</h1>
+          </div>
+        </div>
         
         <div className="header-right">
           <button className="menu-icon">☰</button>
           <button className="new-post-btn" title="New post">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-      <line x1="12" y1="5" x2="12" y2="19"/>
-      <line x1="5" y1="12" x2="19" y2="12"/>
-    </svg>
-  </button>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
         </div>
       </header>
 
       {/* Tabs Navigation */}
       <nav className="tabs-nav">
+        <button className="filter-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <line x1="4" y1="6" x2="20" y2="6" strokeWidth="2" strokeLinecap="round"/>
+            <line x1="4" y1="12" x2="20" y2="12" strokeWidth="2" strokeLinecap="round"/>
+            <line x1="4" y1="18" x2="20" y2="18" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+          <span className="filter-text">Filter</span>
+        </button>
         {tabs.map((tab) => (
           <button
             key={tab}
@@ -197,7 +204,11 @@ const Store = () => {
       {/* Projects Grid */}
       <div className="projects-grid">
         {displayedProjects.map((project) => (
-          <div key={project.id} className="project-card">
+          <div 
+            key={project.id} 
+            className="project-card"
+            onClick={() => handleProjectClick(project.id)}
+          >
             <div className="project-image-container">
               <img 
                 src={project.image} 
@@ -212,7 +223,6 @@ const Store = () => {
                 <div className="author-info">
                   <span className="author-name">{project.author}</span>
                 </div>
-                
               </div>
             </div>
           </div>
@@ -227,8 +237,6 @@ const Store = () => {
           </button>
         </div>
       )}
-
-      
     </div>
   );
 };
