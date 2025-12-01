@@ -16,6 +16,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Store from './Components/Store/Store';
 import ProductDetail from './Components/ProductDetail/ProductDetail';
+import NewPost from './Components/NewPost/NewPost';
 import './App.css';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Store />} />
           <Route path="/product/:id" element={<ProductDetail />} />
+           <Route path="/new-post" element={<NewPost />} />
         </Routes>
       </div>
     </Router>
