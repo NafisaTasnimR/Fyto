@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import './LoginSignup.css';
 
-const LoginSignup = ({ mode = 'login' }) => {
-  const navigate = useNavigate();
+const LoginSignup = ({ mode = 'login', onClose, onModeChange }) => {
   const [isLogin, setIsLogin] = useState(mode === 'login');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -56,7 +54,9 @@ const LoginSignup = ({ mode = 'login' }) => {
     const newMode = !isLogin;
     setIsLogin(newMode);
     setFormData({ email: '', username: '', password: '', confirmPassword: '' });
-    navigate(newMode ? '/login' : '/signup');
+    if (onModeChange) {
+      onModeChange(newMode ? 'login' : 'signup');
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -64,9 +64,11 @@ const LoginSignup = ({ mode = 'login' }) => {
   };
 
   return (
-    <div className="login-signup-container">
-      <div className="form-wrapper">
-        <h2>{isLogin ? 'Login' : 'Sign In'}</h2>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="login-signup-container" onClick={(e) => e.stopPropagation()}>
+        <button className="close-modal" onClick={onClose}>&times;</button>
+        <div className="form-wrapper">
+          <h2>{isLogin ? 'Login' : 'Sign In'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <input
@@ -168,9 +170,10 @@ const LoginSignup = ({ mode = 'login' }) => {
         <p className="toggle-text">
           {isLogin ? "Don't have an account? " : "Already have an account? "}
           <span onClick={toggleMode} className="toggle-link">
-            {isLogin ? 'Sign Up' : 'Login'}
+            {isLogin ? 'Sign In' : 'Login'}
           </span>
         </p>
+        </div>
       </div>
     </div>
   );

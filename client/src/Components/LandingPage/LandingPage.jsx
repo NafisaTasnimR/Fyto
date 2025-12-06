@@ -1,9 +1,19 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import LoginSignup from '../LoginSignup/LoginSignup';
 import './LandingPage.css';
 
 export default function LandingPage() {
-  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+  const [modalMode, setModalMode] = useState('login');
+
+  const openModal = (mode) => {
+    setModalMode(mode);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
 
   return (
     <div className="landing-container">
@@ -12,8 +22,8 @@ export default function LandingPage() {
         <div className="header-content">
           <div className="logo">Fyto</div>
           <nav className="nav-buttons">
-            <button className="nav-btn" onClick={() => navigate('/login')}>Login</button>
-            <button className="nav-btn signup-btn" onClick={() => navigate('/signup')}>Signup</button>
+            <button className="nav-btn" onClick={() => openModal('login')}>Login</button>
+            <button className="nav-btn signup-btn" onClick={() => openModal('signup')}>Signup</button>
           </nav>
         </div>
       </header>
@@ -75,6 +85,14 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* LOGIN/SIGNUP MODAL */}
+      {showModal && (
+        <LoginSignup 
+          mode={modalMode} 
+          onClose={closeModal}
+          onModeChange={setModalMode}
+        />
+      )}
     </div>
   );
 }
