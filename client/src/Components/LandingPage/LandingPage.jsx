@@ -29,6 +29,20 @@ export default function LandingPage() {
       </header>
 
       {/* HERO SECTION */}
+      {/* TOP HERO - new banner above main hero (large centered header with search + CTAs) */}
+      <section className="top-hero">
+        <div className="top-hero-content">
+          <div className="top-hero-inner">
+            <h1>Grow. Share. Connect.</h1>
+            <p className="top-sub">A community-driven platform for plant lovers.</p>
+
+            <div className="top-ctas">
+              <button className="cta primary">Join Community</button>
+              <button className="cta secondary">Explore Plants</button>
+            </div>
+          </div>
+        </div>
+      </section>
       <section 
         className="hero"
         style={{
