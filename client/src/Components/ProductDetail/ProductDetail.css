@@ -135,11 +135,52 @@ body {
   margin: 0;
 }
 
-.product-meta-info {
+/* Post Type Badge */
+.post-type-badge-container {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 20px;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.post-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 15px;
+  border: 2px solid;
+}
+
+.post-type-badge.sell {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border-color: #90caf9;
+}
+
+.post-type-badge.donate {
+  background-color: #fce4ec;
+  color: #c2185b;
+  border-color: #f8bbd0;
+}
+
+.post-type-badge svg {
+  flex-shrink: 0;
+}
+
+.price-display {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+.product-meta-info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 24px;
   background-color: #ffffff;
   border-radius: 8px;
   border: 1px solid #e7e7e7;
@@ -147,15 +188,16 @@ body {
 
 .meta-item {
   display: flex;
-  gap: 12px;
-  align-items: center;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .meta-label {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
   color: #696969;
-  min-width: 80px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .meta-value {
@@ -333,13 +375,20 @@ body {
     font-size: 28px;
   }
 
+  .price-display {
+    font-size: 28px;
+  }
+
+  .product-meta-info {
+    grid-template-columns: 1fr;
+  }
+
   .section-title {
     font-size: 18px;
   }
 
   .meta-label {
-    min-width: 70px;
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .meta-value {
@@ -408,24 +457,31 @@ body {
     font-size: 22px;
   }
 
+  .post-type-badge {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  .post-type-badge svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .price-display {
+    font-size: 24px;
+  }
+
   .section-title {
     font-size: 17px;
   }
 
   .product-meta-info {
     padding: 16px;
-    gap: 10px;
-  }
-
-  .meta-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+    gap: 12px;
   }
 
   .meta-label {
-    min-width: auto;
-    font-size: 13px;
+    font-size: 11px;
   }
 
   .meta-value {

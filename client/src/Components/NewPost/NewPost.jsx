@@ -9,6 +9,9 @@ const NewPost = () => {
   const [formData, setFormData] = useState({
     treeName: '',
     treeType: '',
+    customTreeType: '', // for when user selects "Other"
+    treePart: '', // seed, sapling, mature tree, etc.
+    customTreePart: '', // for when user selects "Other"
     description: '',
     postType: 'sell', // 'sell' or 'donate'
     price: '',
@@ -32,6 +35,20 @@ const NewPost = () => {
     'Fruit Tree',
     'Flowering Tree',
     'Shade Tree',
+    'Other'
+  ];
+
+  const treeParts = [
+    'Seeds',
+    'Seedling',
+    'Sapling',
+    'Young Tree',
+    'Mature Tree',
+    'Cuttings',
+    'Root Division',
+    'Whole Tree with Root Ball',
+    'Bare Root Tree',
+    'Potted Tree',
     'Other'
   ];
 
@@ -120,6 +137,14 @@ const NewPost = () => {
 
     if (!formData.treeType) {
       newErrors.treeType = 'Please select a tree type';
+    } else if (formData.treeType === 'Other' && !formData.customTreeType.trim()) {
+      newErrors.customTreeType = 'Please specify the tree type';
+    }
+
+    if (!formData.treePart) {
+      newErrors.treePart = 'Please select what part of the tree you are offering';
+    } else if (formData.treePart === 'Other' && !formData.customTreePart.trim()) {
+      newErrors.customTreePart = 'Please specify what you are offering';
     }
 
     if (!formData.description.trim()) {
@@ -270,6 +295,54 @@ const NewPost = () => {
               ))}
             </select>
             {errors.treeType && <span className="error-message">{errors.treeType}</span>}
+            
+            {/* Show custom input if Other is selected */}
+            {formData.treeType === 'Other' && (
+              <div style={{ marginTop: '12px' }}>
+                <input
+                  type="text"
+                  name="customTreeType"
+                  value={formData.customTreeType}
+                  onChange={handleInputChange}
+                  placeholder="Please specify the tree type"
+                  className={`form-input ${errors.customTreeType ? 'error' : ''}`}
+                />
+                {errors.customTreeType && <span className="error-message">{errors.customTreeType}</span>}
+              </div>
+            )}
+          </div>
+
+          {/* Tree Part */}
+          <div className="form-section">
+            <label htmlFor="treePart" className="section-label">What are you offering? *</label>
+            <select
+              id="treePart"
+              name="treePart"
+              value={formData.treePart}
+              onChange={handleInputChange}
+              className={`form-select ${errors.treePart ? 'error' : ''}`}
+            >
+              <option value="">Select what you're offering</option>
+              {treeParts.map((part) => (
+                <option key={part} value={part}>{part}</option>
+              ))}
+            </select>
+            {errors.treePart && <span className="error-message">{errors.treePart}</span>}
+            
+            {/* Show custom input if Other is selected */}
+            {formData.treePart === 'Other' && (
+              <div style={{ marginTop: '12px' }}>
+                <input
+                  type="text"
+                  name="customTreePart"
+                  value={formData.customTreePart}
+                  onChange={handleInputChange}
+                  placeholder="Please specify what you're offering"
+                  className={`form-input ${errors.customTreePart ? 'error' : ''}`}
+                />
+                {errors.customTreePart && <span className="error-message">{errors.customTreePart}</span>}
+              </div>
+            )}
           </div>
 
           {/* Description */}
