@@ -17,11 +17,13 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Store from './Components/Store/Store';
 import ProductDetail from './Components/ProductDetail/ProductDetail';
 import NewPost from './Components/NewPost/NewPost';
+import ScrollToTop from './Components/Scrolltotop/Scrolltotop';
 import './App.css';
 
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <div className="App">
         <Routes>
           <Route path="/" element={<Store />} />
