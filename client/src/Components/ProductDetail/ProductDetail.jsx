@@ -52,8 +52,9 @@ const ProductDetail = () => {
       location: 'Mountain View, Colorado',
       description: 'Collection of three pine trees, ideal for creating natural privacy screens or windbreaks. These evergreens are low-maintenance and provide year-round greenery. Perfect for larger properties or rural settings.',
       size: 'Large (8-12 feet)',
-      postType: 'donate',
+      postType: 'exchange',
       price: '0',
+      exchangeFor: 'Fruit tree saplings or oak seedlings',
       contact: '+1 (555) 987-6543',
       options: ['Pickup Only', 'Bare Root', 'Professional Transplant Service']
     },
@@ -148,8 +149,9 @@ const ProductDetail = () => {
       location: 'Evergreen, Washington',
       description: 'Collection of mixed evergreen seedlings including spruce and fir. Perfect for creating natural borders or privacy screens. These trees maintain their foliage year-round and are excellent for colder climates.',
       size: 'Small (1-2 feet)',
-      postType: 'donate',
+      postType: 'exchange',
       price: '0',
+      exchangeFor: 'Flowering tree seeds or gardening equipment',
       contact: '+1 (555) 741-8520',
       options: ['Pickup Only', 'Bare Root', 'Delivery Available']
     },
@@ -333,6 +335,16 @@ const ProductDetail = () => {
                   </svg>
                   For Sale
                 </>
+              ) : product.postType === 'exchange' ? (
+                <>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M16 3l4 4-4 4"/>
+                    <path d="M20 7H4"/>
+                    <path d="M8 21l-4-4 4-4"/>
+                    <path d="M4 17h16"/>
+                  </svg>
+                  For Exchange
+                </>
               ) : (
                 <>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -380,6 +392,22 @@ const ProductDetail = () => {
             <h3 className="section-title">Condition</h3>
             <div className="condition-badge">{product.condition}</div>
           </div>
+
+          {/* Exchange For (only for exchange posts) */}
+          {product.postType === 'exchange' && product.exchangeFor && (
+            <div className="exchange-section">
+              <h3 className="section-title">Looking for in Exchange</h3>
+              <div className="exchange-info">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M16 3l4 4-4 4"/>
+                  <path d="M20 7H4"/>
+                  <path d="M8 21l-4-4 4-4"/>
+                  <path d="M4 17h16"/>
+                </svg>
+                <span>{product.exchangeFor}</span>
+              </div>
+            </div>
+          )}
 
           {/* Description */}
           <div className="description-section">

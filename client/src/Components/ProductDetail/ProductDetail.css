@@ -160,6 +160,12 @@ body {
   border-color: #90caf9;
 }
 
+.post-type-badge.exchange {
+  background-color: #fff3e0;
+  color: #f57c00;
+  border-color: #ffcc80;
+}
+
 .post-type-badge.donate {
   background-color: #fce4ec;
   color: #c2185b;
@@ -231,6 +237,31 @@ body {
   border-radius: 20px;
   width: fit-content;
   border: 1px solid #a5d6a7;
+}
+
+/* Exchange Section */
+.exchange-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.exchange-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background-color: #fff3e0;
+  color: #f57c00;
+  font-weight: 600;
+  font-size: 15px;
+  border-radius: 8px;
+  border: 2px solid #ffcc80;
+}
+
+.exchange-info svg {
+  flex-shrink: 0;
+  color: #f57c00;
 }
 
 /* Description Section */
