@@ -282,7 +282,7 @@
 /* Post Type Buttons */
 .post-type-buttons {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 }
 
@@ -456,6 +456,10 @@
   .image-preview-wrapper {
     height: 250px;
   }
+
+  .post-type-buttons {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Responsive Design - Small Mobile */
@@ -561,6 +565,7 @@
 
   .post-type-buttons {
     gap: 12px;
+    grid-template-columns: 1fr;
   }
 
   .post-type-btn {
