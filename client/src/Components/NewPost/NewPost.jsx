@@ -13,8 +13,9 @@ const NewPost = () => {
     treePart: '', // seed, sapling, mature tree, etc.
     customTreePart: '', // for when user selects "Other"
     description: '',
-    postType: 'sell', // 'sell' or 'donate'
+    postType: 'sell', // 'sell', 'donate', or 'exchange'
     price: '',
+    exchangeFor: '', // what user wants in exchange
     contact: '',
     image: null,
     imagePreview: null
@@ -72,7 +73,8 @@ const NewPost = () => {
     setFormData(prev => ({
       ...prev,
       postType: type,
-      price: type === 'donate' ? '' : prev.price
+      price: type === 'sell' ? prev.price : '',
+      exchangeFor: type === 'exchange' ? prev.exchangeFor : ''
     }));
   };
 
@@ -157,6 +159,10 @@ const NewPost = () => {
       newErrors.price = 'Price is required for selling';
     } else if (formData.postType === 'sell' && isNaN(formData.price)) {
       newErrors.price = 'Please enter a valid price';
+    }
+
+    if (formData.postType === 'exchange' && !formData.exchangeFor.trim()) {
+      newErrors.exchangeFor = 'Please specify what you want in exchange';
     }
 
     if (!formData.contact.trim()) {
@@ -363,7 +369,7 @@ const NewPost = () => {
             {errors.description && <span className="error-message">{errors.description}</span>}
           </div>
 
-          {/* Post Type - Sell or Donate */}
+          {/* Post Type - Sell, Exchange, or Donate */}
           <div className="form-section">
             <label className="section-label">Post Type *</label>
             <div className="post-type-buttons">
@@ -380,6 +386,19 @@ const NewPost = () => {
               </button>
               <button
                 type="button"
+                className={`post-type-btn ${formData.postType === 'exchange' ? 'active' : ''}`}
+                onClick={() => handlePostTypeChange('exchange')}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M16 3l4 4-4 4"/>
+                  <path d="M20 7H4"/>
+                  <path d="M8 21l-4-4 4-4"/>
+                  <path d="M4 17h16"/>
+                </svg>
+                Exchange
+              </button>
+              <button
+                type="button"
                 className={`post-type-btn ${formData.postType === 'donate' ? 'active' : ''}`}
                 onClick={() => handlePostTypeChange('donate')}
               >
@@ -391,10 +410,10 @@ const NewPost = () => {
             </div>
           </div>
 
-          {/* Price (disabled if donate) */}
+          {/* Price (disabled if donate or exchange) */}
           <div className="form-section">
             <label htmlFor="price" className="section-label">
-              Price {formData.postType === 'sell' ? '*' : '(Not applicable for donation)'}
+              Price {formData.postType === 'sell' ? '*' : '(Only for selling)'}
             </label>
             <div className="price-input-wrapper">
               <span className="currency-symbol">$</span>
@@ -405,12 +424,29 @@ const NewPost = () => {
                 value={formData.price}
                 onChange={handleInputChange}
                 placeholder="0.00"
-                disabled={formData.postType === 'donate'}
-                className={`form-input price-input ${errors.price ? 'error' : ''} ${formData.postType === 'donate' ? 'disabled' : ''}`}
+                disabled={formData.postType !== 'sell'}
+                className={`form-input price-input ${errors.price ? 'error' : ''} ${formData.postType !== 'sell' ? 'disabled' : ''}`}
               />
             </div>
             {errors.price && <span className="error-message">{errors.price}</span>}
           </div>
+
+          {/* Exchange For (only shown for exchange) */}
+          {formData.postType === 'exchange' && (
+            <div className="form-section">
+              <label htmlFor="exchangeFor" className="section-label">What do you want in exchange? *</label>
+              <input
+                type="text"
+                id="exchangeFor"
+                name="exchangeFor"
+                value={formData.exchangeFor}
+                onChange={handleInputChange}
+                placeholder="e.g., Oak tree seedlings, Gardening tools, etc."
+                className={`form-input ${errors.exchangeFor ? 'error' : ''}`}
+              />
+              {errors.exchangeFor && <span className="error-message">{errors.exchangeFor}</span>}
+            </div>
+          )}
 
           {/* Contact Information */}
           <div className="form-section">
