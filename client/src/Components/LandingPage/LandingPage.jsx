@@ -32,6 +32,49 @@ export default function LandingPage() {
       {/* TOP HERO - new banner above main hero (large centered header with search + CTAs) */}
       <section className="top-hero">
         <div className="top-hero-content">
+          <div className="top-hero-visuals scroller">
+            <div className="scroller-track">
+              <div className="polaroid p1">
+                <img src="/c2.png" alt="plant" />
+              </div>
+              <div className="polaroid p2">
+                <img src="/c2.png" alt="plant" />
+              </div>
+              <div className="polaroid p3">
+                <img src="/c2.png" alt="plant" />
+              </div>
+              <div className="polaroid p4">
+                <img src="/c2.png" alt="plant" />
+              </div>
+              <div className="polaroid p5 portrait">
+                <img src="/c2.png" alt="plant" />
+              </div>
+              <div className="polaroid p6 portrait">
+                <img src="/c2.png" alt="plant" />
+              </div>
+
+              {/* duplicate for seamless scroll */}
+              <div className="polaroid p1">
+                <img src="/c2.png" alt="plant" />
+              </div>
+              <div className="polaroid p2">
+                <img src="/c2.png" alt="plant" />
+              </div>
+              <div className="polaroid p3">
+                <img src="/c2.png" alt="plant" />
+              </div>
+              <div className="polaroid p4">
+                <img src="/c2.png" alt="plant" />
+              </div>
+              <div className="polaroid p5 portrait">
+                <img src="/c2.png" alt="plant" />
+              </div>
+              <div className="polaroid p6 portrait">
+                <img src="/c2.png" alt="plant" />
+              </div>
+            </div>
+          </div>
+
           <div className="top-hero-inner">
             <h1>Grow. Share. Connect.</h1>
             <p className="top-sub">A community-driven platform for plant lovers.</p>

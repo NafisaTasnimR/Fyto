@@ -83,13 +83,15 @@
 
 /* ---- TOP HERO BANNER ---- */
 .top-hero {
-  background: #f0f7ef; 
-  padding: 120px 20px;
-  min-height: 250px;
+  background: #f0f7ef;
+  /* fixed total height requested */
+  height: 550px;
+  padding: 0 20px;
   display: flex;
   justify-content: center;
   align-items: center;
   color: #123d24;
+  overflow: hidden;
 }
 
 .top-hero-content {
@@ -97,13 +99,87 @@
   max-width: 1200px;
   padding: 0 20px;
   display: flex;
-  justify-content: center;
+  /* left visuals + right content */
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
 }
 
 .top-hero-inner {
+  /* constrain to right half */
+  width: 45%;
+  max-width: 650px;
+  text-align: left;
+  padding-left: 20px;
+}
+
+/* ---- POLAROID VISUALS ON LEFT ---- */
+.top-hero-visuals {
+  /* wrapper for scroller - keep size and overflow control here */
+  width: max-content;
+  pointer-events: none;
+  overflow: hidden;
+  height: 100%;
+}
+
+.polaroid {
+  position: relative;
+  width: 200px;
+  background: #fff;
+  padding: 14px 14px 20px 14px;
+  box-shadow: 0 14px 36px rgba(0,0,0,0.16);
+  border-radius: 6px;
+  transform-origin: center center;
+}
+
+.polaroid img {
+  display: block;
   width: 100%;
-  max-width: 1100px;
-  text-align: center;
+  height: auto;
+  border-radius: 4px;
+}
+
+/* portrait variation: taller image area */
+.polaroid.portrait img {
+  height: 260px;
+  object-fit: cover;
+}
+
+/* Slight caption area look: simulate polaroid bottom */
+.polaroid::after {
+  content: "";
+  display: block;
+  height: 12px;
+}
+
+/* arrange into two rows (grid) - polaroids are straight (no rotation) */
+.polaroid { transform: none; }
+
+/* nudge right-column polaroids slightly lower than left column */
+.top-hero-visuals .polaroid:nth-child(even) {
+  margin-top: 30px;
+}
+
+/* credits-style upward animation: polaroids move up and fade out like movie credits */
+.scroller-track {
+  display: grid;
+  grid-template-columns: repeat(2, 200px);
+  grid-auto-rows: auto;
+  /* row-gap column-gap: more horizontal space between side-by-side polaroids */
+  gap: 20px 44px;
+  align-items: start;
+  justify-content: start;
+}
+
+/* smooth continuous upward scroll: track contains duplicated items and scrolls -50% of its height */
+.scroller-track {
+  animation: scroll-up 24s linear infinite;
+  will-change: transform;
+}
+
+@keyframes scroll-up {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
 }
 
 .top-hero h1 {
@@ -127,7 +203,7 @@
 .top-ctas {
   margin-top: 20px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 14px;
 }
 
@@ -156,6 +232,11 @@
 @media (max-width: 1024px) {
   .top-hero h1 { font-size: 46px; }
   .top-sub { font-size: 18px; }
+  /* revert right-half layout on medium and smaller screens */
+  .top-hero-content { justify-content: center; }
+  .top-hero-inner { width: 100%; max-width: 1100px; text-align: center; padding-left: 0; }
+  .top-ctas { justify-content: center; }
+  .top-hero-visuals { display: none; }
 }
 
 @media (max-width: 768px) {
