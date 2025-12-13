@@ -4,7 +4,7 @@
   padding: 0;
   margin: 0;
   font-family: "Poppins", sans-serif;
-  background: #f4f9f4; /* soft green tint */
+  background: #f4f9f4; 
 }
 
 /* ---- FIXED HEADER ---- */
@@ -66,20 +66,7 @@
 }
 
 /* ---- HERO SECTION ---- */
-.hero {
-  text-align: left;
-  padding: 200px 20px 140px;
-  background-image: linear-gradient(rgba(197, 229, 211, 0.7), rgba(168, 213, 186, 0.7));
-  background-color: #c5e5d3;
-  color: #2c3e2f;
-  margin-top: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding-left: 60px;
-}
+/* main .hero section removed — styles unused now that the standalone hero was deleted */
 
 /* ---- TOP HERO BANNER ---- */
 .top-hero {
@@ -105,12 +92,54 @@
   height: 100%;
 }
 
+/* top-hero-inner: right-side content (heading + CTAs) */
 .top-hero-inner {
-  /* constrain to right half */
-  width: 45%;
-  max-width: 650px;
+  width: 48%;
+  max-width: 520px;
   text-align: left;
-  padding-left: 20px;
+  padding-left: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.top-hero-inner h1 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 56px;
+  line-height: 1.02;
+  margin: 0 0 18px 0;
+  color: #123d24;
+  font-weight: 800;
+}
+
+.top-hero-inner .top-sub {
+  margin: 0 0 28px 0;
+  font-size: 20px;
+  color: #2f6b48;
+}
+
+.top-ctas { gap: 22px; }
+
+.cta {
+  border-radius: 999px;
+  padding: 18px 36px;
+  font-weight: 700;
+  font-size: 18px;
+  cursor: pointer;
+  border: none;
+}
+
+.cta.primary {
+  background: #1f5b2f;
+  color: #fff;
+  box-shadow: 0 18px 36px rgba(31,91,47,0.12);
+}
+
+.cta.secondary {
+  background: #fff;
+  color: #1f5b2f;
+  box-shadow: 0 10px 26px rgba(20,50,30,0.06);
+  border: 1px solid rgba(39,75,47,0.06);
 }
 
 /* ---- POLAROID VISUALS ON LEFT ---- */
@@ -178,14 +207,92 @@
   100% { transform: translateY(-50%); }
 }
 
-.top-hero h1 {
-  margin: 0 0 22px 0;
-  font-size: 52px;
-  line-height: 1.04;
-  font-weight: 800;
-  color: #274b2f; 
-  letter-spacing: -0.6px;
+/* ---- FEATURES / HOW IT WORKS HERO ---- */
+.features-hero {
+  background: #ffffff; /* white background for the features area */
+  padding: 60px 20px;
 }
+
+.features-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.features-inner h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 36px;
+  color: #274b2f;
+  margin-bottom: 28px;
+}
+
+.features-grid {
+  display: grid;
+  /* narrower fixed columns so each feature card is smaller */
+  grid-template-columns: repeat(3, 340px);
+  gap: 24px;
+  justify-content: center;
+}
+.feature-card {
+  background: #f4f9f4; 
+  border-radius: 10px;
+  padding: 26px 22px;
+  text-align: left;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.07);
+  border: 1px solid rgba(18,61,36,0.03);
+  max-width: 340px;
+  margin: 0 auto;
+  transition: transform 300ms cubic-bezier(.22,.9,.3,1), box-shadow 300ms cubic-bezier(.22,.9,.3,1), background-color 300ms ease;
+  will-change: transform, box-shadow;
+  cursor: pointer;
+}
+
+.feature-icon {
+  font-size: 22px;
+  color: #2f7a3d;
+  margin-bottom: 12px;
+}
+
+.feature-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 20px;
+  color: #274b2f;
+}
+
+.feature-card p {
+  margin: 0;
+  color: #596f5c;
+}
+
+/* Hover / focus lift effect */
+.feature-card:hover,
+.feature-card:focus-within {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 18px 36px rgba(31,79,47,0.10);
+  background-color: #ffffff;
+}
+
+/* Touch devices: use active state for quick feedback, smaller lift */
+@media (hover: none) {
+  .feature-card:active {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(31,79,47,0.08);
+  }
+}
+
+@media (max-width: 1024px) {
+  .features-grid { grid-template-columns: repeat(2, 320px); justify-content: center; }
+  .features-inner h2 { font-size: 30px; }
+}
+
+@media (max-width: 700px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .feature-card { max-width: none; }
+  .features-inner { padding: 0 12px; }
+  .features-inner h2 { font-size: 24px; }
+}
+
+/* main top-hero heading styles removed (top hero no longer contains text on the right) */
 
 .top-sub {
   margin: 0 0 26px 0;
@@ -226,8 +333,8 @@
 }
 
 @media (max-width: 1024px) {
-  .top-hero h1 { font-size: 46px; }
-  .top-sub { font-size: 18px; }
+  .top-hero h1 { font-size: 40px; }
+  .top-sub { font-size: 16px; }
   /* revert right-half layout on medium and smaller screens */
   .top-hero-content { justify-content: center; }
   .top-hero-inner { width: 100%; max-width: 1100px; text-align: center; padding-left: 0; }
@@ -236,43 +343,15 @@
 }
 
 @media (max-width: 768px) {
-  .top-hero { padding: 60px 14px; min-height: 260px; }
-  .top-hero h1 { font-size: 32px; }
-  .top-sub { font-size: 15px; }
+  .top-hero { padding: 60px 14px; min-height: 320px; }
+  .top-hero-inner h1 { font-size: 28px; }
+  .top-sub { font-size: 14px; }
   .cta { padding: 12px 20px; font-size: 15px; }
   .top-ctas { flex-direction: row; gap: 10px; }
 }
 
 
-
-.hero h1 {
-  font-size: 3rem;
-  font-weight: 700;
-  margin-bottom: 10px;
-  max-width: 50%;
-}
-
-.hero p {
-  font-size: 1.2rem;
-  margin-bottom: 20px;
-  max-width: 50%;
-}
-
-.hero-btn {
-  padding: 12px 28px;
-  background: #4caf50;
-  color: white;
-  border: none;
-  font-size: 1rem;
-  border-radius: 25px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.hero-btn:hover {
-  background: #3d8d40;
-}
-
+ 
 /* ---- SECONDARY HERO SECTION ---- */
 .secondary-hero {
   display: flex;
@@ -452,21 +531,7 @@
     font-size: 0.9rem;
   }
 
-  .hero {
-    padding: 150px 20px 100px;
-    padding-left: 30px;
-    align-items: flex-start;
-  }
-
-  .hero h1 {
-    font-size: 2rem;
-    max-width: 70%;
-  }
-
-  .hero p {
-    font-size: 1rem;
-    max-width: 70%;
-  }
+  /* responsive adjustments for removed .hero */
 
   .secondary-hero {
     flex-direction: column;
@@ -540,20 +605,7 @@
     font-size: 0.85rem;
   }
 
-  .hero {
-    padding: 140px 15px 90px;
-    padding-left: 20px;
-  }
-
-  .hero h1 {
-    font-size: 1.8rem;
-    max-width: 90%;
-  }
-
-  .hero p {
-    font-size: 0.9rem;
-    max-width: 90%;
-  }
+  /* responsive adjustments for removed .hero */
 
   .secondary-image {
     min-height: 300px;
