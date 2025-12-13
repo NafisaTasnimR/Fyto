@@ -116,7 +116,8 @@
 /* ---- POLAROID VISUALS ON LEFT ---- */
 .top-hero-visuals {
   /* wrapper for scroller - keep size and overflow control here */
-  width: max-content;
+  /* wider fixed visuals area so portraits have more breathing room */
+  width: 640px;
   pointer-events: none;
   overflow: hidden;
   height: 100%;
@@ -127,7 +128,7 @@
   width: 200px;
   background: #fff;
   padding: 14px 14px 20px 14px;
-  box-shadow: 0 14px 36px rgba(0,0,0,0.16);
+  box-shadow: none;
   border-radius: 6px;
   transform-origin: center center;
 }
@@ -135,14 +136,9 @@
 .polaroid img {
   display: block;
   width: 100%;
-  height: auto;
-  border-radius: 4px;
-}
-
-/* portrait variation: taller image area */
-.polaroid.portrait img {
-  height: 260px;
+  height: 200px;
   object-fit: cover;
+  border-radius: 4px;
 }
 
 /* Slight caption area look: simulate polaroid bottom */

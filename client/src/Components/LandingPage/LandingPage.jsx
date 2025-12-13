@@ -38,16 +38,16 @@ export default function LandingPage() {
                 <img src="/c2.png" alt="plant" />
               </div>
               <div className="polaroid p2">
-                <img src="/c2.png" alt="plant" />
+                <img src="/p2.jpg" alt="plant" />
               </div>
               <div className="polaroid p3">
-                <img src="/c2.png" alt="plant" />
+                <img src="/p1.jpg" alt="plant" />
               </div>
               <div className="polaroid p4">
-                <img src="/c2.png" alt="plant" />
+                <img src="/p3.jpg" alt="plant" />
               </div>
               <div className="polaroid p5 portrait">
-                <img src="/c2.png" alt="plant" />
+                <img src="/AfricanViolet.png" alt="plant" />
               </div>
               <div className="polaroid p6 portrait">
                 <img src="/c2.png" alt="plant" />
@@ -55,22 +55,22 @@ export default function LandingPage() {
 
               {/* duplicate for seamless scroll */}
               <div className="polaroid p1">
-                <img src="/c2.png" alt="plant" />
+                <img src="/p2.jpg" alt="plant" />
               </div>
               <div className="polaroid p2">
-                <img src="/c2.png" alt="plant" />
+                <img src="/p1.jpg" alt="plant" />
               </div>
               <div className="polaroid p3">
                 <img src="/c2.png" alt="plant" />
               </div>
               <div className="polaroid p4">
-                <img src="/c2.png" alt="plant" />
+                <img src="/p3.jpg" alt="plant" />
               </div>
               <div className="polaroid p5 portrait">
-                <img src="/c2.png" alt="plant" />
+                <img src="/AfricanViolet.png" alt="plant" />
               </div>
               <div className="polaroid p6 portrait">
-                <img src="/c2.png" alt="plant" />
+                <img src="/p1.jpg" alt="plant" />
               </div>
             </div>
           </div>
