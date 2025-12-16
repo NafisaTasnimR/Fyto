@@ -3,6 +3,9 @@ import './SocialPage.css';
 
 const SocialPage = () => {
   const [showCreatePostModal, setShowCreatePostModal] = useState(false);
+  const [activeNav, setActiveNav] = useState('home');
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [newPostData, setNewPostData] = useState({
     caption: '',
     image: null,
@@ -13,53 +16,53 @@ const SocialPage = () => {
   const [posts, setPosts] = useState([
     {
       id: 1,
-      username: 'john_doe',
-      userAvatar: 'https://via.placeholder.com/40',
-      postImage: 'https://via.placeholder.com/500x400',
+      username: 'plant_lover_alex',
+      userAvatar: '/girl.png',
+      postImage: 'https://via.placeholder.com/500x400?text=Monstera+Plant',
       likes: 245,
-      caption: 'Beautiful sunset at the beach 🌅 #travel #nature',
+      caption: 'My Monstera is finally growing a new leaf! 🪴 Took 3 months but it was worth the wait. Consistent watering and bright indirect light is the key! #PlantCare #Monstera #PlantParent',
       timestamp: '2 hours ago',
       liked: false,
       comments: [
-        { id: 1, username: 'jane_smith', text: 'Amazing view!' },
-        { id: 2, username: 'mike_wilson', text: 'I need to visit this place!' },
+        { id: 1, username: 'garden_guru', text: 'Beautiful! How often do you water it?' },
+        { id: 2, username: 'succulent_queen', text: 'That leaf is huge! Mine never grows this big' },
       ],
     },
     {
       id: 2,
-      username: 'sarah_travels',
-      userAvatar: 'https://via.placeholder.com/40',
-      postImage: 'https://via.placeholder.com/500x400',
+      username: 'green_thumb_sam',
+      userAvatar: '/g.png',
+      postImage: 'https://via.placeholder.com/500x400?text=Tomato+Garden',
       likes: 532,
-      caption: 'Coffee and mountains ☕🏔️ #morningvibes',
+      caption: 'First harvest of the season! 🍅🌿 Organic homegrown tomatoes taste so much better. Anyone else growing veggies at home? #HomeGarden #OrganicFarming #GardenLife',
       timestamp: '5 hours ago',
       liked: false,
       comments: [
-        { id: 1, username: 'alex_photo', text: 'Perfect composition!' },
+        { id: 1, username: 'veggie_grower', text: 'Those look so fresh and healthy!' },
       ],
     },
     {
       id: 3,
-      username: 'nature_explorer',
-      userAvatar: 'https://via.placeholder.com/40',
-      postImage: 'https://via.placeholder.com/500x400',
+      username: 'jungle_explorer_josh',
+      userAvatar: '/m.png',
+      postImage: 'https://via.placeholder.com/500x400?text=Indoor+Jungle',
       likes: 892,
-      caption: 'Forest adventures 🌲 #hiking #outdoor',
+      caption: 'My living room has officially become a jungle! 🌿🌱 I now have 47 plants and I\'m not done collecting 😅 #PlantCollection #IndoorPlants #PlantJungle #PlantAddict',
       timestamp: '1 day ago',
       liked: false,
       comments: [],
     },
     {
       id: 4,
-      username: 'food_lover',
-      userAvatar: 'https://via.placeholder.com/40',
-      postImage: 'https://via.placeholder.com/500x400',
+      username: 'succulent_collection',
+      userAvatar: '/s.png',
+      postImage: 'https://via.placeholder.com/500x400?text=Succulents',
       likes: 421,
-      caption: 'Delicious homemade pasta 🍝 #foodstagram #cooking',
+      caption: 'Propagation success! 🌵✨ Started from a single leaf 2 months ago and now I have 12 baby plants! Low maintenance and so satisfying to watch grow. #Succulents #Propagation #PlantProp #GardeningTips',
       timestamp: '1 day ago',
       liked: false,
       comments: [
-        { id: 1, username: 'chef_marco', text: 'Looks so tasty!' },
+        { id: 1, username: 'plant_scientist', text: 'Looks so healthy! What species are these?' },
       ],
     },
   ]);
@@ -88,7 +91,7 @@ const SocialPage = () => {
     const newPost = {
       id: posts.length + 1,
       username: 'Your Name',
-      userAvatar: 'https://via.placeholder.com/40',
+      userAvatar: '/boy.png',
       postImage: newPostData.imagePreview,
       likes: 0,
       caption: newPostData.caption,
@@ -193,6 +196,91 @@ const SocialPage = () => {
 
   return (
     <div className="social-page">
+      {/* Fixed Header */}
+      <header className="social-fixed-header">
+        <div className="social-header-content">
+          <div className="social-logo">🌿 Fyto</div>
+          <div className="social-header-actions">
+            <span className="header-welcome">Plant Community</span>
+          </div>
+        </div>
+      </header>
+
+      {/* Left Sidebar */}
+      <div className="sidebar">
+        <nav className="sidebar-nav">
+          <button
+            className={`nav-item ${activeNav === 'home' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveNav('home');
+              setShowSearchResults(false);
+            }}
+          >
+            <span className="nav-icon">🏠</span>
+            <span className="nav-label">Home</span>
+          </button>
+
+          <button
+            className={`nav-item ${activeNav === 'search' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveNav('search');
+              setShowSearchResults(true);
+            }}
+          >
+            <span className="nav-icon">🔍</span>
+            <span className="nav-label">Search</span>
+          </button>
+
+          <button
+            className={`nav-item ${activeNav === 'notifications' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveNav('notifications');
+              setShowSearchResults(false);
+            }}
+          >
+            <span className="nav-icon">🔔</span>
+            <span className="nav-label">Notifications</span>
+          </button>
+
+          <button
+            className={`nav-item ${activeNav === 'profile' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveNav('profile');
+              setShowSearchResults(false);
+            }}
+          >
+            <span className="nav-icon">👤</span>
+            <span className="nav-label">Profile</span>
+          </button>
+        </nav>
+      </div>
+
+      {/* Search Panel */}
+      {showSearchResults && (
+        <div className="search-panel">
+          <div className="search-header">
+            <input
+              type="text"
+              placeholder="Search plants, users, topics..."
+              className="search-input"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              autoFocus
+            />
+          </div>
+          <div className="search-results">
+            {searchQuery ? (
+              <div className="search-message">
+                Searching for: <strong>{searchQuery}</strong>
+              </div>
+            ) : (
+              <div className="search-message">
+                Try searching for plants, users, or topics!
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       {/* Modal for Creating Post */}
       {showCreatePostModal && (
         <div className="modal-overlay" onClick={() => setShowCreatePostModal(false)}>
@@ -246,7 +334,7 @@ const SocialPage = () => {
                 <label htmlFor="caption">Caption</label>
                 <textarea
                   id="caption"
-                  placeholder="Write a caption... (add hashtags and emojis)"
+                  placeholder="Share your plant story! Ask questions, show off your plants, give tips & advice... 🌿 #PlantCommunity"
                   value={newPostData.caption}
                   onChange={(e) =>
                     setNewPostData({ ...newPostData, caption: e.target.value })
@@ -268,12 +356,13 @@ const SocialPage = () => {
         </div>
       )}
 
-      <div className="feed-container">
+      <div className="main-content">
+        <div className="feed-container">
         {/* Create Post Section */}
         <div className="create-post-section">
           <div className="create-post-container">
             <img
-              src="https://via.placeholder.com/40"
+              src="/boy.png"
               alt="user"
               className="create-post-avatar"
             />
@@ -281,7 +370,7 @@ const SocialPage = () => {
               className="create-post-input"
               onClick={() => setShowCreatePostModal(true)}
             >
-              What's on your mind?
+              Share your plant journey...
             </button>
           </div>
           <button
@@ -296,6 +385,7 @@ const SocialPage = () => {
           {posts.map((post) => (
             <Post key={post.id} post={post} />
           ))}
+        </div>
         </div>
       </div>
     </div>
