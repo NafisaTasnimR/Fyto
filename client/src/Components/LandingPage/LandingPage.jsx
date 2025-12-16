@@ -90,7 +90,7 @@ export default function LandingPage() {
       {/* FEATURES / HOW IT WORKS HERO (new) */}
       <section className="features-hero">
         <div className="features-inner">
-          <h2>How It Works</h2>
+          <h2>Explore Fyto</h2>
           <div className="features-grid">
             <div className="feature-card">
               <div className="feature-icon">🌿</div>
@@ -148,32 +148,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* THIRD SECTION - PRODUCT CARDS */}
-      <section className="third-hero">
-        <div className="product-card">
-          <div className="product-image" style={{
-            backgroundImage: 'url(/c2.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}></div>
-          <div className="product-info">
-            <p className="product-label">Big Sale Products</p>
-            <h3 className="product-title">Plants<br />For Interior</h3>
-          </div>
-        </div>
-
-        <div className="product-card">
-          <div className="product-image" style={{
-            backgroundImage: 'url(/AfricanViolet.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}></div>
-          <div className="product-info">
-            <p className="product-label">Top Products</p>
-            <h3 className="product-title">Plants<br />For Healthy</h3>
-          </div>
-        </div>
-      </section>
 
       {/* LOGIN/SIGNUP MODAL */}
       {showModal && (
