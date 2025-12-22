@@ -122,19 +122,28 @@
 
 .create-post-btn {
   padding: 10px 20px;
-  background-color: #0095f6;
+  background-color: #86be5c;
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 20px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s ease;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.plus-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
 }
 
 .create-post-btn:hover {
-  background-color: #0080d0;
+  background-color: #489524;
 }
 
 .posts-feed {
@@ -236,6 +245,12 @@
 
 .like-btn.liked {
   color: #ed4956;
+}
+
+.action-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
 }
 
 .comment-btn,
@@ -791,18 +806,19 @@
 .modal-content {
   background-color: #fff;
   border-radius: 12px;
-  max-width: 500px;
+  max-width: 600px;
   width: 90%;
-  max-height: 90vh;
+  max-height: 85vh;
   overflow-y: auto;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  margin-top: 70px;
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  padding: 16px;
   border-bottom: 1px solid #efefef;
 }
 
@@ -832,11 +848,11 @@
 }
 
 .modal-content form {
-  padding: 20px;
+  padding: 16px;
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .form-group label {
@@ -844,7 +860,7 @@
   font-size: 14px;
   font-weight: 600;
   color: #262626;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .form-group input,
@@ -891,8 +907,11 @@
 }
 
 .upload-icon {
-  font-size: 48px;
-  margin-bottom: 12px;
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  margin: 0 auto 12px auto;
+  display: block;
 }
 
 .upload-label p {
@@ -937,8 +956,8 @@
 
 .modal-actions {
   display: flex;
-  gap: 12px;
-  padding-top: 20px;
+  gap: 10px;
+  padding-top: 12px;
   border-top: 1px solid #efefef;
 }
 

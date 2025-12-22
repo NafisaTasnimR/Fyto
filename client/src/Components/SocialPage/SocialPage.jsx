@@ -145,10 +145,14 @@ const SocialPage = () => {
             className={`action-btn like-btn ${post.liked ? 'liked' : ''}`}
             onClick={() => toggleLike(post.id)}
           >
-            ❤️ Like
+            <img src={post.liked ? '/l.png' : '/leaf.png'} alt="like" className="action-icon" />
           </button>
-          <button className="action-btn comment-btn">💬 Comment</button>
-          <button className="action-btn share-btn">↗️ Share</button>
+          <button className="action-btn comment-btn">
+            <img src="/cmnt.png" alt="comment" className="action-icon" />
+          </button>
+          <button className="action-btn share-btn">
+            <img src="/send.png" alt="share" className="action-icon" />
+          </button>
         </div>
 
         {/* Likes Count */}
@@ -324,7 +328,7 @@ const SocialPage = () => {
                     </div>
                   ) : (
                     <label htmlFor="imageInput" className="upload-label">
-                      <div className="upload-icon">📸</div>
+                      <img src="/camera.png" alt="camera" className="upload-icon" />
                       <p>Click to select image from your device</p>
                       <input
                         type="file"
@@ -341,7 +345,7 @@ const SocialPage = () => {
                 <label htmlFor="caption">Caption</label>
                 <textarea
                   id="caption"
-                  placeholder="Share your plant story! Ask questions, show off your plants, give tips & advice... 🌿 #PlantCommunity"
+                  placeholder="Share your plant story! Ask questions, show off your plants, give tips & advice. #PlantCommunity"
                   value={newPostData.caption}
                   onChange={(e) =>
                     setNewPostData({ ...newPostData, caption: e.target.value })
@@ -384,7 +388,8 @@ const SocialPage = () => {
             className="create-post-btn"
             onClick={() => setShowCreatePostModal(true)}
           >
-            ➕ Create Post
+            <img src="/plus.png" alt="create" className="plus-icon" />
+            Create Post
           </button>
         </div>
 
