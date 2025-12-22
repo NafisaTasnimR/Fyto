@@ -6,6 +6,8 @@ const SocialPage = () => {
   const [activeNav, setActiveNav] = useState('home');
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [newPostData, setNewPostData] = useState({
     caption: '',
     image: null,
@@ -18,7 +20,7 @@ const SocialPage = () => {
       id: 1,
       username: 'plant_lover_alex',
       userAvatar: '/girl.png',
-      postImage: 'https://via.placeholder.com/500x400?text=Monstera+Plant',
+      postImage: '/g1.jpg',
       likes: 245,
       caption: 'My Monstera is finally growing a new leaf! 🪴 Took 3 months but it was worth the wait. Consistent watering and bright indirect light is the key! #PlantCare #Monstera #PlantParent',
       timestamp: '2 hours ago',
@@ -32,7 +34,7 @@ const SocialPage = () => {
       id: 2,
       username: 'green_thumb_sam',
       userAvatar: '/g.png',
-      postImage: 'https://via.placeholder.com/500x400?text=Tomato+Garden',
+      postImage: '/g2.jpg',
       likes: 532,
       caption: 'First harvest of the season! 🍅🌿 Organic homegrown tomatoes taste so much better. Anyone else growing veggies at home? #HomeGarden #OrganicFarming #GardenLife',
       timestamp: '5 hours ago',
@@ -45,7 +47,7 @@ const SocialPage = () => {
       id: 3,
       username: 'jungle_explorer_josh',
       userAvatar: '/m.png',
-      postImage: 'https://via.placeholder.com/500x400?text=Indoor+Jungle',
+      postImage: '/g3.jpg',
       likes: 892,
       caption: 'My living room has officially become a jungle! 🌿🌱 I now have 47 plants and I\'m not done collecting 😅 #PlantCollection #IndoorPlants #PlantJungle #PlantAddict',
       timestamp: '1 day ago',
@@ -56,7 +58,7 @@ const SocialPage = () => {
       id: 4,
       username: 'succulent_collection',
       userAvatar: '/s.png',
-      postImage: 'https://via.placeholder.com/500x400?text=Succulents',
+      postImage: '/g4.jpg',
       likes: 421,
       caption: 'Propagation success! 🌵✨ Started from a single leaf 2 months ago and now I have 12 baby plants! Low maintenance and so satisfying to watch grow. #Succulents #Propagation #PlantProp #GardeningTips',
       timestamp: '1 day ago',
@@ -207,7 +209,16 @@ const SocialPage = () => {
       </header>
 
       {/* Left Sidebar */}
-      <div className="sidebar">
+      <div className={`sidebar ${sidebarOpen ? 'open' : 'closed'} ${sidebarCollapsed ? 'collapsed' : ''}`}>
+        <div className="sidebar-header">
+          <button
+            className="sidebar-collapse-btn"
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {sidebarCollapsed ? '|>' : '<|'}
+          </button>
+        </div>
         <nav className="sidebar-nav">
           <button
             className={`nav-item ${activeNav === 'home' ? 'active' : ''}`}
@@ -216,7 +227,7 @@ const SocialPage = () => {
               setShowSearchResults(false);
             }}
           >
-            <span className="nav-icon">🏠</span>
+            <img src="/home.png" alt="home" className="nav-icon-img" />
             <span className="nav-label">Home</span>
           </button>
 
@@ -224,10 +235,10 @@ const SocialPage = () => {
             className={`nav-item ${activeNav === 'search' ? 'active' : ''}`}
             onClick={() => {
               setActiveNav('search');
-              setShowSearchResults(true);
+              setShowSearchResults(!showSearchResults);
             }}
           >
-            <span className="nav-icon">🔍</span>
+            <img src="/search.png" alt="search" className="nav-icon-img" />
             <span className="nav-label">Search</span>
           </button>
 
@@ -238,19 +249,8 @@ const SocialPage = () => {
               setShowSearchResults(false);
             }}
           >
-            <span className="nav-icon">🔔</span>
+            <img src="/notification.png" alt="notifications" className="nav-icon-img" />
             <span className="nav-label">Notifications</span>
-          </button>
-
-          <button
-            className={`nav-item ${activeNav === 'profile' ? 'active' : ''}`}
-            onClick={() => {
-              setActiveNav('profile');
-              setShowSearchResults(false);
-            }}
-          >
-            <span className="nav-icon">👤</span>
-            <span className="nav-label">Profile</span>
           </button>
         </nav>
       </div>
@@ -267,6 +267,13 @@ const SocialPage = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               autoFocus
             />
+            <button
+              className="search-close-btn"
+              onClick={() => setShowSearchResults(false)}
+              title="Close search"
+            >
+              ✕
+            </button>
           </div>
           <div className="search-results">
             {searchQuery ? (
