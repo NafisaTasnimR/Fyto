@@ -6,6 +6,7 @@ const SocialPage = () => {
   const [activeNav, setActiveNav] = useState('home');
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showNotifications, setShowNotifications] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [newPostData, setNewPostData] = useState({
@@ -13,6 +14,55 @@ const SocialPage = () => {
     image: null,
     imagePreview: null,
   });
+
+  // Sample notifications data
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      type: 'like',
+      username: 'garden_guru',
+      userAvatar: '/g.png',
+      action: 'liked your post',
+      timestamp: 'now',
+      read: false,
+    },
+    {
+      id: 2,
+      type: 'comment',
+      username: 'plant_scientist',
+      userAvatar: '/m.png',
+      action: 'commented on your post',
+      timestamp: '5 minutes ago',
+      read: false,
+    },
+    {
+      id: 3,
+      type: 'follow',
+      username: 'succulent_queen',
+      userAvatar: '/g1.jpg',
+      action: 'started following you',
+      timestamp: '1 hour ago',
+      read: true,
+    },
+    {
+      id: 4,
+      type: 'like',
+      username: 'veggie_grower',
+      userAvatar: '/g2.jpg',
+      action: 'liked your post',
+      timestamp: '2 hours ago',
+      read: true,
+    },
+    {
+      id: 5,
+      type: 'comment',
+      username: 'jungle_lover',
+      userAvatar: '/g3.jpg',
+      action: 'commented on your post',
+      timestamp: '1 day ago',
+      read: true,
+    },
+  ]);
 
   // Sample posts data
   const [posts, setPosts] = useState([
@@ -85,8 +135,10 @@ const SocialPage = () => {
 
   const handleCreatePost = (e) => {
     e.preventDefault();
-    if (!newPostData.caption.trim() || !newPostData.image) {
-      alert('Please add a caption and select an image');
+    
+    // At least caption or image required
+    if (!newPostData.caption.trim() && !newPostData.image) {
+      alert('Please write something or add an image');
       return;
     }
 
@@ -134,10 +186,12 @@ const SocialPage = () => {
           </div>
         </div>
 
-        {/* Post Image */}
-        <div className="post-image-container">
-          <img src={post.postImage} alt="post" className="post-image" />
-        </div>
+        {/* Post Image - Only show if image exists */}
+        {post.postImage && (
+          <div className="post-image-container">
+            <img src={post.postImage} alt="post" className="post-image" />
+          </div>
+        )}
 
         {/* Post Actions */}
         <div className="post-actions">
@@ -240,6 +294,7 @@ const SocialPage = () => {
             onClick={() => {
               setActiveNav('search');
               setShowSearchResults(!showSearchResults);
+              setShowNotifications(false);
             }}
           >
             <img src="/search.png" alt="search" className="nav-icon-img" />
@@ -250,6 +305,7 @@ const SocialPage = () => {
             className={`nav-item ${activeNav === 'notifications' ? 'active' : ''}`}
             onClick={() => {
               setActiveNav('notifications');
+              setShowNotifications(!showNotifications);
               setShowSearchResults(false);
             }}
           >
@@ -292,12 +348,51 @@ const SocialPage = () => {
           </div>
         </div>
       )}
+
+      {/* Notifications Panel */}
+      {showNotifications && (
+        <div className="notifications-panel">
+          <div className="notifications-header">
+            <h3>Notifications</h3>
+            <button
+              className="notifications-close-btn"
+              onClick={() => setShowNotifications(false)}
+              title="Close notifications"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="notifications-list">
+            {notifications.length > 0 ? (
+              notifications.map((notif) => (
+                <div
+                  key={notif.id}
+                  className={`notification-item ${notif.read ? 'read' : 'unread'}`}
+                >
+                  <img src={notif.userAvatar} alt={notif.username} className="notif-avatar" />
+                  <div className="notif-content">
+                    <p>
+                      <strong>{notif.username}</strong> {notif.action}
+                    </p>
+                    <span className="notif-timestamp">{notif.timestamp}</span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="notifications-empty">
+                <p>No notifications yet</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Modal for Creating Post */}
       {showCreatePostModal && (
         <div className="modal-overlay" onClick={() => setShowCreatePostModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content facebook-style" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Create New Post</h2>
+              <h2>Create post</h2>
               <button
                 className="close-btn"
                 onClick={() => setShowCreatePostModal(false)}
@@ -305,60 +400,66 @@ const SocialPage = () => {
                 ✕
               </button>
             </div>
-            <form onSubmit={handleCreatePost}>
-              <div className="form-group">
-                <label htmlFor="imageInput">Select Image</label>
-                <div className="image-upload-area">
-                  {newPostData.imagePreview ? (
-                    <div className="image-preview">
-                      <img src={newPostData.imagePreview} alt="preview" />
-                      <button
-                        type="button"
-                        className="remove-image-btn"
-                        onClick={() =>
-                          setNewPostData({
-                            ...newPostData,
-                            image: null,
-                            imagePreview: null,
-                          })
-                        }
-                      >
-                        ✕ Remove
-                      </button>
-                    </div>
-                  ) : (
-                    <label htmlFor="imageInput" className="upload-label">
-                      <img src="/camera.png" alt="camera" className="upload-icon" />
-                      <p>Click to select image from your device</p>
-                      <input
-                        type="file"
-                        id="imageInput"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        style={{ display: 'none' }}
-                      />
-                    </label>
-                  )}
-                </div>
-              </div>
-              <div className="form-group">
-                <label htmlFor="caption">Caption</label>
+
+            <form onSubmit={handleCreatePost} className="facebook-post-form">
+              {/* Text Input Area */}
+              <div className="text-input-section">
                 <textarea
-                  id="caption"
-                  placeholder="Share your plant story! Ask questions, show off your plants, give tips & advice. #PlantCommunity"
+                  placeholder="What's on your mind, Friend?"
                   value={newPostData.caption}
                   onChange={(e) =>
                     setNewPostData({ ...newPostData, caption: e.target.value })
                   }
-                  rows="4"
-                  required
+                  rows="6"
+                  className="status-textarea"
                 />
               </div>
-              <div className="modal-actions">
+
+              {/* Add to Your Post Section */}
+              <div className="add-to-post-section">
+                <p className="add-to-post-label">Add to your post</p>
+                <div className="add-to-post-icons">
+                  <label htmlFor="imageInput" className="post-action-icon">
+                    <img src="/camera.png" alt="photo" className="action-icon-small" />
+                    <input
+                      type="file"
+                      id="imageInput"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* Image Preview */}
+              {newPostData.imagePreview && (
+                <div className="image-preview-section">
+                  <div className="image-preview-large">
+                    <img src={newPostData.imagePreview} alt="preview" />
+                    <button
+                      type="button"
+                      className="remove-image-btn-large"
+                      onClick={() =>
+                        setNewPostData({
+                          ...newPostData,
+                          image: null,
+                          imagePreview: null,
+                        })
+                      }
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Modal Actions */}
+              <div className="modal-actions facebook-style">
                 <button type="button" className="btn-cancel" onClick={() => setShowCreatePostModal(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="btn-submit">
+                <button type="submit" className="btn-submit-facebook">
                   Post
                 </button>
               </div>
