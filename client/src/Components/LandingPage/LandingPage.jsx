@@ -93,37 +93,37 @@ export default function LandingPage() {
           <h2>Explore Fyto</h2>
           <div className="features-grid">
             <div className="feature-card">
-              <div className="feature-icon">🌿</div>
+              <div className="feature-icon"><img src="/tea.png" alt="profile" /></div>
               <h3>Profile & Garden Showcase</h3>
               <p>Show your gardening journey, badges, activity.</p>
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">💬</div>
+              <div className="feature-icon"><img src="/community.png" alt="community" /></div>
               <h3>Community Feed & Posts</h3>
               <p>Share stories, ask questions, learn from others.</p>
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">🛒</div>
+              <div className="feature-icon"><img src="/shopping.png" alt="marketplace" /></div>
               <h3>Marketplace</h3>
               <p>Donate • Exchange • Sell plants, seeds, pots.</p>
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">📔</div>
+              <div className="feature-icon"><img src="/paper.png" alt="journal" /></div>
               <h3>Digital Plant Journal</h3>
               <p>Track watering, growth, and plant health.</p>
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">🏅</div>
+              <div className="feature-icon"><img src="/challenge.png" alt="challenges" /></div>
               <h3>Challenges & Badges</h3>
               <p>Join fun gardening missions and earn badges.</p>
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">🔍</div>
+              <div className="feature-icon"><img src="/find.png" alt="plant care" /></div>
               <h3>Plant Care </h3>
               <p>Search thousands of plants with sunlight, water, and care info.</p>
             </div>

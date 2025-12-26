@@ -210,7 +210,7 @@
 /* ---- FEATURES / HOW IT WORKS HERO ---- */
 .features-hero {
   background: #ffffff; /* white background for the features area */
-  padding: 60px 20px;
+  padding: 30px 20px 60px 20px;
 }
 
 .features-inner {
@@ -250,9 +250,18 @@
 }
 
 .feature-icon {
-  font-size: 22px;
+  font-size: 28px;
   color: #2f7a3d;
   margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.feature-icon img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
 }
 
 .feature-card h3 {
