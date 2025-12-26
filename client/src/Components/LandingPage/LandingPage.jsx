@@ -35,42 +35,42 @@ export default function LandingPage() {
           <div className="top-hero-visuals scroller">
             <div className="scroller-track">
               <div className="polaroid p1">
-                <img src="/c2.png" alt="plant" />
+                <img src="/q1.png" alt="plant" />
               </div>
               <div className="polaroid p2">
-                <img src="/p2.jpg" alt="plant" />
+                <img src="/q2.png" alt="plant" />
               </div>
               <div className="polaroid p3">
-                <img src="/p1.jpg" alt="plant" />
+                <img src="/q3.png" alt="plant" />
               </div>
               <div className="polaroid p4">
-                <img src="/p3.jpg" alt="plant" />
+                <img src="/q4.png" alt="plant" />
               </div>
               <div className="polaroid p5 portrait">
-                <img src="/AfricanViolet.png" alt="plant" />
+                <img src="/q5.png" alt="plant" />
               </div>
               <div className="polaroid p6 portrait">
-                <img src="/c2.png" alt="plant" />
+                <img src="/q6.png" alt="plant" />
               </div>
 
               {/* duplicate for seamless scroll */}
               <div className="polaroid p1">
-                <img src="/p2.jpg" alt="plant" />
+                <img src="/q1.png" alt="plant" />
               </div>
               <div className="polaroid p2">
-                <img src="/p1.jpg" alt="plant" />
+                <img src="/q7.png" alt="plant" />
               </div>
               <div className="polaroid p3">
-                <img src="/c2.png" alt="plant" />
+                <img src="/q2.png" alt="plant" />
               </div>
               <div className="polaroid p4">
-                <img src="/p3.jpg" alt="plant" />
+                <img src="/q3.png" alt="plant" />
               </div>
               <div className="polaroid p5 portrait">
-                <img src="/AfricanViolet.png" alt="plant" />
+                <img src="/q4.png" alt="plant" />
               </div>
               <div className="polaroid p6 portrait">
-                <img src="/p1.jpg" alt="plant" />
+                <img src="/q6.png" alt="plant" />
               </div>
             </div>
           </div>
@@ -136,14 +136,16 @@ export default function LandingPage() {
       {/* SECONDARY SECTION */}
       <section className="secondary-hero">
         <div className="secondary-image" style={{
-          backgroundImage: 'url(/bg4.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}></div>
+          backgroundColor: '#f0f7ef'
+        }}>
+          <img src="/cat.png" alt="cat" className="secondary-image-item cat-img" />
+          <img src="/champion.png" alt="champion" className="secondary-image-item champion-img" />
+          {/*<img src="/yay.png" alt="yay" className="secondary-image-item yay-img" /> */}
+          <img src="/help.png" alt="help" className="secondary-image-item help-img" />
+        </div>
         <div className="secondary-content">
-          <h2>Join Our Growing Community</h2>
-          <p>Connect with plant enthusiasts, share your green journey, and discover new species.</p>
+          <h2>From Seed to Story — Grow Together on Fyto</h2>
+          <p>Track your plants, share milestones, ask for help, and celebrate growth — all in one place.</p>
           <button className="secondary-btn">Get Started</button>
         </div>
       </section>

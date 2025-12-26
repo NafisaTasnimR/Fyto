@@ -155,11 +155,12 @@
 .polaroid {
   position: relative;
   width: 200px;
-  background: #fff;
+  background: #ffffff;
   padding: 14px 14px 20px 14px;
   box-shadow: none;
   border-radius: 6px;
   transform-origin: center center;
+  overflow: hidden;
 }
 
 .polaroid img {
@@ -168,6 +169,7 @@
   height: 200px;
   object-fit: cover;
   border-radius: 4px;
+  object-position: center;
 }
 
 /* Slight caption area look: simulate polaroid bottom */
@@ -366,7 +368,7 @@
 /* ---- SECONDARY HERO SECTION ---- */
 .secondary-hero {
   display: flex;
-  flex-direction: row;
+  flex-direction: row-reverse;
   align-items: stretch;
   max-width: 1400px;
   margin: 0 auto;
@@ -376,6 +378,44 @@
 .secondary-image {
   flex: 1;
   min-height: 480px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.secondary-image-item {
+  position: absolute;
+  object-fit: contain;
+}
+
+.cat-img {
+  width: 190px;
+  height: 190px;
+  left: 20px;
+  top: 40px;
+}
+
+.champion-img {
+  width: 190px;
+  height: 190px;
+  right: 30px;
+  top: 20px;
+}
+
+.help-img {
+  width: 180px;
+  height: 180px;
+  left: 50%;
+  bottom: 50px;
+  transform: translateX(-50%);
+}
+
+.yay-img {
+  width: 160px;
+  height: 160px;
+  right: 50px;
+  bottom: 40px;
 }
 
 .secondary-content {
@@ -385,25 +425,28 @@
   justify-content: center;
   align-items: flex-start;
   padding: 60px 80px;
-  background: #ebebeb;
+  background: #f0f7ef;
   color: #2c3e2f;
 }
 
 .secondary-content h2 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 15px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 48px;
+  line-height: 1.02;
+  font-weight: 800;
+  margin: 0 0 18px 0;
+  color: #123d24;
 }
 
 .secondary-content p {
-  font-size: 1.2rem;
-  margin-bottom: 25px;
-  color: #5a6b4d;
+  font-size: 20px;
+  margin: 0 0 28px 0;
+  color: #2f6b48;
 }
 
 .secondary-btn {
   padding: 12px 28px;
-  background: #4caf50;
+  background: #2f6b48;
   color: white;
   border: none;
   font-size: 1rem;
