@@ -994,6 +994,104 @@
   color: #262626;
 }
 
+/* Comments Modal Style (matches screenshot layout) */
+.modal-content.comments-style {
+  width: 720px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.modal-content.comments-style .modal-header {
+  text-align: center;
+  padding: 18px 24px;
+  border-bottom: 1px solid #efefef;
+}
+
+.modal-content.comments-style .modal-header h2 {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.comments-list {
+  padding: 16px 20px;
+  overflow-y: auto;
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: #fff;
+}
+
+.comment-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px;
+  border-radius: 10px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+}
+
+.comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comment-body {
+  flex: 1;
+}
+
+.comment-body strong { 
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.comment-body p {
+  margin: 0;
+  color: #262626;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.comment-composer {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid #efefef;
+  align-items: center;
+  background: #fff;
+}
+
+.composer-input {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 999px;
+  border: 1px solid #e9e9e9;
+  background: #f5f6f7;
+  outline: none;
+  font-size: 14px;
+}
+
+.composer-send {
+  background: #0095f6;
+  border: none;
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-comments { padding: 16px; }
+
 /* Post Tabs */
 .post-tabs {
   display: none;
@@ -1133,8 +1231,8 @@
 }
 
 .action-icon-small {
-  width: 20px;
-  height: 20px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
 }
 /* Add to Post Section */
@@ -1146,7 +1244,7 @@
 }
 
 .add-to-post-label {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: #262626;
   margin: 0 0 12px 0;
@@ -1155,6 +1253,7 @@
 .add-to-post-icons {
   display: flex;
   gap: 8px;
+  justify-content: center;
 }
 
 .post-action-icon {
@@ -1162,8 +1261,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 6px;
+  border-radius: 12px;
   transition: background-color 0.3s ease;
 }
 

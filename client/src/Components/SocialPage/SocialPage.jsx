@@ -3,6 +3,8 @@ import './SocialPage.css';
 
 const SocialPage = () => {
   const [showCreatePostModal, setShowCreatePostModal] = useState(false);
+  const [showCommentsModal, setShowCommentsModal] = useState(false);
+  const [activeCommentsPost, setActiveCommentsPost] = useState(null);
   const [activeNav, setActiveNav] = useState('home');
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -201,7 +203,13 @@ const SocialPage = () => {
           >
             <img src={post.liked ? '/l.png' : '/leaf.png'} alt="like" className="action-icon" />
           </button>
-          <button className="action-btn comment-btn">
+          <button
+            className="action-btn comment-btn"
+            onClick={() => {
+              setActiveCommentsPost(post);
+              setShowCommentsModal(true);
+            }}
+          >
             <img src="/cmnt.png" alt="comment" className="action-icon" />
           </button>
           <button className="action-btn share-btn">
@@ -231,7 +239,13 @@ const SocialPage = () => {
                 </div>
               ))}
               {post.comments.length > 2 && (
-                <button className="view-more-comments">
+                <button
+                  className="view-more-comments"
+                  onClick={() => {
+                    setActiveCommentsPost(post);
+                    setShowCommentsModal(true);
+                  }}
+                >
                   View all {post.comments.length} comments
                 </button>
               )}
@@ -345,6 +359,45 @@ const SocialPage = () => {
                 Try searching for plants, users, or topics!
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal for Viewing Comments */}
+      {showCommentsModal && activeCommentsPost && (
+        <div className="modal-overlay" onClick={() => { setShowCommentsModal(false); setActiveCommentsPost(null); }}>
+          <div className="modal-content comments-style" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{activeCommentsPost.username}'s Post</h2>
+              <button
+                className="close-btn"
+                onClick={() => { setShowCommentsModal(false); setActiveCommentsPost(null); }}
+                title="Close comments"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="comments-list">
+              {activeCommentsPost.comments && activeCommentsPost.comments.length > 0 ? (
+                activeCommentsPost.comments.map((c) => (
+                  <div key={c.id} className="comment-item">
+                    <img src="/girl.png" alt={c.username} className="comment-avatar" />
+                    <div className="comment-body">
+                      <strong>{c.username}</strong>
+                      <p>{c.text}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="no-comments">No comments yet.</p>
+              )}
+            </div>
+
+            <div className="comment-composer">
+              <input type="text" placeholder="Write a comment..." className="composer-input" />
+              <button className="composer-send">➤</button>
+            </div>
           </div>
         </div>
       )}
@@ -485,13 +538,6 @@ const SocialPage = () => {
               Share your plant journey...
             </button>
           </div>
-          <button
-            className="create-post-btn"
-            onClick={() => setShowCreatePostModal(true)}
-          >
-            <img src="/plus.png" alt="create" className="plus-icon" />
-            Create Post
-          </button>
         </div>
 
         <div className="posts-feed">
