@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import './Journal.css';
 import Header from './Header';
-import Toolbar from './Toolbar';
+import Sidebar from './Sidebar';
 import JournalPage from './JournalPage';
-import Sidebar from './SideBar';
+import CoverSelection from './CoverSelection';
 
 const defaultPreferences = {
   pageColor: '#ffffff',
@@ -18,6 +18,8 @@ const defaultPreferences = {
 };
 
 function Journal() {
+  const [showCoverSelection, setShowCoverSelection] = useState(true);
+  const [selectedCover, setSelectedCover] = useState(null);
   const [pages, setPages] = useState([
     {
       id: Date.now(),
@@ -38,6 +40,22 @@ function Journal() {
   const [activeDropdown, setActiveDropdown] = useState(null);
 
   const currentPage = pages[currentPageIndex];
+
+  const handleCoverSelect = (cover) => {
+    setSelectedCover(cover);
+    // Update first page with cover colors
+    setPages(prev => prev.map((page, idx) =>
+      idx === 0 ? { 
+        ...page, 
+        preferences: { 
+          ...page.preferences, 
+          pageColor: cover.bgColor,
+          textColor: cover.accentColor
+        }
+      } : page
+    ));
+    setShowCoverSelection(false);
+  };
 
   const updatePage = (updates) => {
     setPages(prev => prev.map((page, idx) =>
@@ -96,6 +114,10 @@ function Journal() {
   const toggleDropdown = (dropdownName) => {
     setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
   };
+
+  if (showCoverSelection) {
+    return <CoverSelection onCoverSelect={handleCoverSelect} />;
+  }
 
   return (
     <div className="app-container">

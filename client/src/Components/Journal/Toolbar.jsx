@@ -11,6 +11,20 @@ function Toolbar({
   toggleDropdown,
   contentRef
 }) {
+  const [hasTextSelected, setHasTextSelected] = React.useState(false);
+
+  // Check if text is selected
+  React.useEffect(() => {
+    const checkSelection = () => {
+      const selection = window.getSelection();
+      const hasSelection = selection && selection.toString().trim().length > 0;
+      setHasTextSelected(hasSelection);
+    };
+
+    document.addEventListener('selectionchange', checkSelection);
+    return () => document.removeEventListener('selectionchange', checkSelection);
+  }, []);
+
   const fontOptions = [
     'Arial, sans-serif',
     'Georgia, serif',
@@ -51,13 +65,29 @@ function Toolbar({
   // Handle text color like Word/Google Docs
   const handleTextColorChange = (color) => {
     const selection = window.getSelection();
-    const hasSelection = selection && selection.toString().length > 0;
+    const hasSelection = selection && selection.toString().trim().length > 0;
     
-    if (hasSelection) {
-      // If text is selected, change only the selected text color
-      document.execCommand('foreColor', false, color);
-      if (contentRef && contentRef.current) {
+    if (hasSelection && contentRef && contentRef.current && contentRef.current.contains(selection.anchorNode)) {
+      // If text is selected within the content area, change only the selected text color
+      const range = selection.getRangeAt(0);
+      const selectedText = range.extractContents();
+      const span = document.createElement('span');
+      span.style.color = color;
+      span.appendChild(selectedText);
+      range.insertNode(span);
+      
+      // Trigger change event to save content
+      if (contentRef.current) {
+        const event = new Event('input', { bubbles: true });
+        contentRef.current.dispatchEvent(event);
         contentRef.current.focus();
+        
+        // Restore selection after the colored span
+        const newRange = document.createRange();
+        newRange.setStartAfter(span);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
       }
     } else {
       // If no text is selected, change the default text color for the whole page
@@ -195,16 +225,50 @@ function Toolbar({
           <button 
             className="toolbar-icon-btn"
             onClick={() => toggleDropdown('textColor')}
-            title="Text Color (selects text if selected, otherwise default color)"
+            title={hasTextSelected ? "Color selected text" : "Change default text color"}
+            style={{ 
+              position: 'relative',
+              backgroundColor: hasTextSelected ? '#e0f2fe' : '',
+              borderColor: hasTextSelected ? '#3498db' : ''
+            }}
           >
             <img src="text-color.png" alt="Text Color" className="toolbar-icon" />
+            <div style={{
+              position: 'absolute',
+              bottom: '2px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '16px',
+              height: '3px',
+              backgroundColor: currentPage.preferences.textColor,
+              borderRadius: '1px'
+            }}></div>
           </button>
           {activeDropdown === 'textColor' && (
-            <ColorPicker
-              color={currentPage.preferences.textColor}
-              onChange={handleTextColorChange}
-              onClose={() => toggleDropdown(null)}
-            />
+            <div>
+              {hasTextSelected && (
+                <div style={{
+                  position: 'absolute',
+                  top: '-30px',
+                  right: '0',
+                  background: '#3498db',
+                  color: 'white',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  whiteSpace: 'nowrap',
+                  fontWeight: '500',
+                  zIndex: 300
+                }}>
+                  Coloring selected text
+                </div>
+              )}
+              <ColorPicker
+                color={currentPage.preferences.textColor}
+                onChange={handleTextColorChange}
+                onClose={() => toggleDropdown(null)}
+              />
+            </div>
           )}
         </div>
 
