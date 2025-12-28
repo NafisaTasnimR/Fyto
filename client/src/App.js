@@ -18,6 +18,7 @@ import Store from './Components/Store/Store';
 import ProductDetail from './Components/ProductDetail/ProductDetail';
 import NewPost from './Components/NewPost/NewPost';
 import ScrollToTop from './Components/Scrolltotop/Scrolltotop';
+import Journal from './Components/Journal/Journal';
 import './App.css';
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
           <Route path="/" element={<Store />} />
           <Route path="/product/:id" element={<ProductDetail />} />
            <Route path="/new-post" element={<NewPost />} />
+          <Route path="/journal" element={<Journal />} />
         </Routes>
       </div>
     </Router>
