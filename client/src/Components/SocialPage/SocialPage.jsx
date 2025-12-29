@@ -121,6 +121,10 @@ const SocialPage = () => {
     },
   ]);
 
+  // Reply UI state: track input values per post-comment and which reply composer is open
+  const [replyInputs, setReplyInputs] = useState({});
+  const [openReply, setOpenReply] = useState({ postId: null, commentId: null });
+
   const toggleLike = (postId) => {
     setPosts(
       posts.map((post) =>
@@ -133,6 +137,49 @@ const SocialPage = () => {
           : post
       )
     );
+  };
+
+  const toggleReply = (postId, commentId) => {
+    if (openReply.postId === postId && openReply.commentId === commentId) {
+      setOpenReply({ postId: null, commentId: null });
+    } else {
+      setOpenReply({ postId, commentId });
+    }
+  };
+
+  const handleReplyChange = (postId, commentId, value) => {
+    setReplyInputs({ ...replyInputs, [`${postId}-${commentId}`]: value });
+  };
+
+  const submitReply = (postId, commentId) => {
+    const key = `${postId}-${commentId}`;
+    const text = (replyInputs[key] || '').trim();
+    if (!text) return;
+
+    setPosts((prevPosts) => {
+      const newPosts = prevPosts.map((post) => {
+        if (post.id !== postId) return post;
+        return {
+          ...post,
+          comments: post.comments.map((c) =>
+            c.id === commentId
+              ? { ...c, replies: [...(c.replies || []), { id: Date.now(), username: 'You', text }] }
+              : c
+          ),
+        };
+      });
+
+      // Update activeCommentsPost if it's the same post
+      if (activeCommentsPost && activeCommentsPost.id === postId) {
+        const updated = newPosts.find((p) => p.id === postId);
+        setActiveCommentsPost(updated);
+      }
+
+      return newPosts;
+    });
+
+    setReplyInputs({ ...replyInputs, [key]: '' });
+    setOpenReply({ postId: null, commentId: null });
   };
 
   const handleCreatePost = (e) => {
@@ -195,6 +242,13 @@ const SocialPage = () => {
           </div>
         )}
 
+        {/* Post Caption (moved before actions) */}
+        <div className="post-caption">
+          <p>
+            <strong>{post.username}</strong> {post.caption}
+          </p>
+        </div>
+
         {/* Post Actions */}
         <div className="post-actions">
           <button
@@ -222,20 +276,52 @@ const SocialPage = () => {
           <span className="likes-count">{post.likes} likes</span>
         </div>
 
-        {/* Post Caption */}
-        <div className="post-caption">
-          <p>
-            <strong>{post.username}</strong> {post.caption}
-          </p>
-        </div>
-
         {/* Comments Section */}
         <div className="comments-section">
           {post.comments.length > 0 ? (
             <>
               {post.comments.map((comment) => (
                 <div key={comment.id} className="comment">
-                  <strong>{comment.username}</strong> {comment.text}
+                  <div className="comment-main">
+                    <strong>{comment.username}</strong> {comment.text}
+                    <button
+                      className="reply-btn"
+                      onClick={() => toggleReply(post.id, comment.id)}
+                      title="Reply"
+                    >
+                      Reply
+                    </button>
+                  </div>
+
+                  {/* Render replies if any */}
+                  {comment.replies && comment.replies.length > 0 && (
+                    <div className="comment-replies">
+                      {comment.replies.map((r) => (
+                        <div key={r.id} className="comment-reply">
+                          <strong>{r.username}</strong> {r.text}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Reply composer for this comment */}
+                  {openReply.postId === post.id && openReply.commentId === comment.id && (
+                    <div className="reply-composer">
+                      <input
+                        type="text"
+                        placeholder={`Reply to ${comment.username}...`}
+                        value={replyInputs[`${post.id}-${comment.id}`] || ''}
+                        onChange={(e) => handleReplyChange(post.id, comment.id, e.target.value)}
+                        className="reply-input"
+                      />
+                      <button
+                        className="reply-send"
+                        onClick={() => submitReply(post.id, comment.id)}
+                      >
+                        Send
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
               {post.comments.length > 2 && (
@@ -386,6 +472,43 @@ const SocialPage = () => {
                     <div className="comment-body">
                       <strong>{c.username}</strong>
                       <p>{c.text}</p>
+
+                      <div className="modal-comment-actions">
+                        <button
+                          className="reply-btn"
+                          onClick={() => toggleReply(activeCommentsPost.id, c.id)}
+                        >
+                          Reply
+                        </button>
+                      </div>
+
+                      {c.replies && c.replies.length > 0 && (
+                        <div className="comment-replies modal-replies">
+                          {c.replies.map((r) => (
+                            <div key={r.id} className="comment-reply">
+                              <strong>{r.username}</strong> {r.text}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {openReply.postId === activeCommentsPost.id && openReply.commentId === c.id && (
+                        <div className="reply-composer modal-reply-composer">
+                          <input
+                            type="text"
+                            placeholder={`Reply to ${c.username}...`}
+                            value={replyInputs[`${activeCommentsPost.id}-${c.id}`] || ''}
+                            onChange={(e) => handleReplyChange(activeCommentsPost.id, c.id, e.target.value)}
+                            className="reply-input"
+                          />
+                          <button
+                            className="reply-send"
+                            onClick={() => submitReply(activeCommentsPost.id, c.id)}
+                          >
+                            Send
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))
@@ -458,7 +581,7 @@ const SocialPage = () => {
               {/* Text Input Area */}
               <div className="text-input-section">
                 <textarea
-                  placeholder="What's on your mind, Friend?"
+                  placeholder="Share your plant journey..."
                   value={newPostData.caption}
                   onChange={(e) =>
                     setNewPostData({ ...newPostData, caption: e.target.value })

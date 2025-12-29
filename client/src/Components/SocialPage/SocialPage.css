@@ -309,6 +309,72 @@
   margin-right: 4px;
 }
 
+/* Reply UI */
+.comment-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.reply-btn {
+  background: none;
+  border: none;
+  color: #0095f6;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+.reply-btn:hover {
+  color: #007acc;
+  text-decoration: underline;
+}
+
+.comment-replies {
+  margin-left: 36px;
+  margin-top: 6px;
+  padding-left: 8px;
+  border-left: 2px solid #f6f6f6;
+}
+
+.comment-reply {
+  font-size: 13px;
+  color: #444;
+  margin: 6px 0;
+}
+
+.reply-composer {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  align-items: center;
+}
+
+.reply-input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #dbdbdb;
+  border-radius: 18px;
+  font-size: 14px;
+  outline: none;
+}
+
+.reply-send {
+  background: #86be5c;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.reply-send:hover {
+  background: #6aa43f;
+}
+
 .no-comments {
   font-size: 13px;
   color: #8e8e8e;
