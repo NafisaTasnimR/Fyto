@@ -355,7 +355,7 @@ const ProductDetail = () => {
               )}
             </span>
             {product.postType === 'sell' && (
-              <span className="price-display">${product.price}</span>
+              <span className="price-display">৳{product.price}</span>
             )}
           </div>
 

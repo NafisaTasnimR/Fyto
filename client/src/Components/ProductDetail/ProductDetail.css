@@ -7,7 +7,7 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background-color: #f9f9f9;
+  background-color: #F0F7EF;
   color: #191919;
 }
 
@@ -15,7 +15,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f9f9f9;
+  background-color: #F0F7EF;
 }
 
 /* Header Styles */
