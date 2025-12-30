@@ -144,7 +144,7 @@ body {
   left: 0;
   right: 0;
   height: 3px;
-  background-color: #0057ff;
+  background-color: #12562b;
 }
 
 /* Tabs Right Side - Search and Filter */
@@ -357,7 +357,7 @@ body {
 }
 
 .load-more-btn:hover {
-  background-color: #0047cc;
+  background-color: #055819;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 87, 255, 0.3);
 }
@@ -378,7 +378,7 @@ body {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #30181d 0%, #0047cc 100%);
+  background: linear-gradient(135deg, #30181d 0%, #055819 100%);
   border: none;
   color: white;
   cursor: pointer;

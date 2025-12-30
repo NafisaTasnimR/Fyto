@@ -1,19 +1,6 @@
-/*import './App.css';
-//import LoginSignup from './Components/LoginSignup/LoginSignup';
-//import Store from './Components/Store/Store';
-import ProductDetail from './Components/ProductDetail/ProductDetail';
-
-function App() {
-  return (
-    <div className="App">
-      
-      <ProductDetail />
-    </div>
-
-  );
-}*/
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LoginSignup from './Components/LoginSignup/LoginSignup';
 import Store from './Components/Store/Store';
 import ProductDetail from './Components/ProductDetail/ProductDetail';
 import NewPost from './Components/NewPost/NewPost';
@@ -26,6 +13,7 @@ function App() {
     <Router>
       <ScrollToTop />
       <div className="App">
+         <LoginSignup />
         <Routes>
           <Route path="/" element={<Store />} />
           <Route path="/product/:id" element={<ProductDetail />} />
