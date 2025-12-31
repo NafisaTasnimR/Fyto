@@ -32,3 +32,17 @@ export const validateCreatePost = (req, res, next) => {
 
     next();
 };
+
+export const validateStatusUpdate = (req, res, next) => {
+    const { status } = req.body;
+
+    if (!status || !['available', 'unavailable'].includes(status)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid status. Must be available or unavailable.'
+        });
+    }
+
+    next();
+};
+
