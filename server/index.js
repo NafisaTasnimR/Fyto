@@ -5,6 +5,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import AuthRouter from "./routes/AuthRoute.js";
 import PostRoute from "./routes/PostRoute.js";
+import MarketplaceRoute from "./routes/MarketplaceRoute.js";
 
 const app = express();
 dotenv.config();
@@ -18,6 +19,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use("/api/auth", AuthRouter);
 app.use("/posts", PostRoute);
+app.use("/api/marketplace", MarketplaceRoute);
 
 const port = process.env.PORT || 5000;
 
