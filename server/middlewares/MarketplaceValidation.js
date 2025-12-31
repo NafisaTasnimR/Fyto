@@ -46,3 +46,15 @@ export const validateStatusUpdate = (req, res, next) => {
     next();
 };
 
+export const validateStatusQuery = (req, res, next) => {
+    const { status } = req.query;
+
+    if (status && !['available', 'unavailable'].includes(status)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid status query. Must be available or unavailable.'
+        });
+    }
+
+    next();
+};
