@@ -22,6 +22,7 @@ function App() {
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/new-post" element={<NewPost />} />
         <Route path="/journal" element={<Journal />} />
+        <Route path="/social" element={<SocialPage />} />
       </Routes>
     </Router>
   );
