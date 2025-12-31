@@ -47,4 +47,326 @@ export const createMarketplacePost = async (req, res) => {
     }
 };
 
+// Delete marketplace post
+export const deleteMarketplacePost = async (req, res) => {
+    try {
+        const { postId } = req.params;
+        const userId = req.user.userId || req.user._id;
 
+        const post = await MarketplacePost.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: 'Marketplace post not found.'
+            });
+        }
+
+        // Check authorization
+        if (post.userId.toString() !== userId.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: 'You are not authorized to delete this post.'
+            });
+        }
+
+        // Delete post
+        await MarketplacePost.findByIdAndDelete(postId);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Marketplace post deleted successfully.'
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to delete marketplace post.',
+            error: error.message
+        });
+    }
+};
+
+// Get all available marketplace posts (no filtering, sorted by date)
+export const getAllAvailablePosts = async (req, res) => {
+    try {
+        const { page = 1, limit = 10 } = req.query;
+
+        // Only filter by available status
+        const filter = { status: 'available' };
+
+        // Pagination
+        const skip = (Number(page) - 1) * Number(limit);
+
+        // Fetch all available posts sorted by most recent
+        const posts = await MarketplacePost.find(filter)
+            .populate('userId', 'name username email profilePic')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(Number(limit));
+
+        // Get total count for pagination
+        const total = await MarketplacePost.countDocuments(filter);
+
+        return res.status(200).json({
+            success: true,
+            posts,
+            pagination: {
+                currentPage: Number(page),
+                totalPages: Math.ceil(total / Number(limit)),
+                totalPosts: total,
+                postsPerPage: Number(limit)
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to fetch marketplace posts.',
+            error: error.message
+        });
+    }
+};
+
+// Search/filter marketplace posts
+export const searchMarketplacePosts = async (req, res) => {
+    try {
+        const {
+            postType,
+            treeType,
+            minPrice,
+            maxPrice,
+            minAge,
+            maxAge,
+            keyword,
+            page = 1,
+            limit = 10
+        } = req.query;
+
+        // Build query filter - only show available posts
+        const filter = { status: 'available' };
+
+        // Filter by post type
+        if (postType) {
+            filter.postType = postType;
+        }
+
+        // Filter by tree type
+        if (treeType) {
+            filter.treeType = { $regex: treeType, $options: 'i' };
+        }
+
+        // Filter by price range
+        if (minPrice || maxPrice) {
+            filter.price = {};
+            if (minPrice) filter.price.$gte = Number(minPrice);
+            if (maxPrice) filter.price.$lte = Number(maxPrice);
+        }
+
+        // Filter by tree age range
+        if (minAge || maxAge) {
+            filter.treeAge = {};
+            if (minAge) filter.treeAge.$gte = Number(minAge);
+            if (maxAge) filter.treeAge.$lte = Number(maxAge);
+        }
+
+        // Search by keyword (in tree name, description, offering)
+        if (keyword) {
+            filter.$or = [
+                { treeName: { $regex: keyword, $options: 'i' } },
+                { description: { $regex: keyword, $options: 'i' } },
+                { offering: { $regex: keyword, $options: 'i' } }
+            ];
+        }
+
+        // Pagination
+        const skip = (Number(page) - 1) * Number(limit);
+
+        // Fetch posts
+        const posts = await MarketplacePost.find(filter)
+            .populate('userId', 'name username email profilePic')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(Number(limit));
+
+        // Get total count for pagination
+        const total = await MarketplacePost.countDocuments(filter);
+
+        return res.status(200).json({
+            success: true,
+            posts,
+            pagination: {
+                currentPage: Number(page),
+                totalPages: Math.ceil(total / Number(limit)),
+                totalPosts: total,
+                postsPerPage: Number(limit)
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to search marketplace posts.',
+            error: error.message
+        });
+    }
+};
+
+// Get single marketplace post details
+export const getMarketplacePostById = async (req, res) => {
+    try {
+        const { postId } = req.params;
+
+        const post = await MarketplacePost.findById(postId)
+            .populate('userId', 'name username email profilePic phone');
+
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: 'Marketplace post not found.'
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            post
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to fetch post details.',
+            error: error.message
+        });
+    }
+};
+
+// Get all posts by logged-in user
+export const getUserMarketplacePosts = async (req, res) => {
+    try {
+        const userId = req.user.userId || req.user._id;
+        const { status, page = 1, limit = 10 } = req.query;
+
+        // Build query filter
+        const filter = { userId };
+
+        // Filter by status if provided
+        if (status) {
+            filter.status = status;
+        }
+
+        // Pagination
+        const skip = (Number(page) - 1) * Number(limit);
+
+        // Fetch posts
+        const posts = await MarketplacePost.find(filter)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(Number(limit));
+
+        // Get total count
+        const total = await MarketplacePost.countDocuments(filter);
+
+        return res.status(200).json({
+            success: true,
+            posts,
+            pagination: {
+                currentPage: Number(page),
+                totalPages: Math.ceil(total / Number(limit)),
+                totalPosts: total,
+                postsPerPage: Number(limit)
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to fetch user posts.',
+            error: error.message
+        });
+    }
+};
+
+// Update marketplace post status (available/unavailable)
+export const updateMarketplacePostStatus = async (req, res) => {
+    try {
+        const { postId } = req.params;
+        const { status } = req.body;
+        const userId = req.user.userId || req.user._id;
+
+        // Find post
+        const post = await MarketplacePost.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: 'Marketplace post not found.'
+            });
+        }
+
+        // Check authorization
+        if (post.userId.toString() !== userId.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: 'You are not authorized to update this post.'
+            });
+        }
+
+        // Update status
+        post.status = status;
+        await post.save();
+
+        await post.populate('userId', 'name username email profilePic');
+
+        return res.status(200).json({
+            success: true,
+            message: 'Post status updated successfully.',
+            post
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to update post status.',
+            error: error.message
+        });
+    }
+};
+
+// Mark post as sold/exchanged (set status to unavailable)
+export const markPostAsSold = async (req, res) => {
+    try {
+        const { postId } = req.params;
+        const userId = req.user.userId || req.user._id;
+
+        // Find post
+        const post = await MarketplacePost.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: 'Marketplace post not found.'
+            });
+        }
+
+        // Check authorization
+        if (post.userId.toString() !== userId.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: 'You are not authorized to update this post.'
+            });
+        }
+
+        // Mark as unavailable
+        post.status = 'unavailable';
+        await post.save();
+
+        await post.populate('userId', 'name username email profilePic');
+
+        return res.status(200).json({
+            success: true,
+            message: `Post marked as ${post.postType === 'sell' ? 'sold' : 'exchanged'} successfully.`,
+            post
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to mark post as sold/exchanged.',
+            error: error.message
+        });
+    }
+};
