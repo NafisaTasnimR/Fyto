@@ -1,0 +1,321 @@
+/* Cover Selection Wrapper */
+.cover-selection-wrapper {
+  min-height: 100vh;
+  background: #F0F7EF;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header styling (same as main app) */
+.cover-selection-wrapper .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 2rem;
+  height: 60px;
+}
+
+.cover-selection-wrapper .header-left {
+  display: flex;
+  align-items: center;
+}
+
+.cover-selection-wrapper .logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cover-selection-wrapper .logo-icon-space {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 6px;
+  border: 2px solid #81c784;
+}
+
+.cover-selection-wrapper .app-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2d5016;
+  margin: 0;
+}
+
+.cover-selection-wrapper .header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cover-selection-wrapper .icon-button {
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  border-radius: 6px;
+}
+
+.cover-selection-wrapper .icon-button:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+/* Cover Selection Container */
+.cover-selection-container {
+  flex: 1;
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Welcome Banner */
+.welcome-banner {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.welcome-title {
+  font-size: 2.5rem;
+  font-weight: 300;
+  color: #4a5568;
+  margin: 0 0 0.5rem 0;
+  font-family: 'Georgia', serif;
+  letter-spacing: 0.5px;
+}
+
+.welcome-subtitle {
+  font-size: 1.1rem;
+  color: #718096;
+  font-weight: 400;
+  margin: 0;
+  font-family: 'Georgia', serif;
+  font-style: italic;
+}
+
+/* Cover Instruction */
+.cover-instruction {
+  font-size: 1rem;
+  color: #718096;
+  margin-bottom: 2.5rem;
+  font-weight: 400;
+  text-align: center;
+  font-family: 'Georgia', serif;
+}
+
+/* Covers Grid */
+.covers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 3rem;
+  max-width: 1200px;
+  width: 100%;
+  padding: 0 2rem;
+}
+
+/* Cover Card */
+.cover-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cover-card:hover {
+  transform: translateY(-8px);
+}
+
+.cover-card:hover .cover-preview {
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Cover Preview */
+.cover-preview {
+  width: 100%;
+  aspect-ratio: 800 / 600;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.06),
+    0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Cover Content */
+.cover-content {
+  width: 100%;
+  height: 100%;
+  padding: 3rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+
+/* Decorative Elements */
+.cover-decorative-circle {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  opacity: 0.1;
+}
+
+.cover-decorative-line {
+  position: absolute;
+  bottom: 2rem;
+  left: 2.5rem;
+  right: 2.5rem;
+  height: 1px;
+  opacity: 0.2;
+}
+
+/* Cover Title Section */
+.cover-title-section {
+  text-align: center;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.cover-journal-title {
+  font-size: 2rem;
+  font-weight: 400;
+  font-family: 'Georgia', serif;
+  margin: 0 0 1rem 0;
+  letter-spacing: 2px;
+  opacity: 0.9;
+}
+
+.cover-divider {
+  width: 80px;
+  height: 2px;
+  margin: 0 auto 1rem auto;
+  opacity: 0.4;
+}
+
+.cover-subtitle-text {
+  font-size: 1rem;
+  font-weight: 300;
+  font-family: 'Georgia', serif;
+  margin: 0;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* Leaf Decoration */
+.cover-leaf-decoration {
+  position: absolute;
+  bottom: 2.5rem;
+  right: 2.5rem;
+  width: 80px;
+  height: 80px;
+}
+
+.leaf-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Cover Name */
+.cover-name {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: 'Georgia', serif;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .welcome-title {
+    font-size: 2rem;
+  }
+
+  .covers-grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .cover-selection-container {
+    padding: 3rem 1rem;
+  }
+
+  .welcome-title {
+    font-size: 1.75rem;
+  }
+
+  .welcome-subtitle {
+    font-size: 1rem;
+  }
+
+  .covers-grid {
+    grid-template-columns: 1fr;
+    padding: 0 1rem;
+    gap: 2rem;
+  }
+
+  .cover-journal-title {
+    font-size: 1.75rem;
+  }
+
+  .cover-content {
+    padding: 2rem 1.5rem;
+  }
+
+  .cover-decorative-circle {
+    width: 50px;
+    height: 50px;
+    top: 1.5rem;
+    right: 1.5rem;
+  }
+
+  .cover-leaf-decoration {
+    width: 60px;
+    height: 60px;
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cover-selection-wrapper .app-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .cover-selection-wrapper .app-title {
+    font-size: 1.5rem;
+  }
+
+  .welcome-title {
+    font-size: 1.5rem;
+  }
+
+  .cover-instruction {
+    font-size: 0.95rem;
+  }
+
+  .cover-journal-title {
+    font-size: 1.5rem;
+  }
+
+  .cover-subtitle-text {
+    font-size: 0.9rem;
+  }
+}
