@@ -266,3 +266,86 @@ export const getUserMarketplacePosts = async (req, res) => {
         });
     }
 };
+
+// Update marketplace post status (available/unavailable)
+export const updateMarketplacePostStatus = async (req, res) => {
+    try {
+        const { postId } = req.params;
+        const { status } = req.body;
+        const userId = req.user.userId || req.user._id;
+
+        const post = await MarketplacePost.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: 'Marketplace post not found.'
+            });
+        }
+
+        if (post.userId.toString() !== userId.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: 'You are not authorized to update this post.'
+            });
+        }
+
+        post.status = status;
+        await post.save();
+
+        await post.populate('userId', 'name username email profilePic');
+
+        return res.status(200).json({
+            success: true,
+            message: 'Post status updated successfully.',
+            post
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to update post status.',
+            error: error.message
+        });
+    }
+};
+
+// Mark post as sold/exchanged (set status to unavailable)
+export const markPostAsSold = async (req, res) => {
+    try {
+        const { postId } = req.params;
+        const userId = req.user.userId || req.user._id;
+
+        const post = await MarketplacePost.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: 'Marketplace post not found.'
+            });
+        }
+
+        if (post.userId.toString() !== userId.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: 'You are not authorized to update this post.'
+            });
+        }
+
+        post.status = 'unavailable';
+        await post.save();
+
+        await post.populate('userId', 'name username email profilePic');
+
+        return res.status(200).json({
+            success: true,
+            message: `Post marked as ${post.postType === 'sell' ? 'sold' : 'exchanged'} successfully.`,
+            post
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to mark post as sold/exchanged.',
+            error: error.message
+        });
+    }
+};
