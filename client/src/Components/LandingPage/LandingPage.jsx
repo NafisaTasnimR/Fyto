@@ -1,0 +1,164 @@
+import React, { useState } from 'react';
+import LoginSignup from '../LoginSignup/LoginSignup';
+import './LandingPage.css';
+
+export default function LandingPage() {
+  const [showModal, setShowModal] = useState(false);
+  const [modalMode, setModalMode] = useState('login');
+
+  const openModal = (mode) => {
+    setModalMode(mode);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
+  return (
+    <div className="landing-container">
+      {/* FIXED HEADER */}
+      <header className="fixed-header">
+        <div className="header-content">
+          <div className="logo">Fyto</div>
+          <nav className="nav-buttons">
+            <button className="nav-btn" onClick={() => openModal('login')}>Login</button>
+            <button className="nav-btn signup-btn" onClick={() => openModal('signup')}>Signup</button>
+          </nav>
+        </div>
+      </header>
+
+      {/* HERO SECTION */}
+      {/* TOP HERO - new banner above main hero (large centered header with search + CTAs) */}
+      <section className="top-hero">
+        <div className="top-hero-content">
+          <div className="top-hero-visuals scroller">
+            <div className="scroller-track">
+              <div className="polaroid p1">
+                <img src="/q1.png" alt="plant" />
+              </div>
+              <div className="polaroid p2">
+                <img src="/q2.png" alt="plant" />
+              </div>
+              <div className="polaroid p3">
+                <img src="/q3.png" alt="plant" />
+              </div>
+              <div className="polaroid p4">
+                <img src="/q4.png" alt="plant" />
+              </div>
+              <div className="polaroid p5 portrait">
+                <img src="/q5.png" alt="plant" />
+              </div>
+              <div className="polaroid p6 portrait">
+                <img src="/q6.png" alt="plant" />
+              </div>
+
+              {/* duplicate for seamless scroll */}
+              <div className="polaroid p1">
+                <img src="/q1.png" alt="plant" />
+              </div>
+              <div className="polaroid p2">
+                <img src="/q7.png" alt="plant" />
+              </div>
+              <div className="polaroid p3">
+                <img src="/q2.png" alt="plant" />
+              </div>
+              <div className="polaroid p4">
+                <img src="/q3.png" alt="plant" />
+              </div>
+              <div className="polaroid p5 portrait">
+                <img src="/q4.png" alt="plant" />
+              </div>
+              <div className="polaroid p6 portrait">
+                <img src="/q6.png" alt="plant" />
+              </div>
+            </div>
+          </div>
+
+          <div className="top-hero-inner">
+            <h1>Grow. Share. Connect.</h1>
+            <p className="top-sub">A community-driven platform for plant lovers.</p>
+            <div className="top-ctas">
+              <button className="cta primary" onClick={() => openModal('signup')}>Join Community</button>
+              <button className="cta secondary" onClick={() => { window.scrollTo({ top: document.body.scrollHeight/4, behavior: 'smooth' }); }}>Explore Plants</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* FEATURES / HOW IT WORKS HERO (new) */}
+      <section className="features-hero">
+        <div className="features-inner">
+          <h2>Explore Fyto</h2>
+          <div className="features-grid">
+            <div className="feature-card">
+              <div className="feature-icon"><img src="/tea.png" alt="profile" /></div>
+              <h3>Profile & Garden Showcase</h3>
+              <p>Show your gardening journey, badges, activity.</p>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon"><img src="/community.png" alt="community" /></div>
+              <h3>Community Feed & Posts</h3>
+              <p>Share stories, ask questions, learn from others.</p>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon"><img src="/shopping.png" alt="marketplace" /></div>
+              <h3>Marketplace</h3>
+              <p>Donate • Exchange • Sell plants, seeds, pots.</p>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon"><img src="/paper.png" alt="journal" /></div>
+              <h3>Digital Plant Journal</h3>
+              <p>Track watering, growth, and plant health.</p>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon"><img src="/challenge.png" alt="challenges" /></div>
+              <h3>Challenges & Badges</h3>
+              <p>Join fun gardening missions and earn badges.</p>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon"><img src="/find.png" alt="plant care" /></div>
+              <h3>Plant Care </h3>
+              <p>Search thousands of plants with sunlight, water, and care info.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      
+
+      {/* SECONDARY SECTION */}
+      <section className="secondary-hero">
+        <div className="secondary-image" style={{
+          backgroundColor: '#f0f7ef'
+        }}>
+          <img src="/cat.png" alt="cat" className="secondary-image-item cat-img" />
+          <img src="/champion.png" alt="champion" className="secondary-image-item champion-img" />
+          {/*<img src="/yay.png" alt="yay" className="secondary-image-item yay-img" /> */}
+          <img src="/help.png" alt="help" className="secondary-image-item help-img" />
+        </div>
+        <div className="secondary-content">
+          <h2>From Seed to Story — Grow Together on Fyto</h2>
+          <p>Track your plants, share milestones, ask for help, and celebrate growth — all in one place.</p>
+          <button className="secondary-btn">Get Started</button>
+        </div>
+      </section>
+
+
+      {/* LOGIN/SIGNUP MODAL */}
+      {showModal && (
+        <LoginSignup 
+          mode={modalMode} 
+          onClose={closeModal}
+          onModeChange={setModalMode}
+        />
+      )}
+    </div>
+  );
+}

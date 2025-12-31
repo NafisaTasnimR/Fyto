@@ -1,0 +1,618 @@
+/* ---- PAGE WRAPPER ---- */
+.landing-container {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: #f4f9f4; 
+}
+
+/* ---- FIXED HEADER ---- */
+.fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 0;
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+}
+
+.logo {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2f6b48;
+  cursor: pointer;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.nav-btn {
+  padding: 10px 25px;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: transparent;
+  color: #2f6b48;
+}
+
+.nav-btn:hover {
+  background: #f0f0f0;
+}
+
+.signup-btn {
+  background: #2f6b48;
+  color: white;
+}
+
+.signup-btn:hover {
+  background: #3d8d40;
+}
+
+/* ---- HERO SECTION ---- */
+/* main .hero section removed — styles unused now that the standalone hero was deleted */
+
+/* ---- TOP HERO BANNER ---- */
+.top-hero {
+  background: #f0f7ef;
+  /* fixed total height requested */
+  height: 550px;
+  padding: 0 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #123d24;
+  overflow: hidden;
+}
+
+.top-hero-content {
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 20px;
+  display: flex;
+  /* left visuals + right content */
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+/* top-hero-inner: right-side content (heading + CTAs) */
+.top-hero-inner {
+  width: 48%;
+  max-width: 520px;
+  text-align: left;
+  padding-left: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.top-hero-inner h1 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 56px;
+  line-height: 1.02;
+  margin: 0 0 18px 0;
+  color: #123d24;
+  font-weight: 800;
+}
+
+.top-hero-inner .top-sub {
+  margin: 0 0 28px 0;
+  font-size: 20px;
+  color: #2f6b48;
+}
+
+.top-ctas { gap: 22px; }
+
+.cta {
+  border-radius: 999px;
+  padding: 18px 36px;
+  font-weight: 700;
+  font-size: 18px;
+  cursor: pointer;
+  border: none;
+}
+
+.cta.primary {
+  background: #2f6b48;
+  color: #fff;
+  box-shadow: 0 18px 36px rgba(31,91,47,0.12);
+}
+
+.cta.secondary {
+  background: #fff;
+  color: #1f5b2f;
+  box-shadow: 0 10px 26px rgba(20,50,30,0.06);
+  border: 1px solid rgba(39,75,47,0.06);
+}
+
+/* ---- POLAROID VISUALS ON LEFT ---- */
+.top-hero-visuals {
+  /* wrapper for scroller - keep size and overflow control here */
+  /* wider fixed visuals area so portraits have more breathing room */
+  width: 640px;
+  pointer-events: none;
+  overflow: hidden;
+  height: 100%;
+}
+
+.polaroid {
+  position: relative;
+  width: 200px;
+  background: #ffffff;
+  padding: 14px 14px 20px 14px;
+  box-shadow: none;
+  border-radius: 6px;
+  transform-origin: center center;
+  overflow: hidden;
+}
+
+.polaroid img {
+  display: block;
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 4px;
+  object-position: center;
+}
+
+/* Slight caption area look: simulate polaroid bottom */
+.polaroid::after {
+  content: "";
+  display: block;
+  height: 12px;
+}
+
+/* arrange into two rows (grid) - polaroids are straight (no rotation) */
+.polaroid { transform: none; }
+
+/* nudge right-column polaroids slightly lower than left column */
+.top-hero-visuals .polaroid:nth-child(even) {
+  margin-top: 30px;
+}
+
+/* credits-style upward animation: polaroids move up and fade out like movie credits */
+.scroller-track {
+  display: grid;
+  grid-template-columns: repeat(2, 200px);
+  grid-auto-rows: auto;
+  /* row-gap column-gap: more horizontal space between side-by-side polaroids */
+  gap: 20px 44px;
+  align-items: start;
+  justify-content: start;
+}
+
+/* smooth continuous upward scroll: track contains duplicated items and scrolls -50% of its height */
+.scroller-track {
+  animation: scroll-up 24s linear infinite;
+  will-change: transform;
+}
+
+@keyframes scroll-up {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+/* ---- FEATURES / HOW IT WORKS HERO ---- */
+.features-hero {
+  background: #ffffff; /* white background for the features area */
+  padding: 30px 20px 60px 20px;
+}
+
+.features-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.features-inner h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 47px;
+  font-weight: 800;
+  line-height: 1.02;
+  color: #274b2f;
+  margin-bottom: 30px;
+}
+
+.features-grid {
+  display: grid;
+  /* narrower fixed columns so each feature card is smaller */
+  grid-template-columns: repeat(3, 340px);
+  gap: 24px;
+  justify-content: center;
+}
+.feature-card {
+  background: #f4f9f4; 
+  border-radius: 10px;
+  padding: 26px 22px;
+  text-align: left;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.07);
+  border: 1px solid rgba(18,61,36,0.03);
+  max-width: 340px;
+  margin: 0 auto;
+  transition: transform 300ms cubic-bezier(.22,.9,.3,1), box-shadow 300ms cubic-bezier(.22,.9,.3,1), background-color 300ms ease;
+  will-change: transform, box-shadow;
+  cursor: pointer;
+}
+
+.feature-icon {
+  font-size: 28px;
+  color: #2f7a3d;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.feature-icon img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.feature-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 20px;
+  color: #274b2f;
+}
+
+.feature-card p {
+  margin: 0;
+  color: #596f5c;
+}
+
+/* Hover / focus lift effect */
+.feature-card:hover,
+.feature-card:focus-within {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 18px 36px rgba(31,79,47,0.10);
+  background-color: #ffffff;
+}
+
+/* Touch devices: use active state for quick feedback, smaller lift */
+@media (hover: none) {
+  .feature-card:active {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(31,79,47,0.08);
+  }
+}
+
+@media (max-width: 1024px) {
+  .features-grid { grid-template-columns: repeat(2, 320px); justify-content: center; }
+  .features-inner h2 { font-size: 36px; }
+}
+
+@media (max-width: 700px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .feature-card { max-width: none; }
+  .features-inner { padding: 0 12px; }
+  .features-inner h2 { font-size: 26px; }
+}
+
+/* main top-hero heading styles removed (top hero no longer contains text on the right) */
+
+.top-sub {
+  margin: 0 0 26px 0;
+  font-size: 18px;
+  color: #325b3f;
+  font-weight: 500;
+}
+
+
+
+.top-ctas {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 14px;
+}
+
+.cta {
+  border-radius: 999px;
+  padding: 14px 30px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+}
+
+.cta.primary {
+  background: #25562d;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(37,86,45,0.18);
+}
+
+.cta.secondary {
+  background: #fff;
+  color: #274b2f;
+  border: 1px solid rgba(39,75,47,0.08);
+  box-shadow: 0 6px 18px rgba(34, 76, 41, 0.06);
+}
+
+@media (max-width: 1024px) {
+  .top-hero h1 { font-size: 40px; }
+  .top-sub { font-size: 16px; }
+  /* revert right-half layout on medium and smaller screens */
+  .top-hero-content { justify-content: center; }
+  .top-hero-inner { width: 100%; max-width: 1100px; text-align: center; padding-left: 0; }
+  .top-ctas { justify-content: center; }
+  .top-hero-visuals { display: none; }
+}
+
+@media (max-width: 768px) {
+  .top-hero { padding: 60px 14px; min-height: 320px; }
+  .top-hero-inner h1 { font-size: 28px; }
+  .top-sub { font-size: 14px; }
+  .cta { padding: 12px 20px; font-size: 15px; }
+  .top-ctas { flex-direction: row; gap: 10px; }
+}
+
+
+ 
+/* ---- SECONDARY HERO SECTION ---- */
+.secondary-hero {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: stretch;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 480px;
+}
+
+.secondary-image {
+  flex: 1;
+  min-height: 480px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.secondary-image-item {
+  position: absolute;
+  object-fit: contain;
+}
+
+.cat-img {
+  width: 190px;
+  height: 190px;
+  left: 20px;
+  top: 40px;
+}
+
+.champion-img {
+  width: 190px;
+  height: 190px;
+  right: 30px;
+  top: 20px;
+}
+
+.help-img {
+  width: 180px;
+  height: 180px;
+  left: 50%;
+  bottom: 50px;
+  transform: translateX(-50%);
+}
+
+.yay-img {
+  width: 160px;
+  height: 160px;
+  right: 50px;
+  bottom: 40px;
+}
+
+.secondary-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 60px 80px;
+  background: #f0f7ef;
+  color: #2c3e2f;
+}
+
+.secondary-content h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 48px;
+  line-height: 1.02;
+  font-weight: 800;
+  margin: 0 0 18px 0;
+  color: #123d24;
+}
+
+.secondary-content p {
+  font-size: 20px;
+  margin: 0 0 28px 0;
+  color: #2f6b48;
+}
+
+.secondary-btn {
+  padding: 12px 28px;
+  background: #2f6b48;
+  color: white;
+  border: none;
+  font-size: 1rem;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.secondary-btn:hover {
+  background: #3d8d40;
+}
+
+/* ---- RESPONSIVE GRID ---- */
+@media (max-width: 1000px) {
+  .masonry { columns: 3; }
+}
+
+@media (max-width: 700px) {
+  .masonry { columns: 2; }
+}
+
+@media (max-width: 500px) {
+  .masonry { columns: 1; }
+}
+
+/* ---- RESPONSIVE HEADER ---- */
+@media (max-width: 768px) {
+  .header-content {
+    padding: 12px 20px;
+  }
+
+  .logo {
+    font-size: 1.5rem;
+  }
+
+  .nav-btn {
+    padding: 8px 20px;
+    font-size: 0.9rem;
+  }
+
+  /* responsive adjustments for removed .hero */
+
+  .secondary-hero {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .secondary-image {
+    min-height: 350px;
+  }
+
+  .secondary-content {
+    padding: 50px 40px;
+  }
+
+  .secondary-content h2 {
+    font-size: 2rem;
+  }
+
+  .secondary-content p {
+    font-size: 1rem;
+  }
+
+  .secondary-content h2 {
+    font-size: 1.6rem;
+    max-width: 90%;
+  }
+
+  .secondary-content p {
+    font-size: 0.95rem;
+    max-width: 90%;
+  }
+
+  .third-hero {
+    flex-direction: column;
+    padding: 60px 30px;
+    gap: 25px;
+  }
+
+  .product-card {
+    max-width: 100%;
+  }
+
+  .product-image {
+    min-height: 220px;
+  }
+
+  .product-info {
+    padding: 30px 25px;
+  }
+
+  .product-title {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content {
+    padding: 10px 15px;
+  }
+
+  .logo {
+    font-size: 1.3rem;
+  }
+
+  .nav-buttons {
+    gap: 10px;
+  }
+
+  .nav-btn {
+    padding: 7px 16px;
+    font-size: 0.85rem;
+  }
+
+  /* responsive adjustments for removed .hero */
+
+  .secondary-image {
+    min-height: 300px;
+  }
+
+  .secondary-content {
+    padding: 40px 30px;
+  }
+
+  .secondary-content h2 {
+    font-size: 1.6rem;
+  }
+
+  .secondary-content p {
+    font-size: 0.9rem;
+  }
+
+  .secondary-content h2 {
+    font-size: 1.4rem;
+    max-width: 95%;
+  }
+
+  .secondary-content p {
+    font-size: 0.85rem;
+    max-width: 95%;
+  }
+
+  .third-hero {
+    padding: 50px 20px;
+    gap: 20px;
+  }
+
+  .product-card {
+    flex-direction: column;
+  }
+
+  .product-image {
+    min-height: 200px;
+  }
+
+  .product-info {
+    padding: 25px 20px;
+  }
+
+  .product-title {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+  }
+
+  .product-label {
+    font-size: 0.75rem;
+  }
+
+}
