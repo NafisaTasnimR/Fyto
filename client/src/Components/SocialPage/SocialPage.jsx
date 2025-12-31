@@ -17,7 +17,6 @@ const SocialPage = () => {
     imagePreview: null,
   });
 
-  // Sample notifications data
   const [notifications, setNotifications] = useState([
     {
       id: 1,
@@ -66,7 +65,6 @@ const SocialPage = () => {
     },
   ]);
 
-  // Sample posts data
   const [posts, setPosts] = useState([
     {
       id: 1,
@@ -121,7 +119,6 @@ const SocialPage = () => {
     },
   ]);
 
-  // Reply UI state: track input values per post-comment and which reply composer is open
   const [replyInputs, setReplyInputs] = useState({});
   const [openReply, setOpenReply] = useState({ postId: null, commentId: null });
 
@@ -169,7 +166,6 @@ const SocialPage = () => {
         };
       });
 
-      // Update activeCommentsPost if it's the same post
       if (activeCommentsPost && activeCommentsPost.id === postId) {
         const updated = newPosts.find((p) => p.id === postId);
         setActiveCommentsPost(updated);
@@ -185,7 +181,6 @@ const SocialPage = () => {
   const handleCreatePost = (e) => {
     e.preventDefault();
     
-    // At least caption or image required
     if (!newPostData.caption.trim() && !newPostData.image) {
       alert('Please write something or add an image');
       return;
@@ -249,7 +244,6 @@ const SocialPage = () => {
           </p>
         </div>
 
-        {/* Post Actions */}
         <div className="post-actions">
           <button
             className={`action-btn like-btn ${post.liked ? 'liked' : ''}`}
@@ -271,12 +265,10 @@ const SocialPage = () => {
           </button>
         </div>
 
-        {/* Likes Count */}
         <div className="likes-info">
           <span className="likes-count">{post.likes} likes</span>
         </div>
 
-        {/* Comments Section */}
         <div className="comments-section">
           {post.comments.length > 0 ? (
             <>
@@ -293,7 +285,6 @@ const SocialPage = () => {
                     </button>
                   </div>
 
-                  {/* Render replies if any */}
                   {comment.replies && comment.replies.length > 0 && (
                     <div className="comment-replies">
                       {comment.replies.map((r) => (
@@ -304,7 +295,6 @@ const SocialPage = () => {
                     </div>
                   )}
 
-                  {/* Reply composer for this comment */}
                   {openReply.postId === post.id && openReply.commentId === comment.id && (
                     <div className="reply-composer">
                       <input
@@ -341,7 +331,6 @@ const SocialPage = () => {
           )}
         </div>
 
-        {/* Add Comment Input */}
         <div className="add-comment">
           <input
             type="text"
@@ -356,7 +345,6 @@ const SocialPage = () => {
 
   return (
     <div className="social-page">
-      {/* Fixed Header */}
       <header className="social-fixed-header">
         <div className="social-header-content">
           <div className="social-logo">🌿 Fyto</div>
@@ -366,7 +354,6 @@ const SocialPage = () => {
         </div>
       </header>
 
-      {/* Left Sidebar */}
       <div className={`sidebar ${sidebarOpen ? 'open' : 'closed'} ${sidebarCollapsed ? 'collapsed' : ''}`}>
         <div className="sidebar-header">
           <button
@@ -415,7 +402,6 @@ const SocialPage = () => {
         </nav>
       </div>
 
-      {/* Search Panel */}
       {showSearchResults && (
         <div className="search-panel">
           <div className="search-header">
@@ -449,7 +435,6 @@ const SocialPage = () => {
         </div>
       )}
 
-      {/* Modal for Viewing Comments */}
       {showCommentsModal && activeCommentsPost && (
         <div className="modal-overlay" onClick={() => { setShowCommentsModal(false); setActiveCommentsPost(null); }}>
           <div className="modal-content comments-style" onClick={(e) => e.stopPropagation()}>
@@ -525,7 +510,6 @@ const SocialPage = () => {
         </div>
       )}
 
-      {/* Notifications Panel */}
       {showNotifications && (
         <div className="notifications-panel">
           <div className="notifications-header">
@@ -563,7 +547,6 @@ const SocialPage = () => {
         </div>
       )}
 
-      {/* Modal for Creating Post */}
       {showCreatePostModal && (
         <div className="modal-overlay" onClick={() => setShowCreatePostModal(false)}>
           <div className="modal-content facebook-style" onClick={(e) => e.stopPropagation()}>
@@ -578,7 +561,6 @@ const SocialPage = () => {
             </div>
 
             <form onSubmit={handleCreatePost} className="facebook-post-form">
-              {/* Text Input Area */}
               <div className="text-input-section">
                 <textarea
                   placeholder="Share your plant journey..."
@@ -591,7 +573,6 @@ const SocialPage = () => {
                 />
               </div>
 
-              {/* Add to Your Post Section */}
               <div className="add-to-post-section">
                 <p className="add-to-post-label">Add to your post</p>
                 <div className="add-to-post-icons">
@@ -608,7 +589,6 @@ const SocialPage = () => {
                 </div>
               </div>
 
-              {/* Image Preview */}
               {newPostData.imagePreview && (
                 <div className="image-preview-section">
                   <div className="image-preview-large">
@@ -630,7 +610,6 @@ const SocialPage = () => {
                 </div>
               )}
 
-              {/* Modal Actions */}
               <div className="modal-actions facebook-style">
                 <button type="button" className="btn-cancel" onClick={() => setShowCreatePostModal(false)}>
                   Cancel
@@ -646,7 +625,6 @@ const SocialPage = () => {
 
       <div className="main-content">
         <div className="feed-container">
-        {/* Create Post Section */}
         <div className="create-post-section">
           <div className="create-post-container">
             <img
