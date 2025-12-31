@@ -1,12 +1,10 @@
 import Post from '../models/Post.js';
 
-// Create a new post
 export const createPost = async (req, res) => {
     try {
         const { content, images } = req.body;
         const authorId = req.users.userId || req.users._id;
 
-        // Validate required fields
         if (!content && (!images || images.length === 0)) {
             return res.status(400).json({
                 success: false,
@@ -14,7 +12,6 @@ export const createPost = async (req, res) => {
             });
         }
 
-        // Create new post
         const newPost = new Post({
             authorId,
             content,
@@ -24,7 +21,6 @@ export const createPost = async (req, res) => {
 
         const savedPost = await newPost.save();
 
-        // Populate author information
         await savedPost.populate('authorId', 'name username profilePic');
 
         return res.status(201).json({
@@ -41,13 +37,12 @@ export const createPost = async (req, res) => {
     }
 };
 
-// Delete a post
+
 export const deletePost = async (req, res) => {
     try {
         const { postId } = req.params;
         const userId = req.user.userId || req.user.id;
 
-        // Find the post
         const post = await Post.findById(postId);
 
         if (!post) {
@@ -57,7 +52,6 @@ export const deletePost = async (req, res) => {
             });
         }
 
-        // Check if the user is the author
         if (post.authorId.toString() !== userId.toString()) {
             return res.status(403).json({
                 success: false,
@@ -65,7 +59,6 @@ export const deletePost = async (req, res) => {
             });
         }
 
-        // Delete the post
         await Post.findByIdAndDelete(postId);
 
         return res.status(200).json({
@@ -81,14 +74,12 @@ export const deletePost = async (req, res) => {
     }
 };
 
-// Update a post
 export const updatePost = async (req, res) => {
     try {
         const { postId } = req.params;
         const { content, images } = req.body;
         const userId = req.user.userId || req.user.id;
 
-        // Find the post
         const post = await Post.findById(postId);
 
         if (!post) {
@@ -98,7 +89,6 @@ export const updatePost = async (req, res) => {
             });
         }
 
-        // Check if the user is the author
         if (post.authorId.toString() !== userId.toString()) {
             return res.status(403).json({
                 success: false,
@@ -106,13 +96,11 @@ export const updatePost = async (req, res) => {
             });
         }
 
-        // Update fields
         if (content !== undefined) post.content = content;
         if (images !== undefined) post.images = images;
 
         const updatedPost = await post.save();
 
-        // Populate author information
         await updatedPost.populate('authorId', 'name username profilePic');
 
         return res.status(200).json({
@@ -129,21 +117,19 @@ export const updatePost = async (req, res) => {
     }
 };
 
-// Get posts (user's own posts or posts user liked)
+
 export const getUserPosts = async (req, res) => {
     try {
         const userId = req.user.userId || req.user.id;
-        const { type } = req.query; // type can be 'created' or 'liked'
+        const { type } = req.query;
 
         let posts;
 
         if (type === 'liked') {
-            // Get posts that user liked
             posts = await Post.find({ likes: userId })
                 .populate('authorId', 'name username profilePic')
                 .sort({ createdAt: -1 });
         } else {
-            // Default: Get posts created by user
             posts = await Post.find({ authorId: userId })
                 .populate('authorId', 'name username profilePic')
                 .sort({ createdAt: -1 });
@@ -163,7 +149,6 @@ export const getUserPosts = async (req, res) => {
     }
 };
 
-// Get all posts sorted by creation date
 export const getAllPosts = async (req, res) => {
     try {
         const { page = 1, limit = 10 } = req.query;
@@ -208,14 +193,11 @@ export const toggleLike = async (req, res) => {
             });
         }
 
-        // Check if user already liked the post
         const likeIndex = post.likes.indexOf(userId);
 
         if (likeIndex > -1) {
-            // Unlike: Remove user from likes array
             post.likes.splice(likeIndex, 1);
         } else {
-            // Like: Add user to likes array
             post.likes.push(userId);
         }
 
@@ -236,7 +218,7 @@ export const toggleLike = async (req, res) => {
     }
 };
 
-// Get a single post by ID
+
 export const getPostById = async (req, res) => {
     try {
         const { postId } = req.params;
