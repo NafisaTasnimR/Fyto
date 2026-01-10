@@ -4,7 +4,7 @@ import './Store.css';
 
 const Store = () => {
   const [activeTab, setActiveTab] = useState('For you');
-  const [visibleProjects, setVisibleProjects] = useState(8);
+  const [visibleProjects, setVisibleProjects] = useState(12);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
@@ -221,7 +221,7 @@ const Store = () => {
   const hasMore = visibleProjects < filteredProjects.length;
 
   const loadMore = () => {
-    setVisibleProjects(prev => Math.min(prev + 8, filteredProjects.length));
+    setVisibleProjects(prev => Math.min(prev + 12, filteredProjects.length));
   };
 
   const handleProjectClick = (projectId) => {
@@ -234,12 +234,12 @@ const Store = () => {
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-    setVisibleProjects(8); // Reset visible projects when changing tabs
+    setVisibleProjects(12); // Reset visible projects when changing tabs
   };
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
-    setVisibleProjects(8); // Reset visible projects when searching
+    setVisibleProjects(12); // Reset visible projects when searching
   };
 
   const handleFilterClick = () => {
@@ -285,6 +285,10 @@ const Store = () => {
 
         <div className="tabs-right">
           <div className="search-container">
+            <svg className="search-icon-left" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
             <input 
               type="text" 
               className="search-input" 
@@ -292,20 +296,14 @@ const Store = () => {
               value={searchQuery}
               onChange={handleSearchChange}
             />
-            <svg className="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8"/>
-              <path d="m21 21-4.35-4.35"/>
-            </svg>
+            <button className="filter-btn-inside" onClick={handleFilterClick} title="Filter">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="4" y1="6" x2="20" y2="6" strokeLinecap="round"/>
+                <line x1="4" y1="12" x2="20" y2="12" strokeLinecap="round"/>
+                <line x1="4" y1="18" x2="20" y2="18" strokeLinecap="round"/>
+              </svg>
+            </button>
           </div>
-
-          <button className="filter-btn" onClick={handleFilterClick}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <line x1="4" y1="6" x2="20" y2="6" strokeWidth="2" strokeLinecap="round"/>
-              <line x1="4" y1="12" x2="20" y2="12" strokeWidth="2" strokeLinecap="round"/>
-              <line x1="4" y1="18" x2="20" y2="18" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-            <span className="filter-text">Filter</span>
-          </button>
         </div>
       </nav>
 
