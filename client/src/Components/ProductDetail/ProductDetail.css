@@ -212,6 +212,19 @@ body {
   font-weight: 500;
 }
 
+.meta-value.contact-link a {
+  color: #2e7d32;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+  word-break: break-word;
+}
+
+.meta-value.contact-link a:hover {
+  color: #1b5e20;
+  text-decoration: underline;
+}
+
 /* Condition Section */
 .condition-section {
   display: flex;
