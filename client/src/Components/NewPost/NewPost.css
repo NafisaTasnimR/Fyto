@@ -260,6 +260,15 @@
   margin-top: 6px;
 }
 
+/* Input Hint */
+.input-hint {
+  display: block;
+  font-size: 13px;
+  color: #696969;
+  margin-top: 6px;
+  font-style: italic;
+}
+
 /* Price Input */
 .price-input-wrapper {
   position: relative;
@@ -314,6 +323,44 @@
 }
 
 .post-type-btn svg {
+  flex-shrink: 0;
+}
+
+/* Contact Type Buttons */
+.contact-type-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.contact-type-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border: 2px solid #e7e7e7;
+  border-radius: 8px;
+  background-color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #191919;
+}
+
+.contact-type-btn:hover {
+  border-color: #2e7d32;
+  background-color: #f5f5f5;
+}
+
+.contact-type-btn.active {
+  border-color: #2e7d32;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.contact-type-btn svg {
   flex-shrink: 0;
 }
 
@@ -425,6 +472,10 @@
   .image-preview-wrapper {
     height: 300px;
   }
+
+  .contact-type-buttons {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Responsive Design - Mobile Portrait */
@@ -458,6 +509,10 @@
   }
 
   .post-type-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-type-buttons {
     grid-template-columns: 1fr;
   }
 }
@@ -578,6 +633,21 @@
     height: 18px;
   }
 
+  .contact-type-buttons {
+    gap: 12px;
+    grid-template-columns: 1fr;
+  }
+
+  .contact-type-btn {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  .contact-type-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
   .form-actions {
     grid-template-columns: 1fr;
     gap: 12px;
@@ -594,6 +664,10 @@
   }
 
   .error-message {
+    font-size: 12px;
+  }
+
+  .input-hint {
     font-size: 12px;
   }
 }
@@ -638,6 +712,13 @@
     gap: 6px;
     padding: 12px;
     font-size: 14px;
+  }
+
+  .contact-type-btn {
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px;
+    font-size: 13px;
   }
 }
 
