@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './SocialPage.css';
+import Header from '../Shared/Header';
 
 const SocialPage = () => {
   const [showCreatePostModal, setShowCreatePostModal] = useState(false);
@@ -345,14 +346,7 @@ const SocialPage = () => {
 
   return (
     <div className="social-page">
-      <header className="social-fixed-header">
-        <div className="social-header-content">
-          <div className="social-logo">🌿 Fyto</div>
-          <div className="social-header-actions">
-            <span className="header-welcome">Plant Community</span>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <div className={`sidebar ${sidebarOpen ? 'open' : 'closed'} ${sidebarCollapsed ? 'collapsed' : ''}`}>
         <div className="sidebar-header">

@@ -45,8 +45,24 @@ const LoginSignup = ({ mode = 'login', onClose, onModeChange }) => {
     e.preventDefault();
     if (isLogin) {
       console.log('Login submitted:', { email: formData.email, password: formData.password });
+      // Simulate successful login: persist a simple auth flag and notify other components
+      try {
+        localStorage.setItem('fytoAuth', 'true');
+        window.dispatchEvent(new Event('fytoAuthChange'));
+      } catch (err) {
+        console.warn('Could not persist auth flag', err);
+      }
+      if (onClose) onClose();
     } else {
       console.log('Signin submitted:', formData);
+      // Simulate successful signup and login
+      try {
+        localStorage.setItem('fytoAuth', 'true');
+        window.dispatchEvent(new Event('fytoAuthChange'));
+      } catch (err) {
+        console.warn('Could not persist auth flag', err);
+      }
+      if (onClose) onClose();
     }
   };
 

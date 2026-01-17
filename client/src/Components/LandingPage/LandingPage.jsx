@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import LoginSignup from '../LoginSignup/LoginSignup';
 import './LandingPage.css';
 
@@ -15,16 +15,90 @@ export default function LandingPage() {
     setShowModal(false);
   };
 
+  // local auth state for landing page only
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    try {
+      return Boolean(localStorage.getItem('fytoAuth'));
+    } catch (err) {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    const onAuthChange = () => {
+      try {
+        setIsAuthenticated(Boolean(localStorage.getItem('fytoAuth')));
+      } catch (err) {
+        setIsAuthenticated(false);
+      }
+    };
+
+    window.addEventListener('fytoAuthChange', onAuthChange);
+    window.addEventListener('storage', onAuthChange);
+    return () => {
+      window.removeEventListener('fytoAuthChange', onAuthChange);
+      window.removeEventListener('storage', onAuthChange);
+    };
+  }, []);
+
+  // profile menu UI
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileRef = useRef(null);
+  useEffect(() => {
+    const onDocClick = (e) => {
+      if (!showProfileMenu) return;
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setShowProfileMenu(false);
+      }
+    };
+    document.addEventListener('click', onDocClick);
+    return () => document.removeEventListener('click', onDocClick);
+  }, [showProfileMenu]);
+
+  // Landing page uses its own header with login/signup buttons
+
   return (
     <div className="landing-container">
       {/* FIXED HEADER */}
       <header className="fixed-header">
         <div className="header-content">
-          <div className="logo">Fyto</div>
-          <nav className="nav-buttons">
-            <button className="nav-btn" onClick={() => openModal('login')}>Login</button>
-            <button className="nav-btn signup-btn" onClick={() => openModal('signup')}>Signup</button>
-          </nav>
+          <div className="logo">
+            <img src="/2.png" alt="Fyto logo" className="site-logo" />
+            <span>Fyto</span>
+          </div>
+          {isAuthenticated ? (
+            <div className="profile-section" ref={profileRef}>
+              <button className="profile-button" onClick={() => setShowProfileMenu((s) => !s)}>
+                <div className="profile-avatar">U</div>
+                <span className="profile-name">You</span>
+              </button>
+              {showProfileMenu && (
+                <div className="profile-menu">
+                  <a href="/profile" className="profile-menu-item">Profile</a>
+                  <button
+                    className="profile-menu-item"
+                    onClick={() => {
+                      try {
+                        localStorage.removeItem('fytoAuth');
+                        window.dispatchEvent(new Event('fytoAuthChange'));
+                        setIsAuthenticated(false);
+                        setShowProfileMenu(false);
+                      } catch (err) {
+                        console.warn('Logout failed', err);
+                      }
+                    }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <nav className="nav-buttons">
+              <button className="nav-btn1" onClick={() => { setModalMode('login'); setShowModal(true); }}>Login</button>
+              <button className="nav-btn1 signup-btn1" onClick={() => { setModalMode('signup'); setShowModal(true); }}>Signup</button>
+            </nav>
+          )}
         </div>
       </header>
 
