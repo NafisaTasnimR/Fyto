@@ -6,7 +6,8 @@ import {
     getUserPosts,
     getAllPosts,
     toggleLike,
-    getPostById
+    getPostById,
+    searchPosts
 } from '../controllers/PostController.js';
 import verifyToken from '../middlewares/Authorization.js';
 
@@ -20,6 +21,9 @@ router.post('/', createPost);
 
 // Get all posts (with pagination)
 router.get('/', getAllPosts);
+
+// Search posts
+router.get('/search', searchPosts);
 
 // Get user's posts (created or liked)
 router.get('/user', getUserPosts);
