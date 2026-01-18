@@ -57,4 +57,33 @@ const login = async (req, res) => {
     }
 }
 
-export { signup, login };
+const searchUsers = async (req, res) => {
+    try {
+        const { query } = req.query;
+
+        if (!query || query.trim() === '') {
+            return res.status(400).json({
+                message: "Search query is required",
+                success: false
+            });
+        }
+
+        // Search users by username (case-insensitive)
+        const users = await UserModel.find({
+            username: { $regex: query, $options: 'i' }
+        })
+            .select('name username profilePic bio')
+            .limit(20);
+
+        return res.status(200).json({
+            success: true,
+            count: users.length,
+            users
+        });
+    } catch (error) {
+        console.error('Search users error:', error);
+        res.status(500).json({ message: "Internal Server Error", success: false });
+    }
+}
+
+export { signup, login, searchUsers };
