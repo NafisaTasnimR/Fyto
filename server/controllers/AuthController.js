@@ -68,9 +68,12 @@ const searchUsers = async (req, res) => {
             });
         }
 
-        // Search users by username (case-insensitive)
+        // Search users by username or name (case-insensitive)
         const users = await UserModel.find({
-            username: { $regex: query, $options: 'i' }
+            $or: [
+                { username: { $regex: query, $options: 'i' } },
+                { name: { $regex: query, $options: 'i' } }
+            ]
         })
             .select('name username profilePic bio')
             .limit(20);
