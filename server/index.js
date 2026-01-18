@@ -16,10 +16,11 @@ app.get("/", (req, res) => {
 })
 
 app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
-    credentials: true
+    origin: '*',
+    credentials: false
 }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use("/api/auth", AuthRouter);
 app.use("/posts", PostRoute);
 app.use("/api/marketplace", MarketplaceRoute);
