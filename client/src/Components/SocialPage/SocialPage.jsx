@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './SocialPage.css';
 
 const SocialPage = () => {
@@ -8,6 +9,8 @@ const SocialPage = () => {
   const [activeNav, setActiveNav] = useState('home');
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -65,75 +68,154 @@ const SocialPage = () => {
     },
   ]);
 
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      username: 'plant_lover_alex',
-      userAvatar: '/girl.png',
-      postImage: '/g1.jpg',
-      likes: 245,
-      caption: 'My Monstera is finally growing a new leaf! 🪴 Took 3 months but it was worth the wait. Consistent watering and bright indirect light is the key! #PlantCare #Monstera #PlantParent',
-      timestamp: '2 hours ago',
-      liked: false,
-      comments: [
-        { id: 1, username: 'garden_guru', text: 'Beautiful! How often do you water it?' },
-        { id: 2, username: 'succulent_queen', text: 'That leaf is huge! Mine never grows this big' },
-      ],
-    },
-    {
-      id: 2,
-      username: 'green_thumb_sam',
-      userAvatar: '/g.png',
-      postImage: '/g2.jpg',
-      likes: 532,
-      caption: 'First harvest of the season! 🍅🌿 Organic homegrown tomatoes taste so much better. Anyone else growing veggies at home? #HomeGarden #OrganicFarming #GardenLife',
-      timestamp: '5 hours ago',
-      liked: false,
-      comments: [
-        { id: 1, username: 'veggie_grower', text: 'Those look so fresh and healthy!' },
-      ],
-    },
-    {
-      id: 3,
-      username: 'jungle_explorer_josh',
-      userAvatar: '/m.png',
-      postImage: '/g3.jpg',
-      likes: 892,
-      caption: 'My living room has officially become a jungle! 🌿🌱 I now have 47 plants and I\'m not done collecting 😅 #PlantCollection #IndoorPlants #PlantJungle #PlantAddict',
-      timestamp: '1 day ago',
-      liked: false,
-      comments: [],
-    },
-    {
-      id: 4,
-      username: 'succulent_collection',
-      userAvatar: '/s.png',
-      postImage: '/g4.jpg',
-      likes: 421,
-      caption: 'Propagation success! 🌵✨ Started from a single leaf 2 months ago and now I have 12 baby plants! Low maintenance and so satisfying to watch grow. #Succulents #Propagation #PlantProp #GardeningTips',
-      timestamp: '1 day ago',
-      liked: false,
-      comments: [
-        { id: 1, username: 'plant_scientist', text: 'Looks so healthy! What species are these?' },
-      ],
-    },
-  ]);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [postsError, setPostsError] = useState(null);
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        setPostsError('Please login to view posts');
+        setLoading(false);
+        return;
+      }
+
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/posts`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        if (!response.data.posts || response.data.posts.length === 0) {
+          setPosts([]);
+          setPostsError(response.data.message || 'No posts available');
+          setLoading(false);
+          return;
+        }
+
+        const formattedPosts = response.data.posts.map(post => ({
+          id: post._id,
+          username: post.authorId?.username || 'Unknown User',
+          userAvatar: post.authorId?.profilePic || '/boy.png',
+          postImage: post.images && post.images.length > 0 ? post.images[0] : null,
+          likes: post.likes?.length || 0,
+          caption: post.content || '',
+          timestamp: formatTimestamp(post.createdAt),
+          liked: false,
+          comments: [],
+        }));
+        setPosts(formattedPosts);
+        setPostsError(null);
+      }
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching posts:', err);
+      setPostsError(err.response?.data?.message || 'Failed to load posts');
+      setLoading(false);
+    }
+  };
+
+  const formatTimestamp = (date) => {
+    const now = new Date();
+    const postDate = new Date(date);
+    const diffMs = now - postDate;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return 'now';
+    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    return postDate.toLocaleDateString();
+  };
+
+  // Search functionality
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (searchQuery.trim()) {
+        performSearch(searchQuery.trim());
+      } else {
+        setSearchResults([]);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
+
+  const performSearch = async (query) => {
+    try {
+      setSearchLoading(true);
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        console.error('No authentication token found');
+        setSearchLoading(false);
+        return;
+      }
+
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/auth/search?query=${encodeURIComponent(query)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const users = response.data.success ? response.data.users : [];
+      setSearchResults(users);
+      setSearchLoading(false);
+    } catch (err) {
+      console.error('Error performing search:', err);
+      setSearchLoading(false);
+    }
+  };
 
   const [replyInputs, setReplyInputs] = useState({});
   const [openReply, setOpenReply] = useState({ postId: null, commentId: null });
 
-  const toggleLike = (postId) => {
-    setPosts(
-      posts.map((post) =>
-        post.id === postId
-          ? {
-              ...post,
-              liked: !post.liked,
-              likes: post.liked ? post.likes - 1 : post.likes + 1,
-            }
-          : post
-      )
-    );
+  const toggleLike = async (postId) => {
+    try {
+      const token = localStorage.getItem('token');
+
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/posts/${postId}/like`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        setPosts(
+          posts.map((post) =>
+            post.id === postId
+              ? {
+                ...post,
+                liked: response.data.isLiked,
+                likes: response.data.likesCount,
+              }
+              : post
+          )
+        );
+      }
+    } catch (err) {
+      console.error('Error toggling like:', err);
+    }
   };
 
   const toggleReply = (postId, commentId) => {
@@ -178,44 +260,102 @@ const SocialPage = () => {
     setOpenReply({ postId: null, commentId: null });
   };
 
-  const handleCreatePost = (e) => {
+  const handleCreatePost = async (e) => {
     e.preventDefault();
-    
+
     if (!newPostData.caption.trim() && !newPostData.image) {
       alert('Please write something or add an image');
       return;
     }
 
-    const newPost = {
-      id: posts.length + 1,
-      username: 'Your Name',
-      userAvatar: '/boy.png',
-      postImage: newPostData.imagePreview,
-      likes: 0,
-      caption: newPostData.caption,
-      timestamp: 'now',
-      liked: false,
-      comments: [],
-    };
+    try {
+      const token = localStorage.getItem('token');
 
-    setPosts([newPost, ...posts]);
-    setNewPostData({ caption: '', image: null, imagePreview: null });
-    setShowCreatePostModal(false);
+      const postData = {
+        content: newPostData.caption,
+        images: newPostData.imagePreview ? [newPostData.imagePreview] : [],
+      };
+
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/posts`,
+        postData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.data.success) {
+        const newPost = {
+          id: response.data.post._id,
+          username: response.data.post.authorId?.username || 'You',
+          userAvatar: response.data.post.authorId?.profilePic || '/boy.png',
+          postImage: response.data.post.images && response.data.post.images.length > 0 ? response.data.post.images[0] : null,
+          likes: 0,
+          caption: response.data.post.content,
+          timestamp: 'now',
+          liked: false,
+          comments: [],
+        };
+
+        setPosts([newPost, ...posts]);
+        setNewPostData({ caption: '', image: null, imagePreview: null });
+        setShowCreatePostModal(false);
+      }
+    } catch (err) {
+      console.error('Error creating post:', err);
+      alert('Failed to create post. Please try again.');
+    }
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
+      compressImage(file);
+    }
+  };
+
+  const compressImage = (file) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = img.width;
+        let height = img.height;
+        const maxSize = 1200;
+
+        if (width > height) {
+          if (width > maxSize) {
+            height = (height * maxSize) / width;
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width = (width * maxSize) / height;
+            height = maxSize;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
         setNewPostData({
           ...newPostData,
           image: file,
-          imagePreview: reader.result,
+          imagePreview: compressedBase64,
         });
       };
-      reader.readAsDataURL(file);
-    }
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
   };
 
   const Post = ({ post }) => {
@@ -407,7 +547,7 @@ const SocialPage = () => {
           <div className="search-header">
             <input
               type="text"
-              placeholder="Search plants, users, topics..."
+              placeholder="Search users by username..."
               className="search-input"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -415,20 +555,40 @@ const SocialPage = () => {
             />
             <button
               className="search-close-btn"
-              onClick={() => setShowSearchResults(false)}
+              onClick={() => {
+                setShowSearchResults(false);
+                setSearchQuery('');
+                setSearchResults([]);
+              }}
               title="Close search"
             >
               ✕
             </button>
           </div>
           <div className="search-results">
-            {searchQuery ? (
+            {searchLoading ? (
+              <div className="search-message">Searching...</div>
+            ) : !searchQuery ? (
               <div className="search-message">
-                Searching for: <strong>{searchQuery}</strong>
+                Search for users by username
               </div>
+            ) : searchResults.length > 0 ? (
+              searchResults.map((user) => (
+                <div key={user._id} className="user-item">
+                  <img
+                    src={user.profilePic || '/boy.png'}
+                    alt={user.username}
+                    className="user-avatar"
+                  />
+                  <div className="user-info">
+                    <div className="user-name">{user.name}</div>
+                    <div className="user-username">@{user.username}</div>
+                  </div>
+                </div>
+              ))
             ) : (
               <div className="search-message">
-                Try searching for plants, users, or topics!
+                No users found for "<strong>{searchQuery}</strong>"
               </div>
             )}
           </div>
@@ -625,27 +785,41 @@ const SocialPage = () => {
 
       <div className="main-content">
         <div className="feed-container">
-        <div className="create-post-section">
-          <div className="create-post-container">
-            <img
-              src="/boy.png"
-              alt="user"
-              className="create-post-avatar"
-            />
-            <button
-              className="create-post-input"
-              onClick={() => setShowCreatePostModal(true)}
-            >
-              Share your plant journey...
-            </button>
+          <div className="create-post-section">
+            <div className="create-post-container">
+              <img
+                src="/boy.png"
+                alt="user"
+                className="create-post-avatar"
+              />
+              <button
+                className="create-post-input"
+                onClick={() => setShowCreatePostModal(true)}
+              >
+                Share your plant journey...
+              </button>
+            </div>
           </div>
-        </div>
 
-        <div className="posts-feed">
-          {posts.map((post) => (
-            <Post key={post.id} post={post} />
-          ))}
-        </div>
+          <div className="posts-feed">
+            {loading ? (
+              <div className="loading-message">
+                <p>Loading posts...</p>
+              </div>
+            ) : postsError ? (
+              <div className="error-message">
+                <p>{postsError}</p>
+              </div>
+            ) : posts.length === 0 ? (
+              <div className="no-posts-message">
+                <p>No posts yet. Be the first to share your plant journey!</p>
+              </div>
+            ) : (
+              posts.map((post) => (
+                <Post key={post.id} post={post} />
+              ))
+            )}
+          </div>
         </div>
       </div>
     </div>

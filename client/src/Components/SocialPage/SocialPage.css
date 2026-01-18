@@ -453,7 +453,7 @@
     margin-left: 250px;
   }
 
-  .sidebar.collapsed ~ .main-content {
+  .sidebar.collapsed~.main-content {
     margin-left: 80px;
   }
 
@@ -462,7 +462,7 @@
     width: 250px;
   }
 
-  .sidebar.collapsed ~ .search-panel {
+  .sidebar.collapsed~.search-panel {
     left: 80px;
   }
 }
@@ -529,7 +529,7 @@
     margin-left: 0;
   }
 
-  .sidebar.collapsed ~ .main-content {
+  .sidebar.collapsed~.main-content {
     margin-left: 0;
   }
 
@@ -542,7 +542,7 @@
     left: 0 !important;
   }
 
-  .sidebar.collapsed ~ .search-panel {
+  .sidebar.collapsed~.search-panel {
     left: 0 !important;
   }
 
@@ -727,7 +727,7 @@
   transition: margin-left 0.3s ease;
 }
 
-.sidebar.collapsed ~ .main-content {
+.sidebar.collapsed~.main-content {
   margin-left: 80px;
 }
 
@@ -746,7 +746,7 @@
   transition: left 0.3s ease;
 }
 
-.sidebar.collapsed ~ .search-panel {
+.sidebar.collapsed~.search-panel {
   left: 80px;
 }
 
@@ -799,7 +799,7 @@
 
 .search-results {
   flex: 1;
-  padding: 16px;
+  padding: 0;
   overflow-y: auto;
 }
 
@@ -808,6 +808,48 @@
   color: #8e8e8e;
   padding: 20px;
   font-size: 14px;
+}
+
+/* User Item in Search Results */
+.user-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #efefef;
+  display: flex;
+  gap: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.user-item:hover {
+  background-color: #f5f5f5;
+}
+
+.user-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 2px;
+}
+
+.user-username {
+  font-size: 13px;
+  color: #8e8e8e;
 }
 
 /* Notifications Panel */
@@ -825,7 +867,7 @@
   transition: left 0.3s ease;
 }
 
-.sidebar.collapsed ~ .notifications-panel {
+.sidebar.collapsed~.notifications-panel {
   left: 80px;
 }
 
@@ -1112,7 +1154,7 @@
   flex: 1;
 }
 
-.comment-body strong { 
+.comment-body strong {
   display: block;
   font-size: 14px;
   margin-bottom: 6px;
@@ -1156,7 +1198,9 @@
   justify-content: center;
 }
 
-.no-comments { padding: 16px; }
+.no-comments {
+  padding: 16px;
+}
 
 /* Post Tabs */
 .post-tabs {
@@ -1301,6 +1345,7 @@
   height: 40px;
   object-fit: contain;
 }
+
 /* Add to Post Section */
 .add-to-post-section {
   padding: 12px 0;
@@ -1377,7 +1422,7 @@
   margin-bottom: 16px;
 }
 
-.post-type-selection > label {
+.post-type-selection>label {
   display: block;
   font-size: 14px;
   font-weight: 600;
