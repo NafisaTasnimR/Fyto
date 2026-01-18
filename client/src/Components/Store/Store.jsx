@@ -1,14 +1,67 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './Store.css';
 
 const Store = () => {
-  const [activeTab, setActiveTab] = useState('For you');
+  // Preserve active tab from localStorage or default to 'For you'
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem('storeActiveTab') || 'For you';
+  });
   const [visibleProjects, setVisibleProjects] = useState(8);
   const [searchQuery, setSearchQuery] = useState('');
+  const [marketplacePosts, setMarketplacePosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const tabs = ['For you', 'Buy', 'Exchange', 'Donate', 'Favourites'];
+
+  useEffect(() => {
+    fetchMarketplacePosts();
+  }, [activeTab]);
+
+  const fetchMarketplacePosts = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        setError('Please login to view marketplace');
+        setLoading(false);
+        return;
+      }
+
+      let url = `${process.env.REACT_APP_API_URL}/api/marketplace`;
+
+      // Apply filtering based on active tab
+      if (activeTab !== 'For you' && activeTab !== 'Favourites') {
+        // Map tab names to postType values
+        const tabToPostTypeMap = {
+          'Buy': 'sell',
+          'Exchange': 'exchange',
+          'Donate': 'donate'
+        };
+        const postType = tabToPostTypeMap[activeTab];
+        url = `${process.env.REACT_APP_API_URL}/api/marketplace/search?postType=${postType}`;
+      }
+
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data.success) {
+        setMarketplacePosts(response.data.posts || []);
+      }
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching marketplace posts:', err);
+      setError('Failed to load marketplace posts');
+      setLoading(false);
+    }
+  };
 
   // Tree-related projects array with category
   const allProjects = [
@@ -188,28 +241,17 @@ const Store = () => {
 
   // Filter projects based on active tab and search query
   const getFilteredProjects = () => {
-    let filtered = allProjects;
+    let filtered = marketplacePosts;
 
-    // Filter by tab category
-    if (activeTab === 'For you') {
-      // Show all projects for "For you"
-      filtered = allProjects;
-    } else if (activeTab === 'Favourites') {
-      // For favourites, you can implement logic based on user's favorites
-      // For now, showing projects with high likes
-      filtered = allProjects.filter(project => project.likes > 400);
-    } else {
-      // Filter by category (Buy, Exchange, Donate)
-      filtered = allProjects.filter(project => project.category === activeTab);
-    }
-
-    // Filter by search query
+    // Already filtered by backend for Buy/Exchange/Donate tabs
+    // Additional client-side filtering for search query
     if (searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(project => 
-        project.title.toLowerCase().includes(query) ||
-        project.author.toLowerCase().includes(query) ||
-        project.tags.some(tag => tag.toLowerCase().includes(query))
+      filtered = filtered.filter(post =>
+        post.treeName.toLowerCase().includes(query) ||
+        post.treeType.toLowerCase().includes(query) ||
+        post.offering.toLowerCase().includes(query) ||
+        post.description.toLowerCase().includes(query)
       );
     }
 
@@ -234,6 +276,7 @@ const Store = () => {
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
+    localStorage.setItem('storeActiveTab', tab); // Save active tab to localStorage
     setVisibleProjects(8); // Reset visible projects when changing tabs
   };
 
@@ -254,16 +297,16 @@ const Store = () => {
         <div className="header-left">
           <div className="logo-container">
             <svg className="logo-icon" width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="20" cy="20" r="18" fill="#2E7D32"/>
-              <path d="M20 8C20 8 16 14 16 18C16 20.21 17.79 22 20 22C22.21 22 24 20.21 24 18C24 14 20 8 20 8Z" fill="#81C784"/>
-              <path d="M20 18L23 22C23 22 21.5 24 20 24C18.5 24 17 22 17 22L20 18Z" fill="#A5D6A7"/>
-              <rect x="19" y="22" width="2" height="10" rx="1" fill="#6D4C41"/>
-              <circle cx="20" cy="32" r="4" fill="#4CAF50"/>
+              <circle cx="20" cy="20" r="18" fill="#2E7D32" />
+              <path d="M20 8C20 8 16 14 16 18C16 20.21 17.79 22 20 22C22.21 22 24 20.21 24 18C24 14 20 8 20 8Z" fill="#81C784" />
+              <path d="M20 18L23 22C23 22 21.5 24 20 24C18.5 24 17 22 17 22L20 18Z" fill="#A5D6A7" />
+              <rect x="19" y="22" width="2" height="10" rx="1" fill="#6D4C41" />
+              <circle cx="20" cy="32" r="4" fill="#4CAF50" />
             </svg>
             <h1 className="logo">Fyto</h1>
           </div>
         </div>
-        
+
         <div className="header-right">
           <button className="menu-icon">☰</button>
         </div>
@@ -285,24 +328,24 @@ const Store = () => {
 
         <div className="tabs-right">
           <div className="search-container">
-            <input 
-              type="text" 
-              className="search-input" 
+            <input
+              type="text"
+              className="search-input"
               placeholder="Search trees, plants..."
               value={searchQuery}
               onChange={handleSearchChange}
             />
             <svg className="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8"/>
-              <path d="m21 21-4.35-4.35"/>
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
             </svg>
           </div>
 
           <button className="filter-btn" onClick={handleFilterClick}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <line x1="4" y1="6" x2="20" y2="6" strokeWidth="2" strokeLinecap="round"/>
-              <line x1="4" y1="12" x2="20" y2="12" strokeWidth="2" strokeLinecap="round"/>
-              <line x1="4" y1="18" x2="20" y2="18" strokeWidth="2" strokeLinecap="round"/>
+              <line x1="4" y1="6" x2="20" y2="6" strokeWidth="2" strokeLinecap="round" />
+              <line x1="4" y1="12" x2="20" y2="12" strokeWidth="2" strokeLinecap="round" />
+              <line x1="4" y1="18" x2="20" y2="18" strokeWidth="2" strokeLinecap="round" />
             </svg>
             <span className="filter-text">Filter</span>
           </button>
@@ -311,38 +354,47 @@ const Store = () => {
 
       {/* Projects Grid */}
       <div className="projects-grid">
-        {displayedProjects.length > 0 ? (
-          displayedProjects.map((project) => (
-            <div 
-              key={project.id} 
+        {loading ? (
+          <div className="loading-message">Loading marketplace posts...</div>
+        ) : error ? (
+          <div className="error-message">{error}</div>
+        ) : displayedProjects.length > 0 ? (
+          displayedProjects.map((post) => (
+            <div
+              key={post._id}
               className="project-card"
-              onClick={() => handleProjectClick(project.id)}
+              onClick={() => handleProjectClick(post._id)}
             >
               <div className="project-image-container">
-                <img 
-                  src={project.image} 
-                  alt={project.title}
+                <img
+                  src={post.photos && post.photos.length > 0 ? post.photos[0] : '/tree-placeholder.png'}
+                  alt={post.treeName}
                   className="project-image"
                 />
-                <div className="project-category-badge">{project.category}</div>
+                <div className="project-category-badge">
+                  {post.postType.charAt(0).toUpperCase() + post.postType.slice(1)}
+                </div>
               </div>
-              
+
               <div className="project-info">
                 <div className="info-row title-row">
-                  <div className="project-title">{project.title}</div>
-                  {project.category === 'Buy' && project.price && (
-                    <span className="price">৳{project.price.toLocaleString()}</span>
+                  <div className="project-title">{post.treeName} - {post.treeType}</div>
+                  {post.postType === 'sell' && post.price > 0 && (
+                    <span className="price">৳{post.price.toLocaleString()}</span>
                   )}
                 </div>
                 <div className="info-row author-row">
-                  <span className="author-name">{project.author}</span>
+                  <span className="author-name">{post.userId?.username || 'Anonymous'}</span>
+                </div>
+                <div className="info-row offering-row">
+                  <span className="offering-text">{post.offering}</span>
                 </div>
               </div>
             </div>
           ))
         ) : (
           <div className="no-results">
-            <p>No projects found matching your criteria.</p>
+            <p>No marketplace posts found matching your criteria.</p>
           </div>
         )}
       </div>
@@ -360,8 +412,8 @@ const Store = () => {
       <div className="fab-container">
         <button className="new-post-fab" title="Create new post" onClick={handleNewPost}>
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <line x1="12" y1="5" x2="12" y2="19"/>
-            <line x1="5" y1="12" x2="19" y2="12"/>
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
         </button>
       </div>
