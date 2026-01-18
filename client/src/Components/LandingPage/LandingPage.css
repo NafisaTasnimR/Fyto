@@ -53,6 +53,27 @@
   font-size: 1.4rem;
 }
 
+/* center nav added to header */
+.center-nav {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+.center-nav .nav-link {
+  text-decoration: none;
+  color: #4b5563;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.center-nav .nav-link:hover {
+  color: #274b2f;
+}
+
 /* Mirrored styles for unique button classes on LandingPage to avoid clashes */
 .nav-btn1 {
   padding: 10px 25px;

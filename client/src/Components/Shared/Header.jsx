@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import '../LandingPage/LandingPage.css';
 
 export default function Header() {
@@ -14,10 +15,17 @@ export default function Header() {
             <span>Fyto</span>
           </div>
 
+          <div className="center-nav">
+              <NavLink end to="/social" className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>Social</NavLink>
+              <NavLink end to="/store" className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>Marketplace</NavLink>
+              <NavLink end to="/journal" className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>Journal</NavLink>
+              <NavLink end to="/challenges" className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>Challenges</NavLink>
+          </div>
+
           <div className="profile-section">
-            <button className="profile-button" onClick={() => setShowProfileMenu((s) => !s)}>
+            <NavLink to="/profile" className="profile-button">
               <img src="/user.png" alt="Profile" className="profile-avatar" />
-            </button>
+            </NavLink>
           </div>
         </div>
       </header>
