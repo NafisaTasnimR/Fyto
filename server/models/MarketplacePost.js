@@ -4,7 +4,7 @@ const marketplacePostSchema = new mongoose.Schema(
     {
         userId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: "Users",
             required: true
         },
 
@@ -47,8 +47,8 @@ const marketplacePostSchema = new mongoose.Schema(
         },
 
         contactInfo: {
-            phone: String,
-            email: String
+            type: String,
+            required: true
         },
 
         treeAge: {

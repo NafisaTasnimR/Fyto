@@ -14,7 +14,7 @@ export const createMarketplacePost = async (req, res) => {
             treeAge
         } = req.body;
 
-        const userId = req.user.userId || req.user._id;
+        const userId = req.user._id;
 
         const newPost = new MarketplacePost({
             userId,
@@ -51,7 +51,7 @@ export const createMarketplacePost = async (req, res) => {
 export const deleteMarketplacePost = async (req, res) => {
     try {
         const { postId } = req.params;
-        const userId = req.user.userId || req.user._id;
+        const userId = req.user._id;
 
         const post = await MarketplacePost.findById(postId);
 
@@ -225,7 +225,7 @@ export const getMarketplacePostById = async (req, res) => {
 // Get all posts by logged-in user
 export const getUserMarketplacePosts = async (req, res) => {
     try {
-        const userId = req.user.userId || req.user._id;
+        const userId = req.user._id;
         const { status, page = 1, limit = 10 } = req.query;
 
         // Build query filter
@@ -272,7 +272,7 @@ export const updateMarketplacePostStatus = async (req, res) => {
     try {
         const { postId } = req.params;
         const { status } = req.body;
-        const userId = req.user.userId || req.user._id;
+        const userId = req.user._id;
 
         const post = await MarketplacePost.findById(postId);
 
@@ -313,7 +313,7 @@ export const updateMarketplacePostStatus = async (req, res) => {
 export const markPostAsSold = async (req, res) => {
     try {
         const { postId } = req.params;
-        const userId = req.user.userId || req.user._id;
+        const userId = req.user._id;
 
         const post = await MarketplacePost.findById(postId);
 
