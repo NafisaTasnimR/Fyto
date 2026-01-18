@@ -10,29 +10,31 @@
 }
 
 .profile-content {
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 88px 20px 40px; 
+  padding: 88px 20px 0; /* remove bottom padding so card can reach page end */
 }
 
 .infos-wrapper {
   background: transparent;
-  padding: 18px 0 28px;
+  padding: 18px 0 0; /* remove bottom padding */
   margin-top: 18px;
 }
 
 .infos-box {
-  max-width: 1000px;
-  margin: 0 auto;
+  /* revert to centered card width */
+  max-width: 900px;
+  margin: 0 auto 0 auto;
   background: #fff;
   border: 1px solid #e5e5e5;
   padding: 36px;
   border-radius: 6px;
-  min-height: 220px;
+  min-height: calc(100vh - 140px);
+  margin-bottom: 0;
 }
 
 .content-inner {
-  max-width: 1000px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 0 36px;
   box-sizing: border-box;
@@ -109,7 +111,7 @@
 
 .profile-tabs {
   display: flex;
-  gap: 28px;
+  gap: 40px;
   margin-top: 18px;
   align-items: flex-end;
   border-top: 1px solid #d0d0d0d4;
@@ -148,7 +150,7 @@
 }
 
 .tab-panel {
-  margin-top: 28px;
+  margin-top: 12px; /* reduced top space so heading sits closer */
   min-height: 200px;
   background: transparent;
 }
@@ -170,4 +172,119 @@
     height: 90px;
     flex: 0 0 90px;
   }
+}
+
+/* Journal list styling */
+.journal-list {
+  display: block;
+}
+
+.journal-item {
+  padding: 18px 12px;
+  border-bottom: 1px solid #eef0ef;
+}
+
+.journal-item:last-child {
+  border-bottom: none;
+}
+
+.journal-title {
+  font-size: 16px;
+  color: #333;
+}
+
+.journal-heading {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2f6b48;
+  margin: 0 0 12px;
+}
+
+/* Override post overflow and add dropdown menu styles for posts inside profile page */
+.infos-box .post {
+  overflow: visible !important;
+  position: relative;
+}
+
+.infos-box .post-header {
+  position: relative;
+}
+
+.infos-box .post-menu-btn {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  color: #444;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.infos-box .post-menu-btn:hover {
+  background: rgba(0,0,0,0.03);
+}
+
+.infos-box .post-menu {
+  position: absolute;
+  top: 44px;
+  right: 8px;
+  width: 220px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 6px 0;
+  z-index: 120;
+}
+
+.infos-box .post-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-weight: 600;
+  color: #222;
+}
+
+.infos-box .post-menu-item img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.infos-box .post-menu-sep {
+  height: 1px;
+  background: #f0f0f0;
+  margin: 6px 0;
+}
+
+.infos-box .post-menu-item.danger {
+  color: #d9534f;
+}
+
+/* Align feed inside profile page to the left under the heading */
+.infos-box .feed-container {
+  margin: 0; /* remove auto centering */
+  padding: 0; /* align to content-inner padding */
+  max-width: 600px; /* keep same max width as social feed */
+}
+.infos-box .feed-container {
+  margin: 0 auto; /* center the feed inside infos-box */
+  padding: 0 10px; /* small padding so content doesn't touch edges */
+  max-width: 600px; /* keep same max width as social feed */
+}
+
+.infos-box .posts-feed {
+  padding-left: 0;
+}
+.infos-box .posts-feed {
+  padding-left: 0; /* keep posts layout clean within feed */
 }
