@@ -1,11 +1,12 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './NewPost.css';
 
 const NewPost = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
-  
+
   const [formData, setFormData] = useState({
     treeName: '',
     treeType: '',
@@ -59,7 +60,7 @@ const NewPost = () => {
       ...prev,
       [name]: value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
@@ -103,20 +104,59 @@ const NewPost = () => {
         return;
       }
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
+      // Compress and convert image to base64
+      compressImage(file);
+    }
+  };
+
+  const compressImage = (file) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        // Create canvas
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Calculate new dimensions (max 1200px width/height)
+        let width = img.width;
+        let height = img.height;
+        const maxSize = 1200;
+
+        if (width > height) {
+          if (width > maxSize) {
+            height = (height * maxSize) / width;
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width = (width * maxSize) / height;
+            height = maxSize;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw and compress
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert to base64 with compression (0.7 quality)
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
         setFormData(prev => ({
           ...prev,
           image: file,
-          imagePreview: reader.result
+          imagePreview: compressedBase64
         }));
         setErrors(prev => ({
           ...prev,
           image: ''
         }));
       };
-      reader.readAsDataURL(file);
-    }
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleRemoveImage = () => {
@@ -177,14 +217,61 @@ const NewPost = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (validateForm()) {
-      // Here you would typically send the data to your backend
-      console.log('Form submitted:', formData);
-      alert('Post created successfully!');
-      navigate('/');
+      try {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+          alert('Please login to create a post');
+          navigate('/login');
+          return;
+        }
+
+        // Prepare marketplace post data
+        const finalTreeType = formData.treeType === 'Other' ? formData.customTreeType : formData.treeType;
+        const finalTreePart = formData.treePart === 'Other' ? formData.customTreePart : formData.treePart;
+
+        const marketplaceData = {
+          photos: formData.imagePreview ? [formData.imagePreview] : [],
+          treeName: formData.treeName,
+          treeType: finalTreeType,
+          offering: finalTreePart,
+          description: formData.description,
+          postType: formData.postType,
+          price: formData.postType === 'sell' ? parseFloat(formData.price) : 0,
+          contactInfo: formData.contact,
+          treeAge: 0 // You can add age field if needed
+        };
+
+        // If exchange, add what they want in description
+        if (formData.postType === 'exchange') {
+          marketplaceData.description += `\n\nLooking for: ${formData.exchangeFor}`;
+        }
+
+        const response = await axios.post(
+          `${process.env.REACT_APP_API_URL}/api/marketplace`,
+          marketplaceData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (response.data.success) {
+          alert('Marketplace post created successfully!');
+          navigate('/'); // Navigate to store
+        } else {
+          alert('Failed to create post: ' + response.data.message);
+        }
+      } catch (error) {
+        console.error('Error creating post:', error);
+        alert('Failed to create post. Please try again.');
+      }
     } else {
       // Scroll to first error
       const firstError = document.querySelector('.error-message');
@@ -205,22 +292,22 @@ const NewPost = () => {
         <div className="header-left">
           <button className="back-btn" onClick={handleCancel}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 12H5M12 19l-7-7 7-7"/>
+              <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
           </button>
-          
+
           <div className="logo-container">
             <svg className="logo-icon" width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="20" cy="20" r="18" fill="#2E7D32"/>
-              <path d="M20 8C20 8 16 14 16 18C16 20.21 17.79 22 20 22C22.21 22 24 20.21 24 18C24 14 20 8 20 8Z" fill="#81C784"/>
-              <path d="M20 18L23 22C23 22 21.5 24 20 24C18.5 24 17 22 17 22L20 18Z" fill="#A5D6A7"/>
-              <rect x="19" y="22" width="2" height="10" rx="1" fill="#6D4C41"/>
-              <circle cx="20" cy="32" r="4" fill="#4CAF50"/>
+              <circle cx="20" cy="20" r="18" fill="#2E7D32" />
+              <path d="M20 8C20 8 16 14 16 18C16 20.21 17.79 22 20 22C22.21 22 24 20.21 24 18C24 14 20 8 20 8Z" fill="#81C784" />
+              <path d="M20 18L23 22C23 22 21.5 24 20 24C18.5 24 17 22 17 22L20 18Z" fill="#A5D6A7" />
+              <rect x="19" y="22" width="2" height="10" rx="1" fill="#6D4C41" />
+              <circle cx="20" cy="32" r="4" fill="#4CAF50" />
             </svg>
             <h1 className="logo">Fyto</h1>
           </div>
         </div>
-        
+
         <div className="header-right">
           <button className="menu-icon">☰</button>
         </div>
@@ -243,17 +330,17 @@ const NewPost = () => {
                   <img src={formData.imagePreview} alt="Tree preview" className="image-preview" />
                   <button type="button" className="remove-image-btn" onClick={handleRemoveImage}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <line x1="18" y1="6" x2="6" y2="18"/>
-                      <line x1="6" y1="6" x2="18" y2="18"/>
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
                     </svg>
                   </button>
                 </div>
               ) : (
                 <div className="image-upload-placeholder" onClick={handleImageClick}>
                   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                    <circle cx="8.5" cy="8.5" r="1.5"/>
-                    <polyline points="21 15 16 10 5 21"/>
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <polyline points="21 15 16 10 5 21" />
                   </svg>
                   <p className="upload-text">Click to upload image</p>
                   <p className="upload-hint">PNG, JPG up to 5MB</p>
@@ -301,7 +388,7 @@ const NewPost = () => {
               ))}
             </select>
             {errors.treeType && <span className="error-message">{errors.treeType}</span>}
-            
+
             {/* Show custom input if Other is selected */}
             {formData.treeType === 'Other' && (
               <div style={{ marginTop: '12px' }}>
@@ -334,7 +421,7 @@ const NewPost = () => {
               ))}
             </select>
             {errors.treePart && <span className="error-message">{errors.treePart}</span>}
-            
+
             {/* Show custom input if Other is selected */}
             {formData.treePart === 'Other' && (
               <div style={{ marginTop: '12px' }}>
@@ -379,8 +466,8 @@ const NewPost = () => {
                 onClick={() => handlePostTypeChange('sell')}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="12" y1="1" x2="12" y2="23"/>
-                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                  <line x1="12" y1="1" x2="12" y2="23" />
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                 </svg>
                 Sell
               </button>
@@ -390,10 +477,10 @@ const NewPost = () => {
                 onClick={() => handlePostTypeChange('exchange')}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M16 3l4 4-4 4"/>
-                  <path d="M20 7H4"/>
-                  <path d="M8 21l-4-4 4-4"/>
-                  <path d="M4 17h16"/>
+                  <path d="M16 3l4 4-4 4" />
+                  <path d="M20 7H4" />
+                  <path d="M8 21l-4-4 4-4" />
+                  <path d="M4 17h16" />
                 </svg>
                 Exchange
               </button>
@@ -403,7 +490,7 @@ const NewPost = () => {
                 onClick={() => handlePostTypeChange('donate')}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                 </svg>
                 Donate
               </button>
