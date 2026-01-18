@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './SocialPage.css';
 
 const SocialPage = () => {
+  const navigate = useNavigate();
   const [showCreatePostModal, setShowCreatePostModal] = useState(false);
   const [showCommentsModal, setShowCommentsModal] = useState(false);
   const [activeCommentsPost, setActiveCommentsPost] = useState(null);
@@ -221,6 +223,12 @@ const SocialPage = () => {
   const [replyInputs, setReplyInputs] = useState({});
   const [openReply, setOpenReply] = useState({ postId: null, commentId: null });
 
+  const handleUserClick = (username) => {
+    if (username && username !== 'Unknown User') {
+      navigate(`/profile/${username}`);
+    }
+  };
+
   const handleViewPost = (post) => {
     // Get current user ID from token
     const token = localStorage.getItem('token');
@@ -429,9 +437,21 @@ const SocialPage = () => {
       <div className="post">
         {/* Post Header */}
         <div className="post-header">
-          <img src={post.userAvatar} alt={post.username} className="avatar" />
+          <img
+            src={post.userAvatar}
+            alt={post.username}
+            className="avatar"
+            onClick={() => handleUserClick(post.username)}
+            style={{ cursor: 'pointer' }}
+          />
           <div className="header-info">
-            <h3 className="username">{post.username}</h3>
+            <h3
+              className="username"
+              onClick={() => handleUserClick(post.username)}
+              style={{ cursor: 'pointer' }}
+            >
+              {post.username}
+            </h3>
             <span className="timestamp">{post.timestamp}</span>
           </div>
         </div>
@@ -661,7 +681,11 @@ const SocialPage = () => {
                     {searchResults
                       .filter(item => item.type === 'user')
                       .map((item) => (
-                        <div key={item.data._id} className="user-item">
+                        <div
+                          key={item.data._id}
+                          className="user-item"
+                          onClick={() => handleUserClick(item.data.username)}
+                        >
                           <img
                             src={item.data.profilePic || '/boy.png'}
                             alt={item.data.username}
@@ -686,7 +710,13 @@ const SocialPage = () => {
                           className="post-item-search"
                           onClick={() => handleViewPost(item.data)}
                         >
-                          <div className="post-search-header">
+                          <div
+                            className="post-search-header"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleUserClick(item.data.authorId?.username);
+                            }}
+                          >
                             <img
                               src={item.data.authorId?.profilePic || '/boy.png'}
                               alt={item.data.authorId?.username}
@@ -697,9 +727,7 @@ const SocialPage = () => {
                               <div className="user-username">@{item.data.authorId?.username}</div>
                             </div>
                           </div>
-                          <div className="post-search-content">
-                            {item.data.content}
-                          </div>
+                          <div className="post-search-content">{item.data.content}</div>
                           {item.data.images && item.data.images.length > 0 && (
                             <img
                               src={item.data.images[0]}
@@ -812,9 +840,27 @@ const SocialPage = () => {
 
             <div className="view-post-content">
               <div className="post-header">
-                <img src={viewingPost.userAvatar} alt={viewingPost.username} className="post-avatar" />
+                <img
+                  src={viewingPost.userAvatar}
+                  alt={viewingPost.username}
+                  className="post-avatar"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleUserClick(viewingPost.username);
+                  }}
+                  style={{ cursor: 'pointer' }}
+                />
                 <div className="post-user-info">
-                  <strong className="post-username">{viewingPost.username}</strong>
+                  <strong
+                    className="post-username"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleUserClick(viewingPost.username);
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {viewingPost.username}
+                  </strong>
                   <span className="post-timestamp">{viewingPost.timestamp}</span>
                 </div>
               </div>
