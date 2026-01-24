@@ -568,7 +568,7 @@ const ProductDetail = () => {
               </div>
             ) : (
               <div className="options-list">
-                {post.options.map((option, index) => (
+                {post.options && post.options.map((option, index) => (
                   <label key={index} className="option-item">
                     <input
                       type="radio"
