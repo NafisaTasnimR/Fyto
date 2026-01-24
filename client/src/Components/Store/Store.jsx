@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useConfirmedPosts } from '../Context/ConfirmedPostsContext';
 import './Store.css';
 import Header from '../Shared/Header';
 
 const Store = () => {
-  // Preserve active tab from localStorage or default to 'For you'
   const [activeTab, setActiveTab] = useState(() => {
     return localStorage.getItem('storeActiveTab') || 'For you';
   });
-  const [visibleProjects, setVisibleProjects] = useState(8);
+  const [visibleProjects, setVisibleProjects] = useState(12);
   const [searchQuery, setSearchQuery] = useState('');
   const [marketplacePosts, setMarketplacePosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  
+  // Filter states
+  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+  const [availabilityFilter, setAvailabilityFilter] = useState('all'); // 'all', 'available', 'unavailable'
+  
   const navigate = useNavigate();
-  const { isPostConfirmed } = useConfirmedPosts();
 
   const tabs = ['For you', 'Buy', 'Exchange', 'Donate', 'Favourites'];
 
@@ -37,9 +40,7 @@ const Store = () => {
 
       let url = `${process.env.REACT_APP_API_URL}/api/marketplace`;
 
-      // Apply filtering based on active tab
       if (activeTab !== 'For you' && activeTab !== 'Favourites') {
-        // Map tab names to postType values
         const tabToPostTypeMap = {
           'Buy': 'sell',
           'Exchange': 'exchange',
@@ -56,7 +57,15 @@ const Store = () => {
       });
 
       if (response.data.success) {
-        setMarketplacePosts(response.data.posts || []);
+        const posts = response.data.posts || [];
+        
+        // TEMPORARY TEST: Make first post confirmed for testing
+        // Remove this after confirming the overlay works
+        if (posts.length > 0) {
+          posts[0].status = 'confirmed'; // Temporarily set first post as confirmed
+        }
+        
+        setMarketplacePosts(posts);
       }
       setLoading(false);
     } catch (err) {
@@ -66,196 +75,43 @@ const Store = () => {
     }
   };
 
-  // Tree-related projects array with category
-  const allProjects = [
-    {
-      id: 1,
-      image: 'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=600&h=400&fit=crop',
-      title: 'Japanese Maple Tree',
-      author: 'Sarah Johnson',
-      likes: 378,
-      views: '2.8K',
-      category: 'Buy',
-      price: 450,
-      tags: ['maple', 'japanese', 'tree', 'ornamental']
-    },
-    {
-      id: 2,
-      image: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=600&h=400&fit=crop',
-      title: 'Cherry Blossom Sapling',
-      author: 'Michael Chen',
-      likes: 157,
-      views: '344',
-      category: 'Buy',
-      price: 120,
-      tags: ['cherry', 'blossom', 'sapling', 'flowering']
-    },
-    {
-      id: 3,
-      image: 'https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=600&h=400&fit=crop',
-      title: 'Pine Tree Collection',
-      author: 'Garden Masters',
-      likes: 545,
-      views: '8.4K',
-      category: 'Exchange',
-      tags: ['pine', 'evergreen', 'collection', 'conifer']
-    },
-    {
-      id: 4,
-      image: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=600&h=400&fit=crop',
-      title: 'Oak Tree - Mature',
-      author: 'David Martinez',
-      likes: 892,
-      views: '12K',
-      category: 'Buy',
-      price: 1200,
-      tags: ['oak', 'mature', 'hardwood', 'shade']
-    },
-    {
-      id: 5,
-      image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=400&fit=crop',
-      title: 'Birch Tree Duo',
-      author: 'Emma Wilson',
-      likes: 234,
-      views: '1.2K',
-      category: 'Buy',
-      price: 300,
-      tags: ['birch', 'white', 'duo', 'decorative']
-    },
-    {
-      id: 6,
-      image: 'https://images.unsplash.com/photo-1536431311719-398b6704d4cc?w=600&h=400&fit=crop',
-      title: 'Willow Tree - Young',
-      author: 'Robert Green',
-      likes: 456,
-      views: '3.1K',
-      category: 'Donate',
-      tags: ['willow', 'young', 'weeping', 'water']
-    },
-    {
-      id: 7,
-      image: 'https://images.unsplash.com/photo-1511497584788-876760111969?w=600&h=400&fit=crop',
-      title: 'Magnolia Tree',
-      author: 'Lisa Park',
-      likes: 678,
-      views: '5.6K',
-      category: 'Buy',
-      price: 680,
-      tags: ['magnolia', 'flowering', 'fragrant', 'spring']
-    },
-    {
-      id: 8,
-      image: 'https://images.unsplash.com/photo-1470058869958-2a77ade41c02?w=600&h=400&fit=crop',
-      title: 'Palm Tree - Tropical',
-      author: 'James Rodriguez',
-      likes: 321,
-      views: '2.1K',
-      category: 'Buy',
-      price: 550,
-      tags: ['palm', 'tropical', 'exotic', 'coastal']
-    },
-    {
-      id: 9,
-      image: 'https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=600&h=400&fit=crop',
-      title: 'Evergreen Collection',
-      author: 'Rachel Brown',
-      likes: 445,
-      views: '3.5K',
-      category: 'Exchange',
-      tags: ['evergreen', 'collection', 'year-round', 'green']
-    },
-    {
-      id: 10,
-      image: 'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=600&h=400&fit=crop',
-      title: 'Red Maple Tree',
-      author: 'Alex Turner',
-      likes: 567,
-      views: '4.2K',
-      category: 'Buy',
-      price: 400,
-      tags: ['maple', 'red', 'autumn', 'colorful']
-    },
-    {
-      id: 11,
-      image: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=600&h=400&fit=crop',
-      title: 'Flowering Plum Tree',
-      author: 'Maria Santos',
-      likes: 289,
-      views: '1.8K',
-      category: 'Buy',
-      price: 180,
-      tags: ['plum', 'flowering', 'spring', 'pink']
-    },
-    {
-      id: 12,
-      image: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=600&h=400&fit=crop',
-      title: 'Ancient Oak',
-      author: 'Tom Anderson',
-      likes: 398,
-      views: '2.9K',
-      category: 'Buy',
-      price: 2500,
-      tags: ['oak', 'ancient', 'heritage', 'large']
-    },
-    {
-      id: 13,
-      image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=400&fit=crop',
-      title: 'White Birch Tree',
-      author: 'Lisa Chen',
-      likes: 512,
-      views: '4.7K',
-      category: 'Buy',
-      price: 280,
-      tags: ['birch', 'white', 'bark', 'elegant']
-    },
-    {
-      id: 14,
-      image: 'https://images.unsplash.com/photo-1536431311719-398b6704d4cc?w=600&h=400&fit=crop',
-      title: 'Weeping Willow',
-      author: 'Mark Wilson',
-      likes: 423,
-      views: '3.3K',
-      category: 'Buy',
-      price: 850,
-      tags: ['willow', 'weeping', 'graceful', 'pond']
-    },
-    {
-      id: 15,
-      image: 'https://images.unsplash.com/photo-1511497584788-876760111969?w=600&h=400&fit=crop',
-      title: 'Pink Magnolia',
-      author: 'Jessica Park',
-      likes: 334,
-      views: '2.4K',
-      category: 'Donate',
-      tags: ['magnolia', 'pink', 'blooming', 'beautiful']
-    },
-    {
-      id: 16,
-      image: 'https://images.unsplash.com/photo-1470058869958-2a77ade41c02?w=600&h=400&fit=crop',
-      title: 'Coconut Palm Tree',
-      author: 'Chris Martin',
-      likes: 601,
-      views: '5.8K',
-      category: 'Buy',
-      price: 620,
-      tags: ['palm', 'coconut', 'tropical', 'beach']
-    }
-  ];
-
-  // Filter projects based on active tab and search query
   const getFilteredProjects = () => {
     let filtered = marketplacePosts;
 
-    // Already filtered by backend for Buy/Exchange/Donate tabs
-    // Additional client-side filtering for search query
+    // Search filter
     if (searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(post =>
-        post.treeName.toLowerCase().includes(query) ||
-        post.treeType.toLowerCase().includes(query) ||
-        post.offering.toLowerCase().includes(query) ||
-        post.description.toLowerCase().includes(query)
+        post.treeName?.toLowerCase().includes(query) ||
+        post.treeType?.toLowerCase().includes(query) ||
+        post.offering?.toLowerCase().includes(query) ||
+        post.description?.toLowerCase().includes(query)
       );
+    }
+
+    // Price filter
+    if (priceRange.min !== '' || priceRange.max !== '') {
+      filtered = filtered.filter(post => {
+        const price = post.price || 0;
+        const min = priceRange.min !== '' ? parseFloat(priceRange.min) : 0;
+        const max = priceRange.max !== '' ? parseFloat(priceRange.max) : Infinity;
+        return price >= min && price <= max;
+      });
+    }
+
+    // Availability filter
+    if (availabilityFilter === 'available') {
+      filtered = filtered.filter(post => {
+        return post.status === 'available' || 
+               (!post.status) || 
+               (post.status !== 'confirmed' && post.status !== 'sold' && post.status !== 'unavailable');
+      });
+    } else if (availabilityFilter === 'unavailable') {
+      filtered = filtered.filter(post => {
+        return post.status === 'confirmed' || 
+               post.status === 'sold' ||
+               post.status === 'unavailable';
+      });
     }
 
     return filtered;
@@ -279,49 +135,41 @@ const Store = () => {
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-    localStorage.setItem('storeActiveTab', tab); // Save active tab to localStorage
-    setVisibleProjects(8); // Reset visible projects when changing tabs
+    localStorage.setItem('storeActiveTab', tab);
+    setVisibleProjects(12);
   };
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
-    setVisibleProjects(12); // Reset visible projects when searching
+    setVisibleProjects(12);
   };
 
   const handleFilterClick = () => {
-    // Implement filter modal/dropdown here
-    alert('Filter options coming soon!');
+    setShowFilterModal(!showFilterModal);
+  };
+
+  const handleApplyFilters = () => {
+    setShowFilterModal(false);
+    setVisibleProjects(12);
+  };
+
+  const handleClearFilters = () => {
+    setPriceRange({ min: '', max: '' });
+    setAvailabilityFilter('all');
+    setVisibleProjects(12);
   };
 
   return (
-    <div className="portfolio-container">
-      {/* Header */}
-      <header className="header">
-        <div className="header-left">
-          <div className="logo-container">
-            <svg className="logo-icon" width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="20" cy="20" r="18" fill="#2E7D32" />
-              <path d="M20 8C20 8 16 14 16 18C16 20.21 17.79 22 20 22C22.21 22 24 20.21 24 18C24 14 20 8 20 8Z" fill="#81C784" />
-              <path d="M20 18L23 22C23 22 21.5 24 20 24C18.5 24 17 22 17 22L20 18Z" fill="#A5D6A7" />
-              <rect x="19" y="22" width="2" height="10" rx="1" fill="#6D4C41" />
-              <circle cx="20" cy="32" r="4" fill="#4CAF50" />
-            </svg>
-            <h1 className="logo">Fyto</h1>
-          </div>
-        </div>
+    <div className="store-page">
+      <Header />
 
-        <div className="header-right">
-          <button className="menu-icon">☰</button>
-        </div>
-      </header>
-
-      {/* Tabs Navigation with Search and Filter */}
-      <nav className="tabs-nav">
-        <div className="tabs-left">
+      {/* Tabs and Search Navigation */}
+      <div className="marketplace-navbar-wrapper">
+        <div className="marketplace-tabs-container">
           {tabs.map((tab) => (
             <button
               key={tab}
-              className={`tab ${activeTab === tab ? 'active' : ''}`}
+              className={`marketplace-tab-button ${activeTab === tab ? 'marketplace-tab-active' : ''}`}
               onClick={() => handleTabChange(tab)}
             >
               {tab}
@@ -329,95 +177,189 @@ const Store = () => {
           ))}
         </div>
 
-        <div className="tabs-right">
-          <div className="search-container">
-            <svg className="search-icon-left" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.35-4.35" />
+        <div className="marketplace-search-wrapper">
+          <svg className="marketplace-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+          <input
+            type="text"
+            className="marketplace-search-input"
+            placeholder="Search trees, plants..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+          />
+          <button className="marketplace-filter-btn" onClick={handleFilterClick} title="Filter">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="4" y1="6" x2="20" y2="6" strokeLinecap="round" />
+              <line x1="4" y1="12" x2="20" y2="12" strokeLinecap="round" />
+              <line x1="4" y1="18" x2="20" y2="18" strokeLinecap="round" />
             </svg>
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search trees, plants..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
-            <button className="filter-btn-inside" onClick={handleFilterClick} title="Filter">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="4" y1="6" x2="20" y2="6" strokeLinecap="round" />
-                <line x1="4" y1="12" x2="20" y2="12" strokeLinecap="round" />
-                <line x1="4" y1="18" x2="20" y2="18" strokeLinecap="round" />
-              </svg>
-            </button>
-          </div>
+          </button>
         </div>
-      </nav>
+      </div>
 
-      {/* Projects Grid */}
-      <div className="projects-grid">
+      {/* Main Content */}
+      <div className="store-content">
         {loading ? (
-          <div className="loading-message">Loading marketplace posts...</div>
+          <div className="store-message">Loading marketplace posts...</div>
         ) : error ? (
-          <div className="error-message">{error}</div>
+          <div className="store-message">{error}</div>
         ) : displayedProjects.length > 0 ? (
-          displayedProjects.map((post) => (
-            <div
-              key={post._id}
-              className="project-card"
-              onClick={() => handleProjectClick(post._id)}
-            >
-              <div className="project-image-container">
-                <img
-                  src={post.photos && post.photos.length > 0 ? post.photos[0] : '/tree-placeholder.png'}
-                  alt={post.treeName}
-                  className="project-image"
-                />
-                <div className="project-category-badge">
-                  {post.postType.charAt(0).toUpperCase() + post.postType.slice(1)}
-                </div>
-              </div>
+          <>
+            <div className="store-grid">
+              {displayedProjects.map((post) => {
+                // Check if post is confirmed/unavailable
+                // Backend uses status: 'available', 'sold', or 'confirmed'
+                const isConfirmed = post.status === 'confirmed' || 
+                                   post.status === 'sold' ||
+                                   post.status === 'unavailable' ||
+                                   post.isConfirmed === true || 
+                                   post.confirmed === true;
+                
+                return (
+                  <div
+                    key={post._id}
+                    className={`store-card ${isConfirmed ? 'confirmed' : ''}`}
+                    onClick={() => !isConfirmed && handleProjectClick(post._id)}
+                  >
+                    <div className="store-card-image-wrapper">
+                      <img
+                        src={post.photos && post.photos.length > 0 ? post.photos[0] : '/tree-placeholder.png'}
+                        alt={post.treeName}
+                        className="store-card-image"
+                      />
+                      <span className="store-card-badge">
+                        {post.postType === 'sell' ? 'Buy' : 
+                         post.postType === 'exchange' ? 'Exchange' : 
+                         post.postType === 'donate' ? 'Donate' : 'Buy'}
+                      </span>
+                      
+                      {isConfirmed && (
+                        <div className="confirmed-overlay">
+                          <div className="confirmed-badge">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                              <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            Confirmed
+                          </div>
+                          <div className="unavailable-text">NO LONGER AVAILABLE</div>
+                        </div>
+                      )}
+                    </div>
 
-              <div className="project-info">
-                <div className="info-row title-row">
-                  <div className="project-title">{post.treeName} - {post.treeType}</div>
-                  {post.postType === 'sell' && post.price > 0 && (
-                    <span className="price">৳{post.price.toLocaleString()}</span>
-                  )}
-                </div>
-                <div className="info-row author-row">
-                  <span className="author-name">{post.userId?.username || 'Anonymous'}</span>
-                </div>
-                <div className="info-row offering-row">
-                  <span className="offering-text">{post.offering}</span>
-                </div>
-              </div>
+                    <div className="store-card-info">
+                      <div className="store-card-title-row">
+                        <h3 className="store-card-title">{post.treeName} - {post.treeType}</h3>
+                        {post.postType === 'sell' && post.price > 0 && (
+                          <span className="store-card-price">৳{post.price.toLocaleString()}</span>
+                        )}
+                      </div>
+                      <p className="store-card-author">{post.userId?.username || 'Anonymous'}</p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          ))
+
+            {hasMore && (
+              <div className="store-load-more-container">
+                <button className="store-load-more-button" onClick={loadMore}>
+                  Load More
+                </button>
+              </div>
+            )}
+          </>
         ) : (
-          <div className="no-results">
-            <p>No marketplace posts found matching your criteria.</p>
-          </div>
+          <div className="store-message">No marketplace posts found matching your criteria.</div>
         )}
       </div>
 
-      {/* Load More Button */}
-      {hasMore && (
-        <div className="load-more-container">
-          <button className="load-more-btn" onClick={loadMore}>
-            Load More
-          </button>
+      {/* Floating Action Button */}
+      <button className="store-fab" onClick={handleNewPost} title="Create new post">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+      </button>
+
+      {/* Filter Modal */}
+      {showFilterModal && (
+        <div className="filter-modal-overlay" onClick={() => setShowFilterModal(false)}>
+          <div className="filter-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="filter-modal-header">
+              <h3>Filters</h3>
+              <button className="close-modal-btn" onClick={() => setShowFilterModal(false)}>×</button>
+            </div>
+
+            <div className="filter-modal-content">
+              {/* Price Range Filter */}
+              <div className="filter-section">
+                <h4>Price Range (৳)</h4>
+                <div className="price-inputs">
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    value={priceRange.min}
+                    onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
+                    className="price-input"
+                  />
+                  <span>-</span>
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={priceRange.max}
+                    onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
+                    className="price-input"
+                  />
+                </div>
+              </div>
+
+              {/* Availability Filter */}
+              <div className="filter-section">
+                <h4>Availability</h4>
+                <div className="radio-group">
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      name="availability"
+                      value="all"
+                      checked={availabilityFilter === 'all'}
+                      onChange={(e) => setAvailabilityFilter(e.target.value)}
+                    />
+                    All Posts
+                  </label>
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      name="availability"
+                      value="available"
+                      checked={availabilityFilter === 'available'}
+                      onChange={(e) => setAvailabilityFilter(e.target.value)}
+                    />
+                    Available Only
+                  </label>
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      name="availability"
+                      value="unavailable"
+                      checked={availabilityFilter === 'unavailable'}
+                      onChange={(e) => setAvailabilityFilter(e.target.value)}
+                    />
+                    Unavailable Only
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="filter-modal-footer">
+              <button className="clear-filters-btn" onClick={handleClearFilters}>Clear All</button>
+              <button className="apply-filters-btn" onClick={handleApplyFilters}>Apply Filters</button>
+            </div>
+          </div>
         </div>
       )}
-
-      {/* Floating Action Button */}
-      <div className="fab-container">
-        <button className="new-post-fab" title="Create new post" onClick={handleNewPost}>
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-        </button>
-      </div>
     </div>
   );
 };
