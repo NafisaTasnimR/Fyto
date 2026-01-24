@@ -6,6 +6,7 @@ import bodyParser from "body-parser";
 import AuthRouter from "./routes/AuthRoute.js";
 import PostRoute from "./routes/PostRoute.js";
 import MarketplaceRoute from "./routes/MarketplaceRoute.js";
+import JournalRoute from "./routes/JournalRoute.js";
 
 const app = express();
 dotenv.config();
@@ -24,6 +25,7 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use("/api/auth", AuthRouter);
 app.use("/posts", PostRoute);
 app.use("/api/marketplace", MarketplaceRoute);
+app.use("/api/journals", JournalRoute);
 
 const port = process.env.PORT || 5000;
 
