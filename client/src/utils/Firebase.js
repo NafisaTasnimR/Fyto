@@ -1,7 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth"
-import firebase from 'firebase/compat/app';
 import { GoogleAuthProvider } from "firebase/auth";
 const firebase_api = process.env.REACT_APP_FIREBASE_API_KEY;
 // TODO: Add SDKs for Firebase products that you want to use

@@ -340,10 +340,10 @@ const ProductDetail = () => {
     if (selectedOption) {
       // Confirm the post in context
       confirmPost(parseInt(id), selectedOption);
-      
+
       // Show success message
-      alert(`Success! You have confirmed: ${selectedOption} for ${product.title}\n\nYou will now be redirected to the store.`);
-      
+      alert(`Success! You have confirmed: ${selectedOption} for ${post.title}\n\nYou will now be redirected to the store.`);
+
       // Navigate back to store
       navigate('/store');
     } else {
@@ -470,7 +470,7 @@ const ProductDetail = () => {
             </div>
             <div className="meta-item">
               <span className="meta-label">Condition:</span>
-              <span className="meta-value">{product.condition}</span>
+              <span className="meta-value">{post.condition}</span>
             </div>
             <div className="meta-item">
               <span className="meta-label">Owner:</span>
@@ -484,16 +484,19 @@ const ProductDetail = () => {
               <span className="meta-label">Status:</span>
               <span className="meta-value">
                 {post.status === 'available' ? ' Available' : ' Not Available'}
+              </span>
+            </div>
+            <div className="meta-item">
               <span className="meta-label">Contact Type:</span>
-              <span className="meta-value">{product.contactType === 'phone' ? 'Phone Number' : 'Email Address'}</span>
+              <span className="meta-value">{post.contactType === 'phone' ? 'Phone Number' : 'Email Address'}</span>
             </div>
             <div className="meta-item">
               <span className="meta-label">Contact:</span>
               <span className="meta-value contact-link">
-                {product.contactType === 'phone' ? (
-                  <a href={`tel:${product.contact}`}>{product.contact}</a>
+                {post.contactType === 'phone' ? (
+                  <a href={`tel:${post.contact}`}>{post.contact}</a>
                 ) : (
-                  <a href={`mailto:${product.contact}`}>{product.contact}</a>
+                  <a href={`mailto:${post.contact}`}>{post.contact}</a>
                 )}
               </span>
             </div>
@@ -556,7 +559,7 @@ const ProductDetail = () => {
             {isAlreadyConfirmed ? (
               <div className="confirmed-message-box">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                  <polyline points="20 6 9 17 4 12"/>
+                  <polyline points="20 6 9 17 4 12" />
                 </svg>
                 <div>
                   <p className="confirmed-title">This post has been confirmed</p>
@@ -565,7 +568,7 @@ const ProductDetail = () => {
               </div>
             ) : (
               <div className="options-list">
-                {product.options.map((option, index) => (
+                {post.options.map((option, index) => (
                   <label key={index} className="option-item">
                     <input
                       type="radio"
@@ -587,7 +590,7 @@ const ProductDetail = () => {
               className="confirm-btn"
               onClick={handleConfirm}
               disabled={isAlreadyConfirmed}
-              style={{ 
+              style={{
                 opacity: isAlreadyConfirmed ? 0.5 : 1,
                 cursor: isAlreadyConfirmed ? 'not-allowed' : 'pointer'
               }}
