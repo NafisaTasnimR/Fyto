@@ -1,11 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useConfirmedPosts } from '../Context/ConfirmedPostsContext';
 import './ProductDetail.css';
 
 const ProductDetail = () => {
   const [selectedOption, setSelectedOption] = useState('');
   const navigate = useNavigate();
   const { id } = useParams();
+  const { confirmPost, isPostConfirmed } = useConfirmedPosts();
+
+  // Check if this post is already confirmed
+  const isAlreadyConfirmed = isPostConfirmed(parseInt(id));
+
+  // Redirect if already confirmed
+  useEffect(() => {
+    if (isAlreadyConfirmed) {
+      alert('This post has already been confirmed and is no longer available.');
+      navigate('/store');
+    }
+  }, [isAlreadyConfirmed, navigate]);
 
   // All products data - in a real app, this would come from an API or context
   const allProducts = [
@@ -17,12 +30,13 @@ const ProductDetail = () => {
       treePart: 'Mature Tree',
       condition: 'Healthy',
       owner: 'Sarah Johnson',
-      location: 'Garden District, Portland',
+      location: 'Dhanmondi, Dhaka',
       description: 'Beautiful Japanese Maple tree, approximately 5 years old. Perfect for adding color to your garden with its stunning red foliage. Well-maintained and healthy, ready for transplant. Ideal for medium-sized gardens or as a focal point in landscaping. This tree has been carefully nurtured and shows vibrant seasonal color changes.',
       size: 'Medium (4-6 feet)',
       postType: 'sell',
       price: '450',
-      contact: '+1 (555) 123-4567',
+      contactType: 'phone',
+      contact: '+880 1712-345678',
       options: ['Pickup Only', 'With Pot', 'Bare Root']
     },
     {
@@ -33,11 +47,12 @@ const ProductDetail = () => {
       treePart: 'Sapling',
       condition: 'Excellent',
       owner: 'Michael Chen',
-      location: 'Spring Valley, Seattle',
+      location: 'Gulshan, Dhaka',
       description: 'Young cherry blossom tree, 2 years old. Known for its spectacular spring blooms with delicate pink flowers. This variety is particularly hardy and suitable for temperate climates. Perfect for creating a stunning focal point in your garden.',
       size: 'Small (2-3 feet)',
       postType: 'sell',
       price: '120',
+      contactType: 'email',
       contact: 'michael.chen@email.com',
       options: ['Pickup Only', 'With Pot', 'Delivery Available']
     },
@@ -49,13 +64,14 @@ const ProductDetail = () => {
       treePart: 'Young Tree',
       condition: 'Healthy',
       owner: 'Garden Masters',
-      location: 'Mountain View, Colorado',
+      location: 'Uttara, Dhaka',
       description: 'Collection of three pine trees, ideal for creating natural privacy screens or windbreaks. These evergreens are low-maintenance and provide year-round greenery. Perfect for larger properties or rural settings.',
       size: 'Large (8-12 feet)',
       postType: 'exchange',
       price: '0',
       exchangeFor: 'Fruit tree saplings or oak seedlings',
-      contact: '+1 (555) 987-6543',
+      contactType: 'phone',
+      contact: '+880 1923-456789',
       options: ['Pickup Only', 'Bare Root', 'Professional Transplant Service']
     },
     {
@@ -66,11 +82,12 @@ const ProductDetail = () => {
       treePart: 'Mature Tree',
       condition: 'Excellent',
       owner: 'David Martinez',
-      location: 'Oak Ridge, Tennessee',
+      location: 'Banani, Dhaka',
       description: 'Mature oak tree, approximately 15 years old. This majestic tree provides excellent shade and has a strong, well-established root system. Ideal for large properties. Features beautiful fall foliage and attracts beneficial wildlife.',
       size: 'Very Large (15-20 feet)',
       postType: 'sell',
       price: '1200',
+      contactType: 'email',
       contact: 'david.martinez@email.com',
       options: ['Professional Transplant Required', 'Consultation Included']
     },
@@ -82,12 +99,13 @@ const ProductDetail = () => {
       treePart: 'Young Tree',
       condition: 'Healthy',
       owner: 'Emma Wilson',
-      location: 'Birchwood, Minnesota',
+      location: 'Mohammadpur, Dhaka',
       description: 'Pair of white birch trees, 4 years old. Known for their distinctive white bark and graceful appearance. These trees create a striking visual impact and are perfect for adding elegance to any landscape.',
       size: 'Medium (5-7 feet)',
       postType: 'sell',
       price: '300',
-      contact: '+1 (555) 246-8135',
+      contactType: 'phone',
+      contact: '+880 1534-678901',
       options: ['Pickup Only', 'With Pot', 'Bare Root']
     },
     {
@@ -98,11 +116,12 @@ const ProductDetail = () => {
       treePart: 'Young Tree',
       condition: 'Healthy',
       owner: 'Robert Green',
-      location: 'Riverside, California',
+      location: 'Mirpur, Dhaka',
       description: 'Young weeping willow tree, 3 years old. Fast-growing and perfect for water features or pond-side planting. Creates a romantic, flowing appearance with its cascading branches. Thrives in moist soil conditions.',
       size: 'Medium (4-5 feet)',
       postType: 'donate',
       price: '0',
+      contactType: 'email',
       contact: 'robert.green@email.com',
       options: ['Pickup Only', 'With Pot', 'Delivery Available']
     },
@@ -114,12 +133,13 @@ const ProductDetail = () => {
       treePart: 'Mature Tree',
       condition: 'Excellent',
       owner: 'Lisa Park',
-      location: 'Magnolia Springs, Alabama',
+      location: 'Bashundhara, Dhaka',
       description: 'Stunning magnolia tree, 6 years old. Features large, fragrant white flowers in spring and glossy evergreen foliage. This Southern classic adds elegance and charm to any property. Well-suited for warm climates.',
       size: 'Large (7-9 feet)',
       postType: 'sell',
       price: '680',
-      contact: '+1 (555) 369-2580',
+      contactType: 'phone',
+      contact: '+880 1645-789012',
       options: ['Pickup Only', 'With Pot', 'Professional Transplant Service']
     },
     {
@@ -130,11 +150,12 @@ const ProductDetail = () => {
       treePart: 'Potted Tree',
       condition: 'Excellent',
       owner: 'James Rodriguez',
-      location: 'Palm Beach, Florida',
+      location: 'Motijheel, Dhaka',
       description: 'Beautiful tropical palm tree, 4 years old. Perfect for creating a resort-like atmosphere in your backyard. This variety is cold-hardy down to 25°F and adds instant tropical appeal. Low maintenance and drought-tolerant once established.',
       size: 'Medium (6-8 feet)',
       postType: 'sell',
       price: '550',
+      contactType: 'email',
       contact: 'j.rodriguez@email.com',
       options: ['Pickup Only', 'With Pot', 'Delivery Available']
     },
@@ -146,13 +167,14 @@ const ProductDetail = () => {
       treePart: 'Seedling',
       condition: 'Healthy',
       owner: 'Rachel Brown',
-      location: 'Evergreen, Washington',
+      location: 'Khilgaon, Dhaka',
       description: 'Collection of mixed evergreen seedlings including spruce and fir. Perfect for creating natural borders or privacy screens. These trees maintain their foliage year-round and are excellent for colder climates.',
       size: 'Small (1-2 feet)',
       postType: 'exchange',
       price: '0',
       exchangeFor: 'Flowering tree seeds or gardening equipment',
-      contact: '+1 (555) 741-8520',
+      contactType: 'phone',
+      contact: '+880 1756-890123',
       options: ['Pickup Only', 'Bare Root', 'Delivery Available']
     },
     {
@@ -163,11 +185,12 @@ const ProductDetail = () => {
       treePart: 'Young Tree',
       condition: 'Excellent',
       owner: 'Alex Turner',
-      location: 'Maple Grove, Vermont',
+      location: 'Rampura, Dhaka',
       description: 'Vibrant red maple tree, 5 years old. Famous for its brilliant red fall foliage. Fast-growing and adaptable to various soil conditions. Creates stunning autumn displays and provides excellent shade in summer.',
       size: 'Medium (5-7 feet)',
       postType: 'sell',
       price: '400',
+      contactType: 'email',
       contact: 'alex.turner@email.com',
       options: ['Pickup Only', 'With Pot', 'Delivery Available']
     },
@@ -179,12 +202,13 @@ const ProductDetail = () => {
       treePart: 'Sapling',
       condition: 'Healthy',
       owner: 'Maria Santos',
-      location: 'Plum Valley, Oregon',
+      location: 'Badda, Dhaka',
       description: 'Beautiful flowering plum tree, 3 years old. Features stunning pink-purple blooms in early spring followed by dark foliage. Compact size makes it perfect for smaller gardens and ornamental landscaping.',
       size: 'Small to Medium (3-5 feet)',
       postType: 'sell',
       price: '180',
-      contact: '+1 (555) 852-9630',
+      contactType: 'phone',
+      contact: '+880 1867-901234',
       options: ['Pickup Only', 'With Pot', 'Bare Root']
     },
     {
@@ -195,11 +219,12 @@ const ProductDetail = () => {
       treePart: 'Whole Tree with Root Ball',
       condition: 'Good',
       owner: 'Tom Anderson',
-      location: 'Oak Harbor, Ohio',
+      location: 'Baridhara, Dhaka',
       description: 'Heritage oak tree, approximately 25 years old. This magnificent specimen is a piece of living history. Requires careful professional transplanting but offers unmatched character and shade. Perfect for estate properties.',
       size: 'Extra Large (20+ feet)',
       postType: 'sell',
       price: '2500',
+      contactType: 'email',
       contact: 'tom.anderson@email.com',
       options: ['Professional Transplant Required', 'Consultation Included', 'Permit Assistance']
     },
@@ -211,12 +236,13 @@ const ProductDetail = () => {
       treePart: 'Bare Root Tree',
       condition: 'Excellent',
       owner: 'Lisa Chen',
-      location: 'White Plains, New York',
+      location: 'Tejgaon, Dhaka',
       description: 'Single white birch tree, 5 years old. Features distinctive white peeling bark and golden yellow fall foliage. This tree is perfect as a specimen plant and attracts various bird species. Thrives in cooler climates.',
       size: 'Medium (5-6 feet)',
       postType: 'sell',
       price: '280',
-      contact: '+1 (555) 159-7530',
+      contactType: 'phone',
+      contact: '+880 1978-012345',
       options: ['Pickup Only', 'With Pot', 'Delivery Available']
     },
     {
@@ -227,11 +253,12 @@ const ProductDetail = () => {
       treePart: 'Mature Tree',
       condition: 'Healthy',
       owner: 'Mark Wilson',
-      location: 'Willow Creek, Montana',
+      location: 'Lalmatia, Dhaka',
       description: 'Mature weeping willow tree, 8 years old. Creates a dramatic statement with its graceful, flowing branches. Ideal for waterside locations or large properties. Fast-growing and provides excellent shade and privacy.',
       size: 'Large (10-12 feet)',
       postType: 'sell',
       price: '850',
+      contactType: 'email',
       contact: 'mark.wilson@email.com',
       options: ['Professional Transplant Service', 'With Root Ball', 'Consultation Included']
     },
@@ -243,12 +270,13 @@ const ProductDetail = () => {
       treePart: 'Young Tree',
       condition: 'Excellent',
       owner: 'Jessica Park',
-      location: 'Magnolia, Texas',
+      location: 'Shyamoli, Dhaka',
       description: 'Spectacular pink magnolia tree, 4 years old. Features large, fragrant pink blooms in early spring. This variety is particularly striking and adds a touch of elegance to any garden. Prefers partial shade to full sun.',
       size: 'Medium (5-6 feet)',
       postType: 'donate',
       price: '0',
-      contact: '+1 (555) 357-1590',
+      contactType: 'phone',
+      contact: '+880 1389-123456',
       options: ['Pickup Only', 'With Pot', 'Delivery Available']
     },
     {
@@ -259,11 +287,12 @@ const ProductDetail = () => {
       treePart: 'Potted Tree',
       condition: 'Healthy',
       owner: 'Chris Martin',
-      location: 'Coconut Grove, Florida',
+      location: 'Panthapath, Dhaka',
       description: 'Authentic coconut palm tree, 3 years old. Brings true tropical paradise to your property. This variety produces coconuts and creates an instant vacation atmosphere. Requires warm climate and full sun exposure.',
       size: 'Medium (5-7 feet)',
       postType: 'sell',
       price: '620',
+      contactType: 'email',
       contact: 'chris.martin@email.com',
       options: ['Pickup Only', 'With Pot', 'Professional Transplant Service']
     }
@@ -274,8 +303,14 @@ const ProductDetail = () => {
 
   const handleConfirm = () => {
     if (selectedOption) {
-      alert(`Confirmed: ${selectedOption} for ${product.title}`);
-      // Add your confirmation logic here
+      // Confirm the post in context
+      confirmPost(parseInt(id), selectedOption);
+      
+      // Show success message
+      alert(`Success! You have confirmed: ${selectedOption} for ${product.title}\n\nYou will now be redirected to the store.`);
+      
+      // Navigate back to store
+      navigate('/store');
     } else {
       alert('Please select an option');
     }
@@ -355,7 +390,7 @@ const ProductDetail = () => {
               )}
             </span>
             {product.postType === 'sell' && (
-              <span className="price-display">৳{product.price}</span>
+              <span className="price-display">৳{parseInt(product.price).toLocaleString()}</span>
             )}
           </div>
 
@@ -374,6 +409,10 @@ const ProductDetail = () => {
               <span className="meta-value">{product.size}</span>
             </div>
             <div className="meta-item">
+              <span className="meta-label">Condition:</span>
+              <span className="meta-value">{product.condition}</span>
+            </div>
+            <div className="meta-item">
               <span className="meta-label">Owner:</span>
               <span className="meta-value">{product.owner}</span>
             </div>
@@ -382,15 +421,19 @@ const ProductDetail = () => {
               <span className="meta-value">{product.location}</span>
             </div>
             <div className="meta-item">
-              <span className="meta-label">Contact:</span>
-              <span className="meta-value">{product.contact}</span>
+              <span className="meta-label">Contact Type:</span>
+              <span className="meta-value">{product.contactType === 'phone' ? 'Phone Number' : 'Email Address'}</span>
             </div>
-          </div>
-
-          {/* Condition */}
-          <div className="condition-section">
-            <h3 className="section-title">Condition</h3>
-            <div className="condition-badge">{product.condition}</div>
+            <div className="meta-item">
+              <span className="meta-label">Contact:</span>
+              <span className="meta-value contact-link">
+                {product.contactType === 'phone' ? (
+                  <a href={`tel:${product.contact}`}>{product.contact}</a>
+                ) : (
+                  <a href={`mailto:${product.contact}`}>{product.contact}</a>
+                )}
+              </span>
+            </div>
           </div>
 
           {/* Exchange For (only for exchange posts) */}
@@ -418,20 +461,32 @@ const ProductDetail = () => {
           {/* Selection Options */}
           <div className="options-section">
             <h3 className="section-title">Select Option</h3>
-            <div className="options-list">
-              {product.options.map((option, index) => (
-                <label key={index} className="option-item">
-                  <input
-                    type="radio"
-                    name="product-option"
-                    value={option}
-                    checked={selectedOption === option}
-                    onChange={(e) => setSelectedOption(e.target.value)}
-                  />
-                  <span className="option-label">{option}</span>
-                </label>
-              ))}
-            </div>
+            {isAlreadyConfirmed ? (
+              <div className="confirmed-message-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <div>
+                  <p className="confirmed-title">This post has been confirmed</p>
+                  <p className="confirmed-subtitle">This item is no longer available</p>
+                </div>
+              </div>
+            ) : (
+              <div className="options-list">
+                {product.options.map((option, index) => (
+                  <label key={index} className="option-item">
+                    <input
+                      type="radio"
+                      name="product-option"
+                      value={option}
+                      checked={selectedOption === option}
+                      onChange={(e) => setSelectedOption(e.target.value)}
+                    />
+                    <span className="option-label">{option}</span>
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Confirm Button */}
@@ -439,8 +494,13 @@ const ProductDetail = () => {
             <button 
               className="confirm-btn"
               onClick={handleConfirm}
+              disabled={isAlreadyConfirmed}
+              style={{ 
+                opacity: isAlreadyConfirmed ? 0.5 : 1,
+                cursor: isAlreadyConfirmed ? 'not-allowed' : 'pointer'
+              }}
             >
-              Confirm Selection
+              {isAlreadyConfirmed ? 'No Longer Available' : 'Confirm Selection'}
             </button>
           </div>
         </div>

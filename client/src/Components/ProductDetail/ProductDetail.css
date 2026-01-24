@@ -212,6 +212,19 @@ body {
   font-weight: 500;
 }
 
+.meta-value.contact-link a {
+  color: #2e7d32;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+  word-break: break-word;
+}
+
+.meta-value.contact-link a:hover {
+  color: #1b5e20;
+  text-decoration: underline;
+}
+
 /* Condition Section */
 .condition-section {
   display: flex;
@@ -289,6 +302,36 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.confirmed-message-box {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  background-color: #e8f5e9;
+  border: 2px solid #4caf50;
+  border-radius: 12px;
+  color: #2e7d32;
+}
+
+.confirmed-message-box svg {
+  flex-shrink: 0;
+  color: #4caf50;
+}
+
+.confirmed-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2e7d32;
+  margin: 0 0 4px 0;
+}
+
+.confirmed-subtitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: #558b2f;
+  margin: 0;
 }
 
 .option-item {
