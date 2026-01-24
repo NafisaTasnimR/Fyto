@@ -9,7 +9,7 @@ const MenuIcon = () => (
   </svg>
 );
 
-const CoverSelection = ({ onCoverSelect }) => {
+const CoverSelection = ({ onCoverSelect, saving }) => {
   const covers = [
     {
       id: 1,
@@ -17,7 +17,8 @@ const CoverSelection = ({ onCoverSelect }) => {
       bgColor: '#f5f3f0',
       accentColor: '#6b7c5e',
       primaryColor: '#d4e5d3',
-      secondaryColor: '#b8cbb5'
+      secondaryColor: '#b8cbb5',
+      imageUrl: 'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=800'
     },
     {
       id: 2,
@@ -25,7 +26,8 @@ const CoverSelection = ({ onCoverSelect }) => {
       bgColor: '#faf8f5',
       accentColor: '#8b7d91',
       primaryColor: '#e8dce8',
-      secondaryColor: '#d6c4d6'
+      secondaryColor: '#d6c4d6',
+      imageUrl: 'https://images.unsplash.com/photo-1499002238440-d264edd596ec?w=800'
     },
     {
       id: 3,
@@ -33,7 +35,8 @@ const CoverSelection = ({ onCoverSelect }) => {
       bgColor: '#fff9f5',
       accentColor: '#b88873',
       primaryColor: '#f5e5db',
-      secondaryColor: '#e8d1c3'
+      secondaryColor: '#e8d1c3',
+      imageUrl: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800'
     }
   ];
 
@@ -66,18 +69,19 @@ const CoverSelection = ({ onCoverSelect }) => {
             <div
               key={cover.id}
               className="cover-card"
-              onClick={() => onCoverSelect(cover)}
+              onClick={() => !saving && onCoverSelect(cover)}
+              style={{ cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}
             >
-              <div 
-                className="cover-preview" 
-                style={{ 
+              <div
+                className="cover-preview"
+                style={{
                   background: `linear-gradient(135deg, ${cover.primaryColor} 0%, ${cover.secondaryColor} 100%)`
                 }}
               >
                 <div className="cover-content">
                   <div className="cover-decorative-circle" style={{ background: cover.accentColor }}></div>
                   <div className="cover-decorative-line" style={{ background: cover.accentColor }}></div>
-                  
+
                   <div className="cover-title-section">
                     <h2 className="cover-journal-title" style={{ color: cover.accentColor }}>
                       Fyto Journal
@@ -91,15 +95,15 @@ const CoverSelection = ({ onCoverSelect }) => {
                   <div className="cover-leaf-decoration">
                     <svg viewBox="0 0 100 100" className="leaf-svg" style={{ fill: cover.accentColor, opacity: 0.15 }}>
                       <path d="M50,10 Q70,30 70,50 Q70,70 50,90 Q30,70 30,50 Q30,30 50,10 Z" />
-                      <line x1="50" y1="20" x2="50" y2="80" stroke={cover.accentColor} strokeWidth="1" opacity="0.3"/>
-                      <path d="M35,35 Q50,40 65,35" stroke={cover.accentColor} strokeWidth="1" fill="none" opacity="0.3"/>
-                      <path d="M35,50 Q50,55 65,50" stroke={cover.accentColor} strokeWidth="1" fill="none" opacity="0.3"/>
-                      <path d="M35,65 Q50,70 65,65" stroke={cover.accentColor} strokeWidth="1" fill="none" opacity="0.3"/>
+                      <line x1="50" y1="20" x2="50" y2="80" stroke={cover.accentColor} strokeWidth="1" opacity="0.3" />
+                      <path d="M35,35 Q50,40 65,35" stroke={cover.accentColor} strokeWidth="1" fill="none" opacity="0.3" />
+                      <path d="M35,50 Q50,55 65,50" stroke={cover.accentColor} strokeWidth="1" fill="none" opacity="0.3" />
+                      <path d="M35,65 Q50,70 65,65" stroke={cover.accentColor} strokeWidth="1" fill="none" opacity="0.3" />
                     </svg>
                   </div>
                 </div>
               </div>
-              
+
               <div className="cover-name" style={{ color: cover.accentColor }}>{cover.name}</div>
             </div>
           ))}
