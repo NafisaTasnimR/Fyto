@@ -3,7 +3,7 @@ import Post from '../models/Post.js';
 export const createPost = async (req, res) => {
     try {
         const { content, images } = req.body;
-        const authorId = req.users.userId || req.users._id;
+        const authorId = req.user._id;
 
         if (!content && (!images || images.length === 0)) {
             return res.status(400).json({
@@ -29,6 +29,7 @@ export const createPost = async (req, res) => {
             post: savedPost
         });
     } catch (error) {
+        console.error('Create post error:', error);
         return res.status(500).json({
             success: false,
             message: 'Failed to create post.',
@@ -41,7 +42,7 @@ export const createPost = async (req, res) => {
 export const deletePost = async (req, res) => {
     try {
         const { postId } = req.params;
-        const userId = req.user.userId || req.user.id;
+        const userId = req.user._id;
 
         const post = await Post.findById(postId);
 
@@ -78,7 +79,7 @@ export const updatePost = async (req, res) => {
     try {
         const { postId } = req.params;
         const { content, images } = req.body;
-        const userId = req.user.userId || req.user.id;
+        const userId = req.user._id;
 
         const post = await Post.findById(postId);
 
@@ -120,7 +121,7 @@ export const updatePost = async (req, res) => {
 
 export const getUserPosts = async (req, res) => {
     try {
-        const userId = req.user.userId || req.user.id;
+        const userId = req.user._id;
         const { type } = req.query;
 
         let posts;
@@ -133,6 +134,15 @@ export const getUserPosts = async (req, res) => {
             posts = await Post.find({ authorId: userId })
                 .populate('authorId', 'name username profilePic')
                 .sort({ createdAt: -1 });
+        }
+
+        if (!posts || posts.length === 0) {
+            return res.status(200).json({
+                success: true,
+                message: 'No posts available',
+                count: 0,
+                posts: []
+            });
         }
 
         return res.status(200).json({
@@ -162,6 +172,17 @@ export const getAllPosts = async (req, res) => {
 
         const count = await Post.countDocuments();
 
+        if (count === 0 || posts.length === 0) {
+            return res.status(200).json({
+                success: true,
+                message: 'No posts available',
+                posts: [],
+                totalPages: 0,
+                currentPage: parseInt(page),
+                totalPosts: 0
+            });
+        }
+
         return res.status(200).json({
             success: true,
             posts,
@@ -182,7 +203,7 @@ export const getAllPosts = async (req, res) => {
 export const toggleLike = async (req, res) => {
     try {
         const { postId } = req.params;
-        const userId = req.user.userId || req.user.id;
+        const userId = req.user._id;
 
         const post = await Post.findById(postId);
 
@@ -241,6 +262,40 @@ export const getPostById = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: 'Failed to fetch post.',
+            error: error.message
+        });
+    }
+};
+
+// Search posts by content
+export const searchPosts = async (req, res) => {
+    try {
+        const { query } = req.query;
+
+        if (!query || query.trim() === '') {
+            return res.status(400).json({
+                success: false,
+                message: 'Search query is required.'
+            });
+        }
+
+        // Search posts where content contains the query (case-insensitive)
+        const posts = await Post.find({
+            content: { $regex: query, $options: 'i' }
+        })
+            .populate('authorId', 'name username profilePic')
+            .sort({ createdAt: -1 })
+            .limit(50);
+
+        return res.status(200).json({
+            success: true,
+            count: posts.length,
+            posts
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to search posts.',
             error: error.message
         });
     }

@@ -1,17 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { useConfirmedPosts } from '../Context/ConfirmedPostsContext';
 import './Store.css';
 import Header from '../Shared/Header';
 
 const Store = () => {
-  const [activeTab, setActiveTab] = useState('For you');
-  const [visibleProjects, setVisibleProjects] = useState(12);
+  // Preserve active tab from localStorage or default to 'For you'
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem('storeActiveTab') || 'For you';
+  });
+  const [visibleProjects, setVisibleProjects] = useState(8);
   const [searchQuery, setSearchQuery] = useState('');
+  const [marketplacePosts, setMarketplacePosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const { isPostConfirmed } = useConfirmedPosts();
 
   const tabs = ['For you', 'Buy', 'Exchange', 'Donate', 'Favourites'];
+
+  useEffect(() => {
+    fetchMarketplacePosts();
+  }, [activeTab]);
+
+  const fetchMarketplacePosts = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        setError('Please login to view marketplace');
+        setLoading(false);
+        return;
+      }
+
+      let url = `${process.env.REACT_APP_API_URL}/api/marketplace`;
+
+      // Apply filtering based on active tab
+      if (activeTab !== 'For you' && activeTab !== 'Favourites') {
+        // Map tab names to postType values
+        const tabToPostTypeMap = {
+          'Buy': 'sell',
+          'Exchange': 'exchange',
+          'Donate': 'donate'
+        };
+        const postType = tabToPostTypeMap[activeTab];
+        url = `${process.env.REACT_APP_API_URL}/api/marketplace/search?postType=${postType}`;
+      }
+
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data.success) {
+        setMarketplacePosts(response.data.posts || []);
+      }
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching marketplace posts:', err);
+      setError('Failed to load marketplace posts');
+      setLoading(false);
+    }
+  };
 
   // Tree-related projects array with category
   const allProjects = [
@@ -191,28 +244,17 @@ const Store = () => {
 
   // Filter projects based on active tab and search query
   const getFilteredProjects = () => {
-    let filtered = allProjects;
+    let filtered = marketplacePosts;
 
-    // Filter by tab category
-    if (activeTab === 'For you') {
-      // Show all projects for "For you"
-      filtered = allProjects;
-    } else if (activeTab === 'Favourites') {
-      // For favourites, you can implement logic based on user's favorites
-      // For now, showing projects with high likes
-      filtered = allProjects.filter(project => project.likes > 400);
-    } else {
-      // Filter by category (Buy, Exchange, Donate)
-      filtered = allProjects.filter(project => project.category === activeTab);
-    }
-
-    // Filter by search query
+    // Already filtered by backend for Buy/Exchange/Donate tabs
+    // Additional client-side filtering for search query
     if (searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(project => 
-        project.title.toLowerCase().includes(query) ||
-        project.author.toLowerCase().includes(query) ||
-        project.tags.some(tag => tag.toLowerCase().includes(query))
+      filtered = filtered.filter(post =>
+        post.treeName.toLowerCase().includes(query) ||
+        post.treeType.toLowerCase().includes(query) ||
+        post.offering.toLowerCase().includes(query) ||
+        post.description.toLowerCase().includes(query)
       );
     }
 
@@ -237,7 +279,8 @@ const Store = () => {
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-    setVisibleProjects(12); // Reset visible projects when changing tabs
+    localStorage.setItem('storeActiveTab', tab); // Save active tab to localStorage
+    setVisibleProjects(8); // Reset visible projects when changing tabs
   };
 
   const handleSearchChange = (e) => {
@@ -253,8 +296,25 @@ const Store = () => {
   return (
     <div className="portfolio-container">
       {/* Header */}
-      <Header />
-   
+      <header className="header">
+        <div className="header-left">
+          <div className="logo-container">
+            <svg className="logo-icon" width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="20" cy="20" r="18" fill="#2E7D32" />
+              <path d="M20 8C20 8 16 14 16 18C16 20.21 17.79 22 20 22C22.21 22 24 20.21 24 18C24 14 20 8 20 8Z" fill="#81C784" />
+              <path d="M20 18L23 22C23 22 21.5 24 20 24C18.5 24 17 22 17 22L20 18Z" fill="#A5D6A7" />
+              <rect x="19" y="22" width="2" height="10" rx="1" fill="#6D4C41" />
+              <circle cx="20" cy="32" r="4" fill="#4CAF50" />
+            </svg>
+            <h1 className="logo">Fyto</h1>
+          </div>
+        </div>
+
+        <div className="header-right">
+          <button className="menu-icon">☰</button>
+        </div>
+      </header>
+
       {/* Tabs Navigation with Search and Filter */}
       <nav className="tabs-nav">
         <div className="tabs-left">
@@ -295,53 +355,47 @@ const Store = () => {
 
       {/* Projects Grid */}
       <div className="projects-grid">
-        {displayedProjects.length > 0 ? (
-          displayedProjects.map((project) => {
-            const isConfirmed = isPostConfirmed(project.id);
-            return (
-              <div 
-                key={project.id} 
-                className={`project-card ${isConfirmed ? 'confirmed' : ''}`}
-                onClick={() => !isConfirmed && handleProjectClick(project.id)}
-                style={{ cursor: isConfirmed ? 'not-allowed' : 'pointer' }}
-              >
-                <div className="project-image-container">
-                  <img 
-                    src={project.image} 
-                    alt={project.title}
-                    className="project-image"
-                  />
-                  <div className="project-category-badge">{project.category}</div>
-                  {isConfirmed && (
-                    <div className="confirmed-overlay">
-                      <div className="confirmed-badge">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                          <polyline points="20 6 9 17 4 12"/>
-                        </svg>
-                        <span>Confirmed</span>
-                      </div>
-                      <div className="unavailable-text">No Longer Available</div>
-                    </div>
+        {loading ? (
+          <div className="loading-message">Loading marketplace posts...</div>
+        ) : error ? (
+          <div className="error-message">{error}</div>
+        ) : displayedProjects.length > 0 ? (
+          displayedProjects.map((post) => (
+            <div
+              key={post._id}
+              className="project-card"
+              onClick={() => handleProjectClick(post._id)}
+            >
+              <div className="project-image-container">
+                <img
+                  src={post.photos && post.photos.length > 0 ? post.photos[0] : '/tree-placeholder.png'}
+                  alt={post.treeName}
+                  className="project-image"
+                />
+                <div className="project-category-badge">
+                  {post.postType.charAt(0).toUpperCase() + post.postType.slice(1)}
+                </div>
+              </div>
+
+              <div className="project-info">
+                <div className="info-row title-row">
+                  <div className="project-title">{post.treeName} - {post.treeType}</div>
+                  {post.postType === 'sell' && post.price > 0 && (
+                    <span className="price">৳{post.price.toLocaleString()}</span>
                   )}
                 </div>
-                
-                <div className="project-info">
-                  <div className="info-row title-row">
-                    <div className="project-title">{project.title}</div>
-                    {project.category === 'Buy' && project.price && (
-                      <span className="price">৳{project.price.toLocaleString()}</span>
-                    )}
-                  </div>
-                  <div className="info-row author-row">
-                    <span className="author-name">{project.author}</span>
-                  </div>
+                <div className="info-row author-row">
+                  <span className="author-name">{post.userId?.username || 'Anonymous'}</span>
+                </div>
+                <div className="info-row offering-row">
+                  <span className="offering-text">{post.offering}</span>
                 </div>
               </div>
             );
           })
         ) : (
           <div className="no-results">
-            <p>No projects found matching your criteria.</p>
+            <p>No marketplace posts found matching your criteria.</p>
           </div>
         )}
       </div>
@@ -359,8 +413,8 @@ const Store = () => {
       <div className="fab-container">
         <button className="new-post-fab" title="Create new post" onClick={handleNewPost}>
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <line x1="12" y1="5" x2="12" y2="19"/>
-            <line x1="5" y1="12" x2="19" y2="12"/>
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
         </button>
       </div>

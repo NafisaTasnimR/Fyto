@@ -4,7 +4,7 @@ import User from "./User.js";
 const postSchema = new mongoose.Schema({
     authorId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "Users",
         required: true
     },
 
@@ -13,7 +13,7 @@ const postSchema = new mongoose.Schema({
 
     likes: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+        ref: "Users"
     }],
 
     createdAt: { type: Date, default: Date.now }

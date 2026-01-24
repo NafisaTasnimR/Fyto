@@ -1,5 +1,7 @@
 import React, { useRef } from 'react';
 import Toolbar from './Toolbar';
+import * as journalService from '../../services/journalService';
+import { compressImage, validateImageFile } from '../../utils/imageUtils';
 
 const XIcon = ({ size = 16 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -20,8 +22,8 @@ const ChevronRightIcon = () => (
   </svg>
 );
 
-function JournalPage({ 
-  currentPage, 
+function JournalPage({
+  currentPage,
   currentPageIndex,
   pagesLength,
   updatePage,
@@ -36,7 +38,9 @@ function JournalPage({
   addElement,
   deletePage,
   activeDropdown,
-  toggleDropdown
+  toggleDropdown,
+  saving,
+  currentJournal
 }) {
   const canvasRef = useRef(null);
   const contentRef = useRef(null);
@@ -45,7 +49,7 @@ function JournalPage({
     const content = e.currentTarget.innerHTML;
     const text = e.currentTarget.innerText || e.currentTarget.textContent || '';
     const words = text.trim().split(/\s+/).filter(word => word.length > 0).length;
-    updatePage({ 
+    updatePage({
       content: content,
       wordCount: text.trim() === '' ? 0 : words
     });
@@ -58,9 +62,9 @@ function JournalPage({
       const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
       const startOffset = range ? range.startOffset : 0;
       const startContainer = range ? range.startContainer : null;
-      
+
       contentRef.current.innerHTML = currentPage.content || '';
-      
+
       // Restore cursor position if possible
       if (startContainer && contentRef.current.contains(startContainer)) {
         try {
@@ -74,20 +78,57 @@ function JournalPage({
         }
       }
     }
-  }, [currentPageIndex]);
+  }, [currentPageIndex, currentPage.content]);
 
-  const deleteElement = (elementId) => {
+  const deleteElement = async (elementId) => {
     updatePage({
       elements: currentPage.elements.filter(el => el.id !== elementId)
     });
+
+    // Delete from backend
+    try {
+      await journalService.deleteBlock(elementId);
+    } catch (error) {
+      console.error('Error deleting block:', error);
+    }
   };
 
-  const updateElement = (elementId, updates) => {
+  const updateElement = async (elementId, updates) => {
     updatePage({
       elements: currentPage.elements.map(el =>
         el.id === elementId ? { ...el, ...updates } : el
       )
     });
+
+    // Update in backend (debounced for position changes)
+    if (updates.x !== undefined || updates.y !== undefined) {
+      try {
+        await journalService.updateBlockPosition(elementId, {
+          x: updates.x,
+          y: updates.y
+        });
+      } catch (error) {
+        console.error('Error updating block position:', error);
+      }
+    }
+
+    // Update image dimensions
+    if (updates.width !== undefined || updates.height !== undefined) {
+      try {
+        const element = currentPage.elements.find(el => el.id === elementId);
+        if (element && element.type === 'image') {
+          await journalService.updateBlock(elementId, {
+            image: {
+              url: element.imageUrl || updates.imageUrl,
+              width: updates.width || element.width,
+              height: updates.height || element.height
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Error updating block dimensions:', error);
+      }
+    }
   };
 
   const handleDragStart = (e, element) => {
@@ -121,7 +162,7 @@ function JournalPage({
   const handleResizeStart = (e, element) => {
     e.stopPropagation();
     e.preventDefault();
-    
+
     const startX = e.clientX;
     const startY = e.clientY;
     const startWidth = element.width;
@@ -132,10 +173,10 @@ function JournalPage({
     const handleMouseMove = (moveEvent) => {
       const deltaX = moveEvent.clientX - startX;
       const deltaY = moveEvent.clientY - startY;
-      
+
       const newWidth = Math.max(50, Math.min(startWidth + deltaX, currentPage.preferences.pageWidth - element.x));
       const newHeight = Math.max(50, Math.min(startHeight + deltaY, currentPage.preferences.pageHeight - element.y));
-      
+
       updateElement(element.id, { width: newWidth, height: newHeight });
     };
 
@@ -149,12 +190,40 @@ function JournalPage({
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  const handleImageUpload = (elementId, event) => {
+  const handleImageUpload = async (elementId, event) => {
     const file = event.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = (e) => updateElement(elementId, { imageUrl: e.target.result });
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    // Validate file
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      alert(validation.error);
+      return;
+    }
+
+    try {
+      // Compress image
+      const compressedImage = await compressImage(file, 800, 800, 0.85);
+
+      // Update element with compressed image
+      updateElement(elementId, { imageUrl: compressedImage });
+
+      // Save to backend if page exists
+      if (currentPage?.backendId) {
+        const element = currentPage.elements.find(el => el.id === elementId);
+        if (element) {
+          await journalService.updateBlock(elementId, {
+            image: {
+              url: compressedImage,
+              width: element.width,
+              height: element.height
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Failed to upload image. Please try again.');
     }
   };
 
@@ -198,11 +267,13 @@ function JournalPage({
                 {currentPage.title}
               </h2>
             )}
-            <div className="save-status">{getTimeSinceLastSave()}</div>
+            <div className="save-status">
+              {saving ? 'Saving...' : getTimeSinceLastSave()}
+            </div>
           </div>
         </div>
 
-        <Toolbar 
+        <Toolbar
           currentPage={currentPage}
           updatePreferences={updatePreferences}
           addElement={addElement}

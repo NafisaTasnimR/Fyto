@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 import { useConfirmedPosts } from '../Context/ConfirmedPostsContext';
 import './ProductDetail.css';
 
 const ProductDetail = () => {
   const [selectedOption, setSelectedOption] = useState('');
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const { id } = useParams();
   const { confirmPost, isPostConfirmed } = useConfirmedPosts();
@@ -19,6 +23,40 @@ const ProductDetail = () => {
       navigate('/store');
     }
   }, [isAlreadyConfirmed, navigate]);
+
+  useEffect(() => {
+    fetchProductDetail();
+  }, [id]);
+
+  const fetchProductDetail = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/marketplace/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        setPost(response.data.post);
+      }
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching product details:', err);
+      setError('Failed to load product details');
+      setLoading(false);
+    }
+  };
 
   // All products data - in a real app, this would come from an API or context
   const allProducts = [
@@ -298,9 +336,6 @@ const ProductDetail = () => {
     }
   ];
 
-  // Find the current product based on ID
-  const product = allProducts.find(p => p.id === parseInt(id)) || allProducts[0];
-
   const handleConfirm = () => {
     if (selectedOption) {
       // Confirm the post in context
@@ -317,8 +352,29 @@ const ProductDetail = () => {
   };
 
   const handleBack = () => {
-    navigate('/');
+    navigate('/store');
   };
+
+  if (loading) {
+    return (
+      <div className="product-detail-container">
+        <div className="loading-message">Loading product details...</div>
+      </div>
+    );
+  }
+
+  if (error || !post) {
+    return (
+      <div className="product-detail-container">
+        <div className="error-message">
+          <p>{error || 'Product not found'}</p>
+          <button onClick={handleBack} className="back-button">
+            Back to Store
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="product-detail-container">
@@ -327,22 +383,22 @@ const ProductDetail = () => {
         <div className="header-left">
           <button className="back-btn" onClick={handleBack}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 12H5M12 19l-7-7 7-7"/>
+              <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
           </button>
-          
+
           <div className="logo-container">
             <svg className="logo-icon" width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="20" cy="20" r="18" fill="#2E7D32"/>
-              <path d="M20 8C20 8 16 14 16 18C16 20.21 17.79 22 20 22C22.21 22 24 20.21 24 18C24 14 20 8 20 8Z" fill="#81C784"/>
-              <path d="M20 18L23 22C23 22 21.5 24 20 24C18.5 24 17 22 17 22L20 18Z" fill="#A5D6A7"/>
-              <rect x="19" y="22" width="2" height="10" rx="1" fill="#6D4C41"/>
-              <circle cx="20" cy="32" r="4" fill="#4CAF50"/>
+              <circle cx="20" cy="20" r="18" fill="#2E7D32" />
+              <path d="M20 8C20 8 16 14 16 18C16 20.21 17.79 22 20 22C22.21 22 24 20.21 24 18C24 14 20 8 20 8Z" fill="#81C784" />
+              <path d="M20 18L23 22C23 22 21.5 24 20 24C18.5 24 17 22 17 22L20 18Z" fill="#A5D6A7" />
+              <rect x="19" y="22" width="2" height="10" rx="1" fill="#6D4C41" />
+              <circle cx="20" cy="32" r="4" fill="#4CAF50" />
             </svg>
             <h1 className="logo">Fyto</h1>
           </div>
         </div>
-        
+
         <div className="header-right">
           <button className="menu-icon">☰</button>
         </div>
@@ -352,45 +408,49 @@ const ProductDetail = () => {
       <main className="product-main">
         {/* Product Image */}
         <div className="product-image-section">
-          <img src={product.image} alt={product.title} className="product-detail-image" />
+          <img
+            src={post.photos && post.photos.length > 0 ? post.photos[0] : '/tree-placeholder.png'}
+            alt={post.treeName}
+            className="product-detail-image"
+          />
         </div>
 
         {/* Product Info */}
         <div className="product-info-section">
-          <h2 className="product-detail-title">{product.title}</h2>
-          
+          <h2 className="product-detail-title">{post.treeName} - {post.treeType}</h2>
+
           {/* Post Type Badge */}
           <div className="post-type-badge-container">
-            <span className={`post-type-badge ${product.postType}`}>
-              {product.postType === 'sell' ? (
+            <span className={`post-type-badge ${post.postType}`}>
+              {post.postType === 'sell' ? (
                 <>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="12" y1="1" x2="12" y2="23"/>
-                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    <line x1="12" y1="1" x2="12" y2="23" />
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                   </svg>
                   For Sale
                 </>
-              ) : product.postType === 'exchange' ? (
+              ) : post.postType === 'exchange' ? (
                 <>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M16 3l4 4-4 4"/>
-                    <path d="M20 7H4"/>
-                    <path d="M8 21l-4-4 4-4"/>
-                    <path d="M4 17h16"/>
+                    <path d="M16 3l4 4-4 4" />
+                    <path d="M20 7H4" />
+                    <path d="M8 21l-4-4 4-4" />
+                    <path d="M4 17h16" />
                   </svg>
                   For Exchange
                 </>
               ) : (
                 <>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                   </svg>
                   Free - Donation
                 </>
               )}
             </span>
-            {product.postType === 'sell' && (
-              <span className="price-display">৳{parseInt(product.price).toLocaleString()}</span>
+            {post.postType === 'sell' && post.price > 0 && (
+              <span className="price-display">৳{post.price.toLocaleString()}</span>
             )}
           </div>
 
@@ -398,15 +458,15 @@ const ProductDetail = () => {
           <div className="product-meta-info">
             <div className="meta-item">
               <span className="meta-label">Tree Type:</span>
-              <span className="meta-value">{product.treeType}</span>
+              <span className="meta-value">{post.treeType}</span>
             </div>
             <div className="meta-item">
               <span className="meta-label">Offering:</span>
-              <span className="meta-value">{product.treePart}</span>
+              <span className="meta-value">{post.offering}</span>
             </div>
             <div className="meta-item">
-              <span className="meta-label">Size:</span>
-              <span className="meta-value">{product.size}</span>
+              <span className="meta-label">Age:</span>
+              <span className="meta-value">{post.treeAge ? `${post.treeAge} years` : 'Not specified'}</span>
             </div>
             <div className="meta-item">
               <span className="meta-label">Condition:</span>
@@ -414,13 +474,16 @@ const ProductDetail = () => {
             </div>
             <div className="meta-item">
               <span className="meta-label">Owner:</span>
-              <span className="meta-value">{product.owner}</span>
+              <span className="meta-value">{post.userId?.username || 'Anonymous'}</span>
             </div>
             <div className="meta-item">
-              <span className="meta-label">Location:</span>
-              <span className="meta-value">{product.location}</span>
+              <span className="meta-label">Contact:</span>
+              <span className="meta-value">{post.contactInfo || 'Not provided'}</span>
             </div>
             <div className="meta-item">
+              <span className="meta-label">Status:</span>
+              <span className="meta-value">
+                {post.status === 'available' ? ' Available' : ' Not Available'}
               <span className="meta-label">Contact Type:</span>
               <span className="meta-value">{product.contactType === 'phone' ? 'Phone Number' : 'Email Address'}</span>
             </div>
@@ -436,18 +499,24 @@ const ProductDetail = () => {
             </div>
           </div>
 
+          {/* Condition */}
+          <div className="condition-section">
+            <h3 className="section-title">Status</h3>
+            <div className="condition-badge">{post.status}</div>
+          </div>
+
           {/* Exchange For (only for exchange posts) */}
-          {product.postType === 'exchange' && product.exchangeFor && (
+          {post.postType === 'exchange' && (
             <div className="exchange-section">
               <h3 className="section-title">Looking for in Exchange</h3>
               <div className="exchange-info">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M16 3l4 4-4 4"/>
-                  <path d="M20 7H4"/>
-                  <path d="M8 21l-4-4 4-4"/>
-                  <path d="M4 17h16"/>
+                  <path d="M16 3l4 4-4 4" />
+                  <path d="M20 7H4" />
+                  <path d="M8 21l-4-4 4-4" />
+                  <path d="M4 17h16" />
                 </svg>
-                <span>{product.exchangeFor}</span>
+                <span>Check description for exchange details</span>
               </div>
             </div>
           )}
@@ -455,11 +524,34 @@ const ProductDetail = () => {
           {/* Description */}
           <div className="description-section">
             <h3 className="section-title">Description</h3>
-            <p className="description-text">{product.description}</p>
+            <p className="description-text">{post.description}</p>
           </div>
 
           {/* Selection Options */}
           <div className="options-section">
+            <h3 className="section-title">Interested?</h3>
+            <div className="options-list">
+              <label className="option-item">
+                <input
+                  type="radio"
+                  name="product-option"
+                  value="contact"
+                  checked={selectedOption === 'contact'}
+                  onChange={(e) => setSelectedOption(e.target.value)}
+                />
+                <span className="option-label">Contact Seller</span>
+              </label>
+              <label className="option-item">
+                <input
+                  type="radio"
+                  name="product-option"
+                  value="save"
+                  checked={selectedOption === 'save'}
+                  onChange={(e) => setSelectedOption(e.target.value)}
+                />
+                <span className="option-label">Save for Later</span>
+              </label>
+            </div>
             <h3 className="section-title">Select Option</h3>
             {isAlreadyConfirmed ? (
               <div className="confirmed-message-box">
@@ -491,7 +583,7 @@ const ProductDetail = () => {
 
           {/* Confirm Button */}
           <div className="action-section">
-            <button 
+            <button
               className="confirm-btn"
               onClick={handleConfirm}
               disabled={isAlreadyConfirmed}
