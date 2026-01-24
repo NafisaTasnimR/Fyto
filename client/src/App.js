@@ -1,5 +1,7 @@
+import { ConfirmedPostsProvider } from './Components/Context/ConfirmedPostsContext';
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import './Components/Context/ConfirmedPostsContext';
 import LandingPage from './Components/LandingPage/LandingPage';
 import LoginSignup from './Components/LoginSignup/LoginSignup';
 import SocialPage from './Components/SocialPage/SocialPage';
@@ -12,6 +14,7 @@ import './App.css';
 
 function App() {
   return (
+    <ConfirmedPostsProvider>
     <Router>
       <ScrollToTop />
       <Routes>
@@ -24,6 +27,8 @@ function App() {
         <Route path="/journal" element={<Journal />} />
       </Routes>
     </Router>
+    </ConfirmedPostsProvider>
+
   );
 }
 

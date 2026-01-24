@@ -1,11 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useConfirmedPosts } from '../Context/ConfirmedPostsContext';
 import './ProductDetail.css';
 
 const ProductDetail = () => {
   const [selectedOption, setSelectedOption] = useState('');
   const navigate = useNavigate();
   const { id } = useParams();
+  const { confirmPost, isPostConfirmed } = useConfirmedPosts();
+
+  // Check if this post is already confirmed
+  const isAlreadyConfirmed = isPostConfirmed(parseInt(id));
+
+  // Redirect if already confirmed
+  useEffect(() => {
+    if (isAlreadyConfirmed) {
+      alert('This post has already been confirmed and is no longer available.');
+      navigate('/store');
+    }
+  }, [isAlreadyConfirmed, navigate]);
 
   // All products data - in a real app, this would come from an API or context
   const allProducts = [
@@ -290,8 +303,14 @@ const ProductDetail = () => {
 
   const handleConfirm = () => {
     if (selectedOption) {
-      alert(`Confirmed: ${selectedOption} for ${product.title}`);
-      // Add your confirmation logic here
+      // Confirm the post in context
+      confirmPost(parseInt(id), selectedOption);
+      
+      // Show success message
+      alert(`Success! You have confirmed: ${selectedOption} for ${product.title}\n\nYou will now be redirected to the store.`);
+      
+      // Navigate back to store
+      navigate('/store');
     } else {
       alert('Please select an option');
     }
@@ -442,20 +461,32 @@ const ProductDetail = () => {
           {/* Selection Options */}
           <div className="options-section">
             <h3 className="section-title">Select Option</h3>
-            <div className="options-list">
-              {product.options.map((option, index) => (
-                <label key={index} className="option-item">
-                  <input
-                    type="radio"
-                    name="product-option"
-                    value={option}
-                    checked={selectedOption === option}
-                    onChange={(e) => setSelectedOption(e.target.value)}
-                  />
-                  <span className="option-label">{option}</span>
-                </label>
-              ))}
-            </div>
+            {isAlreadyConfirmed ? (
+              <div className="confirmed-message-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <div>
+                  <p className="confirmed-title">This post has been confirmed</p>
+                  <p className="confirmed-subtitle">This item is no longer available</p>
+                </div>
+              </div>
+            ) : (
+              <div className="options-list">
+                {product.options.map((option, index) => (
+                  <label key={index} className="option-item">
+                    <input
+                      type="radio"
+                      name="product-option"
+                      value={option}
+                      checked={selectedOption === option}
+                      onChange={(e) => setSelectedOption(e.target.value)}
+                    />
+                    <span className="option-label">{option}</span>
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Confirm Button */}
@@ -463,8 +494,13 @@ const ProductDetail = () => {
             <button 
               className="confirm-btn"
               onClick={handleConfirm}
+              disabled={isAlreadyConfirmed}
+              style={{ 
+                opacity: isAlreadyConfirmed ? 0.5 : 1,
+                cursor: isAlreadyConfirmed ? 'not-allowed' : 'pointer'
+              }}
             >
-              Confirm Selection
+              {isAlreadyConfirmed ? 'No Longer Available' : 'Confirm Selection'}
             </button>
           </div>
         </div>

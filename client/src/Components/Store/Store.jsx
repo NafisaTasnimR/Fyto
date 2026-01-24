@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useConfirmedPosts } from '../Context/ConfirmedPostsContext';
 import './Store.css';
 
 const Store = () => {
@@ -7,6 +8,7 @@ const Store = () => {
   const [visibleProjects, setVisibleProjects] = useState(12);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const { isPostConfirmed } = useConfirmedPosts();
 
   const tabs = ['For you', 'Buy', 'Exchange', 'Donate', 'Favourites'];
 
@@ -310,34 +312,49 @@ const Store = () => {
       {/* Projects Grid */}
       <div className="projects-grid">
         {displayedProjects.length > 0 ? (
-          displayedProjects.map((project) => (
-            <div 
-              key={project.id} 
-              className="project-card"
-              onClick={() => handleProjectClick(project.id)}
-            >
-              <div className="project-image-container">
-                <img 
-                  src={project.image} 
-                  alt={project.title}
-                  className="project-image"
-                />
-                <div className="project-category-badge">{project.category}</div>
-              </div>
-              
-              <div className="project-info">
-                <div className="info-row title-row">
-                  <div className="project-title">{project.title}</div>
-                  {project.category === 'Buy' && project.price && (
-                    <span className="price">৳{project.price.toLocaleString()}</span>
+          displayedProjects.map((project) => {
+            const isConfirmed = isPostConfirmed(project.id);
+            return (
+              <div 
+                key={project.id} 
+                className={`project-card ${isConfirmed ? 'confirmed' : ''}`}
+                onClick={() => !isConfirmed && handleProjectClick(project.id)}
+                style={{ cursor: isConfirmed ? 'not-allowed' : 'pointer' }}
+              >
+                <div className="project-image-container">
+                  <img 
+                    src={project.image} 
+                    alt={project.title}
+                    className="project-image"
+                  />
+                  <div className="project-category-badge">{project.category}</div>
+                  {isConfirmed && (
+                    <div className="confirmed-overlay">
+                      <div className="confirmed-badge">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                          <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        <span>Confirmed</span>
+                      </div>
+                      <div className="unavailable-text">No Longer Available</div>
+                    </div>
                   )}
                 </div>
-                <div className="info-row author-row">
-                  <span className="author-name">{project.author}</span>
+                
+                <div className="project-info">
+                  <div className="info-row title-row">
+                    <div className="project-title">{project.title}</div>
+                    {project.category === 'Buy' && project.price && (
+                      <span className="price">৳{project.price.toLocaleString()}</span>
+                    )}
+                  </div>
+                  <div className="info-row author-row">
+                    <span className="author-name">{project.author}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            );
+          })
         ) : (
           <div className="no-results">
             <p>No projects found matching your criteria.</p>
