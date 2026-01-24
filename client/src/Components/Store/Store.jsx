@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Store.css';
+import Header from '../Shared/Header';
 
 const Store = () => {
   const [activeTab, setActiveTab] = useState('For you');
@@ -250,25 +251,8 @@ const Store = () => {
   return (
     <div className="portfolio-container">
       {/* Header */}
-      <header className="header">
-        <div className="header-left">
-          <div className="logo-container">
-            <svg className="logo-icon" width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="20" cy="20" r="18" fill="#2E7D32"/>
-              <path d="M20 8C20 8 16 14 16 18C16 20.21 17.79 22 20 22C22.21 22 24 20.21 24 18C24 14 20 8 20 8Z" fill="#81C784"/>
-              <path d="M20 18L23 22C23 22 21.5 24 20 24C18.5 24 17 22 17 22L20 18Z" fill="#A5D6A7"/>
-              <rect x="19" y="22" width="2" height="10" rx="1" fill="#6D4C41"/>
-              <circle cx="20" cy="32" r="4" fill="#4CAF50"/>
-            </svg>
-            <h1 className="logo">Fyto</h1>
-          </div>
-        </div>
-        
-        <div className="header-right">
-          <button className="menu-icon">☰</button>
-        </div>
-      </header>
-
+      <Header />
+   
       {/* Tabs Navigation with Search and Filter */}
       <nav className="tabs-nav">
         <div className="tabs-left">

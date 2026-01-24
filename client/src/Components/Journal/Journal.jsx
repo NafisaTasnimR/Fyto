@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './Journal.css';
-import Header from './Header';
+import Header from '../Shared/Header';
 import Sidebar from './Sidebar';
 import JournalPage from './JournalPage';
 import CoverSelection from './CoverSelection';
