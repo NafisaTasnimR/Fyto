@@ -594,7 +594,7 @@
   padding: 0;
   overflow-y: auto;
   z-index: 100;
-  transition: left 0.3s ease;
+  transition: left 0.25s ease, width 0.25s ease, box-shadow 0.25s ease;
   display: flex;
   flex-direction: column;
 }
@@ -703,6 +703,19 @@
   width: 80px;
 }
 
+/* allow hover to expand for pointer devices */
+.sidebar.collapsed:hover {
+  width: 250px;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+  z-index: 150;
+}
+
+/* programmatic force shadow (used after closing overlay panels to ensure hover works) */
+.sidebar.force-shadow {
+  box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+  z-index: 150;
+}
+
 .sidebar.collapsed .nav-item {
   gap: 0;
   padding: 12px 0;
@@ -748,6 +761,25 @@
 
 .sidebar.collapsed~.search-panel {
   left: 80px;
+}
+
+/* Overlay variant: when a panel is opened it sits on top of the sidebar */
+.search-panel.overlay {
+  left: 0 !important;
+  z-index: 210;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+}
+
+.notifications-panel.overlay {
+  position: fixed;
+  left: 0 !important;
+  top: 60px;
+  width: 300px;
+  height: calc(100vh - 60px);
+  background: #fff;
+  z-index: 210;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+  transition: left 0.25s ease, opacity 0.2s ease;
 }
 
 .search-header {

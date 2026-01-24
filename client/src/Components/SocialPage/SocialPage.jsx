@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './SocialPage.css';
+import Header from '../Shared/Header';
 
 const SocialPage = () => {
   const navigate = useNavigate();
@@ -19,7 +20,19 @@ const SocialPage = () => {
   const [searchLoading, setSearchLoading] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [sidebarForceShadow, setSidebarForceShadow] = useState(false);
+
+  React.useEffect(() => {
+    // When panels are closed, briefly force the sidebar to show its shadow
+    if (!showSearchResults && !showNotifications) {
+      setSidebarForceShadow(true);
+      const t = setTimeout(() => setSidebarForceShadow(false), 220);
+      return () => clearTimeout(t);
+    }
+    // if either panel opens, ensure force-shadow is disabled
+    setSidebarForceShadow(false);
+  }, [showSearchResults, showNotifications]);
   const [newPostData, setNewPostData] = useState({
     caption: '',
     image: null,
@@ -586,25 +599,14 @@ const SocialPage = () => {
 
   return (
     <div className="social-page">
-      <header className="social-fixed-header">
-        <div className="social-header-content">
-          <div className="social-logo">🌿 Fyto</div>
-          <div className="social-header-actions">
-            <span className="header-welcome">Plant Community</span>
-          </div>
-        </div>
-      </header>
+      <Header />
 
-      <div className={`sidebar ${sidebarOpen ? 'open' : 'closed'} ${sidebarCollapsed ? 'collapsed' : ''}`}>
-        <div className="sidebar-header">
-          <button
-            className="sidebar-collapse-btn"
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            {sidebarCollapsed ? '|>' : '<|'}
-          </button>
-        </div>
+      <div
+        className={`sidebar ${sidebarOpen ? 'open' : 'closed'} ${sidebarCollapsed ? 'collapsed' : ''} ${sidebarForceShadow ? 'force-shadow' : ''}`}
+        onMouseEnter={() => setSidebarCollapsed(false)}
+        onMouseLeave={() => setSidebarCollapsed(true)}
+        onClick={() => setSidebarCollapsed((s) => !s)}
+      >
         <nav className="sidebar-nav">
           <button
             className={`nav-item ${activeNav === 'home' ? 'active' : ''}`}
@@ -644,7 +646,7 @@ const SocialPage = () => {
       </div>
 
       {showSearchResults && (
-        <div className="search-panel">
+        <div className="search-panel overlay">
           <div className="search-header">
             <input
               type="text"
@@ -916,7 +918,7 @@ const SocialPage = () => {
       )}
 
       {showNotifications && (
-        <div className="notifications-panel">
+        <div className="notifications-panel overlay">
           <div className="notifications-header">
             <h3>Notifications</h3>
             <button

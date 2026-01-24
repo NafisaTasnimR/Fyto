@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useConfirmedPosts } from '../Context/ConfirmedPostsContext';
 import './Store.css';
+import Header from '../Shared/Header';
 
 const Store = () => {
   // Preserve active tab from localStorage or default to 'For you'
@@ -14,6 +16,7 @@ const Store = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { isPostConfirmed } = useConfirmedPosts();
 
   const tabs = ['For you', 'Buy', 'Exchange', 'Donate', 'Favourites'];
 
@@ -263,7 +266,7 @@ const Store = () => {
   const hasMore = visibleProjects < filteredProjects.length;
 
   const loadMore = () => {
-    setVisibleProjects(prev => Math.min(prev + 8, filteredProjects.length));
+    setVisibleProjects(prev => Math.min(prev + 12, filteredProjects.length));
   };
 
   const handleProjectClick = (projectId) => {
@@ -282,7 +285,7 @@ const Store = () => {
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
-    setVisibleProjects(8); // Reset visible projects when searching
+    setVisibleProjects(12); // Reset visible projects when searching
   };
 
   const handleFilterClick = () => {
@@ -328,27 +331,25 @@ const Store = () => {
 
         <div className="tabs-right">
           <div className="search-container">
-            <input
-              type="text"
-              className="search-input"
+            <svg className="search-icon-left" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input 
+              type="text" 
+              className="search-input" 
               placeholder="Search trees, plants..."
               value={searchQuery}
               onChange={handleSearchChange}
             />
-            <svg className="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.35-4.35" />
-            </svg>
+            <button className="filter-btn-inside" onClick={handleFilterClick} title="Filter">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="4" y1="6" x2="20" y2="6" strokeLinecap="round"/>
+                <line x1="4" y1="12" x2="20" y2="12" strokeLinecap="round"/>
+                <line x1="4" y1="18" x2="20" y2="18" strokeLinecap="round"/>
+              </svg>
+            </button>
           </div>
-
-          <button className="filter-btn" onClick={handleFilterClick}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <line x1="4" y1="6" x2="20" y2="6" strokeWidth="2" strokeLinecap="round" />
-              <line x1="4" y1="12" x2="20" y2="12" strokeWidth="2" strokeLinecap="round" />
-              <line x1="4" y1="18" x2="20" y2="18" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-            <span className="filter-text">Filter</span>
-          </button>
         </div>
       </nav>
 
@@ -390,8 +391,8 @@ const Store = () => {
                   <span className="offering-text">{post.offering}</span>
                 </div>
               </div>
-            </div>
-          ))
+            );
+          })
         ) : (
           <div className="no-results">
             <p>No marketplace posts found matching your criteria.</p>

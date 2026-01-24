@@ -17,6 +17,7 @@ const NewPost = () => {
     postType: 'sell', // 'sell', 'donate', or 'exchange'
     price: '',
     exchangeFor: '', // what user wants in exchange
+    contactType: 'phone', // 'phone' or 'email'
     contact: '',
     image: null,
     imagePreview: null
@@ -77,6 +78,21 @@ const NewPost = () => {
       price: type === 'sell' ? prev.price : '',
       exchangeFor: type === 'exchange' ? prev.exchangeFor : ''
     }));
+  };
+
+  const handleContactTypeChange = (type) => {
+    setFormData(prev => ({
+      ...prev,
+      contactType: type,
+      contact: '' // Clear contact when switching types
+    }));
+    // Clear contact error when switching
+    if (errors.contact) {
+      setErrors(prev => ({
+        ...prev,
+        contact: ''
+      }));
+    }
   };
 
   const handleImageClick = () => {
@@ -170,6 +186,30 @@ const NewPost = () => {
     }
   };
 
+  const validatePhone = (phone) => {
+    // Remove all non-digit characters for validation
+    const digitsOnly = phone.replace(/\D/g, '');
+    
+    // Check if it contains only digits (after removing spaces, dashes, etc.)
+    // Allow 10-15 digits (covers most international formats)
+    if (digitsOnly.length < 10 || digitsOnly.length > 15) {
+      return false;
+    }
+    
+    // Check if original string doesn't contain letters
+    if (/[a-zA-Z]/.test(phone)) {
+      return false;
+    }
+    
+    return true;
+  };
+
+  const validateEmail = (email) => {
+    // Standard email regex pattern
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -205,8 +245,19 @@ const NewPost = () => {
       newErrors.exchangeFor = 'Please specify what you want in exchange';
     }
 
+    // Contact validation
     if (!formData.contact.trim()) {
       newErrors.contact = 'Contact information is required';
+    } else {
+      if (formData.contactType === 'phone') {
+        if (!validatePhone(formData.contact)) {
+          newErrors.contact = 'Please enter a valid phone number (10-15 digits)';
+        }
+      } else if (formData.contactType === 'email') {
+        if (!validateEmail(formData.contact)) {
+          newErrors.contact = 'Please enter a valid email address (e.g., example@email.com)';
+        }
+      }
     }
 
     if (!formData.imagePreview) {
@@ -503,7 +554,7 @@ const NewPost = () => {
               Price {formData.postType === 'sell' ? '*' : '(Only for selling)'}
             </label>
             <div className="price-input-wrapper">
-              <span className="currency-symbol">$</span>
+              <span className="currency-symbol">৳</span>
               <input
                 type="text"
                 id="price"
@@ -535,19 +586,59 @@ const NewPost = () => {
             </div>
           )}
 
+          {/* Contact Type Selection */}
+          <div className="form-section">
+            <label className="section-label">Contact Method *</label>
+            <div className="contact-type-buttons">
+              <button
+                type="button"
+                className={`contact-type-btn ${formData.contactType === 'phone' ? 'active' : ''}`}
+                onClick={() => handleContactTypeChange('phone')}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+                Phone Number
+              </button>
+              <button
+                type="button"
+                className={`contact-type-btn ${formData.contactType === 'email' ? 'active' : ''}`}
+                onClick={() => handleContactTypeChange('email')}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+                Email Address
+              </button>
+            </div>
+          </div>
+
           {/* Contact Information */}
           <div className="form-section">
-            <label htmlFor="contact" className="section-label">Contact Information *</label>
+            <label htmlFor="contact" className="section-label">
+              {formData.contactType === 'phone' ? 'Phone Number *' : 'Email Address *'}
+            </label>
             <input
-              type="text"
+              type={formData.contactType === 'email' ? 'email' : 'tel'}
               id="contact"
               name="contact"
               value={formData.contact}
               onChange={handleInputChange}
-              placeholder="Phone number or email"
+              placeholder={
+                formData.contactType === 'phone' 
+                  ? 'e.g., +880 1234-567890 or 01234567890' 
+                  : 'e.g., example@email.com'
+              }
               className={`form-input ${errors.contact ? 'error' : ''}`}
             />
             {errors.contact && <span className="error-message">{errors.contact}</span>}
+            {!errors.contact && formData.contactType === 'phone' && (
+              <span className="input-hint">Enter a valid phone number (10-15 digits)</span>
+            )}
+            {!errors.contact && formData.contactType === 'email' && (
+              <span className="input-hint">Enter a valid email address</span>
+            )}
           </div>
 
           {/* Action Buttons */}

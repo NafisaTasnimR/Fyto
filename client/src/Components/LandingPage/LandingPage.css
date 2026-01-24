@@ -25,22 +25,57 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 30px;
+  padding: 10px 20px;
 }
 
 .logo {
-  font-size: 1.8rem;
-  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1.6rem;
+  font-weight: 600;
   color: #2f6b48;
   cursor: pointer;
 }
 
-.nav-buttons {
-  display: flex;
-  gap: 15px;
+.site-logo {
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+  display: inline-block;
 }
 
-.nav-btn {
+.logo span {
+  font-family: 'Poppins', sans-serif;
+  color: #2f6b48;
+  font-weight: 700;
+  line-height: 1;
+  font-size: 1.4rem;
+}
+
+/* center nav added to header */
+.center-nav {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+.center-nav .nav-link {
+  text-decoration: none;
+  color: #4b5563;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.center-nav .nav-link:hover {
+  color: #274b2f;
+}
+
+/* Mirrored styles for unique button classes on LandingPage to avoid clashes */
+.nav-btn1 {
   padding: 10px 25px;
   border: none;
   border-radius: 25px;
@@ -52,17 +87,79 @@
   color: #2f6b48;
 }
 
-.nav-btn:hover {
+.nav-btn1:hover {
   background: #f0f0f0;
 }
 
-.signup-btn {
+.signup-btn1 {
   background: #2f6b48;
   color: white;
 }
 
-.signup-btn:hover {
+.signup-btn1:hover {
   background: #3d8d40;
+}
+
+/* Profile section for authenticated users */
+.profile-section {
+  position: relative;
+}
+
+.profile-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px 8px;
+}
+
+.profile-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #eaf7e7;
+  color: #2f6b48;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.profile-name {
+  font-family: 'Poppins', sans-serif;
+  color: #2f6b48;
+  font-weight: 700;
+}
+
+.profile-menu {
+  position: absolute;
+  right: 0;
+  top: 48px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 6px 4px;
+  min-width: 140px;
+  z-index: 1100;
+}
+
+.profile-menu-item {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: #274b2f;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.profile-menu-item:hover {
+  background: #f0f7ef;
 }
 
 /* ---- HERO SECTION ---- */
@@ -475,16 +572,34 @@
 /* ---- RESPONSIVE HEADER ---- */
 @media (max-width: 768px) {
   .header-content {
-    padding: 12px 20px;
+    padding: 8px 16px;
   }
 
   .logo {
     font-size: 1.5rem;
   }
 
+  .site-logo {
+    width: 28px;
+    height: 28px;
+  }
+
   .nav-btn {
     padding: 8px 20px;
     font-size: 0.9rem;
+  }
+
+  .nav-btn1 {
+    padding: 8px 20px;
+    font-size: 0.9rem;
+  }
+
+  .profile-avatar { width: 28px; height: 28px; }
+  .profile-name { font-size: 0.95rem; }
+
+  /* smaller logo text on medium screens */
+  .logo span {
+    font-size: 1.2rem;
   }
 
   /* responsive adjustments for removed .hero */
@@ -545,11 +660,16 @@
 
 @media (max-width: 480px) {
   .header-content {
-    padding: 10px 15px;
+    padding: 6px 12px;
   }
 
   .logo {
     font-size: 1.3rem;
+  }
+
+  .site-logo {
+    width: 24px;
+    height: 24px;
   }
 
   .nav-buttons {
@@ -559,6 +679,16 @@
   .nav-btn {
     padding: 7px 16px;
     font-size: 0.85rem;
+  }
+
+  .nav-btn1 {
+    padding: 7px 16px;
+    font-size: 0.85rem;
+  }
+
+  /* smaller logo text on small screens */
+  .logo span {
+    font-size: 1rem;
   }
 
   /* responsive adjustments for removed .hero */
