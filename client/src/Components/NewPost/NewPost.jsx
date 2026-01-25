@@ -187,25 +187,28 @@ const NewPost = () => {
   };
 
   const validatePhone = (phone) => {
-    // Remove all non-digit characters for validation
-    const digitsOnly = phone.replace(/\D/g, '');
-    
-    // Check if it contains only digits (after removing spaces, dashes, etc.)
-    // Allow 10-15 digits (covers most international formats)
-    if (digitsOnly.length < 10 || digitsOnly.length > 15) {
-      return false;
-    }
-    
-    // Check if original string doesn't contain letters
-    if (/[a-zA-Z]/.test(phone)) {
-      return false;
-    }
-    
-    return true;
-  };
+  const digitsOnly = phone.replace(/\D/g, '');
+
+
+
+  if (!(digitsOnly.length === 11 || digitsOnly.length === 13)) {
+    return false;
+  }
+
+  // Must start with 01 or 8801
+  if (
+    !digitsOnly.startsWith("01") &&
+    !digitsOnly.startsWith("8801")
+  ) {
+    return false;
+  }
+
+  return true;
+};
+
 
   const validateEmail = (email) => {
-    // Standard email regex pattern
+   
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
@@ -251,7 +254,7 @@ const NewPost = () => {
     } else {
       if (formData.contactType === 'phone') {
         if (!validatePhone(formData.contact)) {
-          newErrors.contact = 'Please enter a valid phone number (10-15 digits)';
+          newErrors.contact = 'Please enter a valid phone number ';
         }
       } else if (formData.contactType === 'email') {
         if (!validateEmail(formData.contact)) {
@@ -315,7 +318,7 @@ const NewPost = () => {
 
         if (response.data.success) {
           alert('Marketplace post created successfully!');
-          navigate('/'); // Navigate to store
+          navigate('/store'); 
         } else {
           alert('Failed to create post: ' + response.data.message);
         }
@@ -627,14 +630,14 @@ const NewPost = () => {
               onChange={handleInputChange}
               placeholder={
                 formData.contactType === 'phone' 
-                  ? 'e.g., +880 1234-567890 or 01234567890' 
+                  ? 'e.g., +8801234567890 or 01234567890' 
                   : 'e.g., example@email.com'
               }
               className={`form-input ${errors.contact ? 'error' : ''}`}
             />
             {errors.contact && <span className="error-message">{errors.contact}</span>}
             {!errors.contact && formData.contactType === 'phone' && (
-              <span className="input-hint">Enter a valid phone number (10-15 digits)</span>
+              <span className="input-hint">Enter a valid phone number </span>
             )}
             {!errors.contact && formData.contactType === 'email' && (
               <span className="input-hint">Enter a valid email address</span>

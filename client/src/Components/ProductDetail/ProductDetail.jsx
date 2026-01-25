@@ -11,7 +11,7 @@ const ProductDetail = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const { id } = useParams();
-  const { confirmPost } = useConfirmedPosts();
+  const { confirmPost, isPostConfirmed } = useConfirmedPosts();
 
   useEffect(() => {
     fetchProductDetail();
@@ -37,18 +37,7 @@ const ProductDetail = () => {
       );
 
       if (response.data.success) {
-        const fetchedPost = response.data.post;
-        setPost(fetchedPost);
-        
-        // Check if post is actually unavailable from backend
-        const isUnavailable = fetchedPost.status === 'confirmed' || 
-                             fetchedPost.status === 'sold' || 
-                             fetchedPost.status === 'unavailable';
-        
-        if (isUnavailable) {
-          alert('This post has already been confirmed and is no longer available.');
-          navigate('/store');
-        }
+        setPost(response.data.post);
       }
       setLoading(false);
     } catch (err) {
@@ -61,7 +50,7 @@ const ProductDetail = () => {
   const handleConfirm = () => {
     if (selectedOption) {
       // Confirm the post in context
-      confirmPost(parseInt(id), selectedOption);
+      confirmPost(id, selectedOption);
 
       // Show success message
       alert(`Success! You have confirmed: ${selectedOption} for ${post.treeName}\n\nYou will now be redirected to the store.`);
@@ -98,10 +87,12 @@ const ProductDetail = () => {
     );
   }
 
-  // Check if post is unavailable
-  const isUnavailable = post.status === 'confirmed' || 
-                       post.status === 'sold' || 
-                       post.status === 'unavailable';
+  // Check if post is unavailable - check BOTH backend status AND context
+  const isBackendUnavailable = post.status === 'confirmed' || 
+                               post.status === 'sold' || 
+                               post.status === 'unavailable';
+  const isContextConfirmed = isPostConfirmed(id);
+  const isUnavailable = isBackendUnavailable || isContextConfirmed;
 
   return (
     <div className="product-detail-container">
@@ -206,7 +197,7 @@ const ProductDetail = () => {
             <div className="meta-item">
               <span className="meta-label">Status:</span>
               <span className="meta-value">
-                {post.status === 'available' ? '✓ Available' : '✗ Not Available'}
+                {isUnavailable ? '✗ Not Available' : '✓ Available'}
               </span>
             </div>
             <div className="meta-item">
@@ -228,7 +219,7 @@ const ProductDetail = () => {
           {/* Condition */}
           <div className="condition-section">
             <h3 className="section-title">Status</h3>
-            <div className="condition-badge">{post.status}</div>
+            <div className="condition-badge">{isUnavailable ? 'Not Available' : post.status}</div>
           </div>
 
           {/* Exchange For (only for exchange posts) */}

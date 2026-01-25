@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Store.css';
 import Header from '../Shared/Header';
+import { useConfirmedPosts } from '../Context/ConfirmedPostsContext'; // Add this import
 
 const Store = () => {
   const [activeTab, setActiveTab] = useState(() => {
@@ -17,9 +18,10 @@ const Store = () => {
   
   // Filter states
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
-  const [availabilityFilter, setAvailabilityFilter] = useState('all'); // 'all', 'available', 'unavailable'
+  const [availabilityFilter, setAvailabilityFilter] = useState('all');
   
   const navigate = useNavigate();
+  const { isPostConfirmed } = useConfirmedPosts(); 
 
   const tabs = ['For you', 'Buy', 'Exchange', 'Donate', 'Favourites'];
 
@@ -58,13 +60,7 @@ const Store = () => {
 
       if (response.data.success) {
         const posts = response.data.posts || [];
-        
-        // TEMPORARY TEST: Make first post confirmed for testing
-        // Remove this after confirming the overlay works
-        if (posts.length > 0) {
-          posts[0].status = 'confirmed'; // Temporarily set first post as confirmed
-        }
-        
+        // Remove the temporary test code that was setting posts[0].status
         setMarketplacePosts(posts);
       }
       setLoading(false);
@@ -102,15 +98,23 @@ const Store = () => {
     // Availability filter
     if (availabilityFilter === 'available') {
       filtered = filtered.filter(post => {
-        return post.status === 'available' || 
-               (!post.status) || 
-               (post.status !== 'confirmed' && post.status !== 'sold' && post.status !== 'unavailable');
+        // Check both backend status AND context confirmation
+        const isBackendUnavailable = post.status === 'confirmed' || 
+                                     post.status === 'sold' || 
+                                     post.status === 'unavailable';
+        const isContextConfirmed = isPostConfirmed(post._id);
+        
+        return !isBackendUnavailable && !isContextConfirmed;
       });
     } else if (availabilityFilter === 'unavailable') {
       filtered = filtered.filter(post => {
-        return post.status === 'confirmed' || 
-               post.status === 'sold' ||
-               post.status === 'unavailable';
+        // Check both backend status AND context confirmation
+        const isBackendUnavailable = post.status === 'confirmed' || 
+                                     post.status === 'sold' ||
+                                     post.status === 'unavailable';
+        const isContextConfirmed = isPostConfirmed(post._id);
+        
+        return isBackendUnavailable || isContextConfirmed;
       });
     }
 
@@ -209,13 +213,12 @@ const Store = () => {
           <>
             <div className="store-grid">
               {displayedProjects.map((post) => {
-                // Check if post is confirmed/unavailable
-                // Backend uses status: 'available', 'sold', or 'confirmed'
-                const isConfirmed = post.status === 'confirmed' || 
-                                   post.status === 'sold' ||
-                                   post.status === 'unavailable' ||
-                                   post.isConfirmed === true || 
-                                   post.confirmed === true;
+                // Check BOTH backend status AND context confirmation
+                const isBackendUnavailable = post.status === 'confirmed' || 
+                                            post.status === 'sold' ||
+                                            post.status === 'unavailable';
+                const isContextConfirmed = isPostConfirmed(post._id);
+                const isConfirmed = isBackendUnavailable || isContextConfirmed;
                 
                 return (
                   <div
