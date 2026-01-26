@@ -55,7 +55,7 @@ function JournalPage({
     });
   };
 
-  // Update content when page changes
+  
   React.useEffect(() => {
     if (contentRef.current && contentRef.current.innerHTML !== currentPage.content) {
       const selection = window.getSelection();
@@ -65,7 +65,7 @@ function JournalPage({
 
       contentRef.current.innerHTML = currentPage.content || '';
 
-      // Restore cursor position if possible
+      
       if (startContainer && contentRef.current.contains(startContainer)) {
         try {
           const newRange = document.createRange();
@@ -74,7 +74,7 @@ function JournalPage({
           selection.removeAllRanges();
           selection.addRange(newRange);
         } catch (e) {
-          // Cursor restoration failed, that's ok
+         
         }
       }
     }
@@ -112,7 +112,6 @@ function JournalPage({
       }
     }
 
-    // Update image dimensions
     if (updates.width !== undefined || updates.height !== undefined) {
       try {
         const element = currentPage.elements.find(el => el.id === elementId);

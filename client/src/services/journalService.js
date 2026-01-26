@@ -29,6 +29,14 @@ export const createJournal = async (journalData) => {
     const response = await axios.post(API_URL, journalData, getAuthHeaders());
     return response;
 };
+export const getJournals = async () => {
+  const token = localStorage.getItem('token');
+  return await axios.get(`${API_URL}/api/journals`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
 
 export const getUserJournals = async () => {
     const response = await axios.get(API_URL, getAuthHeaders());

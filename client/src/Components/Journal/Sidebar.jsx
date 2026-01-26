@@ -26,6 +26,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, pages, currentPageIndex, setCurr
         <button 
           className="sidebar-toggle"
           onClick={() => setSidebarOpen(!sidebarOpen)}
+          title={sidebarOpen ? "Close sidebar" : "Open sidebar"}
         >
           {sidebarOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
         </button>

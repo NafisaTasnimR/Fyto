@@ -168,7 +168,7 @@ function Toolbar({
             onClick={() => toggleDropdown('font')}
             title="Font Family"
           >
-            <img src="font-style.png" alt="Font" className="toolbar-icon" />
+            <img src="/font-style.png" alt="Font" className="toolbar-icon" />
           </button>
           {activeDropdown === 'font' && (
             <div className="dropdown-panel">
@@ -197,7 +197,7 @@ function Toolbar({
             onClick={() => toggleDropdown('size')}
             title="Font Size"
           >
-            <img src="font-size.png" alt="Size" className="toolbar-icon" />
+            <img src="/font-size.png" alt="Size" className="toolbar-icon" />
           </button>
           {activeDropdown === 'size' && (
             <div className="dropdown-panel">
@@ -232,7 +232,7 @@ function Toolbar({
               borderColor: hasTextSelected ? '#3498db' : ''
             }}
           >
-            <img src="text-color.png" alt="Text Color" className="toolbar-icon" />
+            <img src="/text-color.png" alt="Text Color" className="toolbar-icon" />
             <div style={{
               position: 'absolute',
               bottom: '2px',
@@ -279,7 +279,7 @@ function Toolbar({
             onClick={() => toggleDropdown('pageColor')}
             title="Page Color"
           >
-            <img src="paper.png" alt="Page Color" className="toolbar-icon" />
+            <img src="/paper.png" alt="Page Color" className="toolbar-icon" />
           </button>
           {activeDropdown === 'pageColor' && (
             <ColorPicker
@@ -297,7 +297,7 @@ function Toolbar({
             onClick={() => toggleDropdown('formatting')}
             title="Text Formatting"
           >
-            <img src="text-format.png" alt="Format" className="toolbar-icon" />
+            <img src="/text-format.png" alt="Format" className="toolbar-icon" />
           </button>
           {activeDropdown === 'formatting' && (
             <div className="dropdown-panel">
@@ -340,7 +340,7 @@ function Toolbar({
             onClick={() => toggleDropdown('layout')}
             title="Page Layout"
           >
-            <img src="paper-size.png" alt="Layout" className="toolbar-icon" />
+            <img src="/paper-size.png" alt="Layout" className="toolbar-icon" />
           </button>
           {activeDropdown === 'layout' && (
             <div className="dropdown-panel">
@@ -385,7 +385,7 @@ function Toolbar({
           className="toolbar-icon-btn"
           title="Add Photo"
         >
-          <img src="image.png" alt="Add Photo" className="toolbar-icon" />
+          <img src="/image.png" alt="Add Photo" className="toolbar-icon" />
         </button>
 
         {/* Delete Page */}
@@ -395,7 +395,7 @@ function Toolbar({
             className="toolbar-icon-btn delete-btn"
             title="Delete Page"
           >
-            <img src="cancel.png" alt="Delete" className="toolbar-icon" />
+            <img src="/cancel.png" alt="Delete" className="toolbar-icon" />
           </button>
         )}
       </div>

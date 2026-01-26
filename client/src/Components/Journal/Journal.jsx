@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './Journal.css';
 import Header from '../Shared/Header';
 import Sidebar from './Sidebar';
@@ -19,7 +20,12 @@ const defaultPreferences = {
 };
 
 function Journal() {
-  const [showCoverSelection, setShowCoverSelection] = useState(true);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isNewJournal = location.pathname === '/journal/new';
+  const isContinue = location.pathname === '/journal/continue';
+
+  const [showCoverSelection, setShowCoverSelection] = useState(isNewJournal);
   const [selectedCover, setSelectedCover] = useState(null);
   const [currentJournal, setCurrentJournal] = useState(null);
   const [pages, setPages] = useState([]);
@@ -30,8 +36,44 @@ function Journal() {
   const [editingTitle, setEditingTitle] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [loadingJournals, setLoadingJournals] = useState(isContinue);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [lastSavedState, setLastSavedState] = useState(null);
 
   const currentPage = pages[currentPageIndex];
+
+  // Load existing journals for "continue" mode
+  useEffect(() => {
+    if (isContinue && !currentJournal) {
+      loadExistingJournals();
+    }
+  }, [isContinue]);
+
+  const loadExistingJournals = async () => {
+    try {
+      setLoadingJournals(true);
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        window.location.href = '/login';
+        return;
+      }
+
+      const response = await journalService.getJournals();
+      const journals = response.data.journals || [];
+
+      if (journals.length > 0) {
+        setCurrentJournal(journals[0]);
+      } else {
+        alert('No journals found. Please create a new journal first.');
+        navigate('/journal');
+      }
+      setLoadingJournals(false);
+    } catch (error) {
+      console.error('Error loading journals:', error);
+      setLoadingJournals(false);
+    }
+  };
 
   const loadJournalPages = useCallback(async () => {
     if (!currentJournal) return;
@@ -40,18 +82,14 @@ function Journal() {
       const response = await journalService.getJournalPages(currentJournal._id);
       const pagesData = response.data || [];
 
-      // Transform backend pages to frontend format
       const transformedPages = await Promise.all(
         pagesData.map(async (page) => {
-          // Get blocks for this page
           const blocksResponse = await journalService.getPageBlocks(page._id);
           const blocks = blocksResponse.data || [];
 
-          // Separate text and image blocks
           const textBlocks = blocks.filter(b => b.type === 'text');
           const imageBlocks = blocks.filter(b => b.type === 'image');
 
-          // Combine text content
           const content = textBlocks.map(b => b.text).join('<br>');
           const wordCount = textBlocks.reduce((count, block) => {
             const words = (block.text || '').trim().split(/\s+/).filter(w => w.length > 0);
@@ -79,35 +117,56 @@ function Journal() {
             }),
             preferences: {
               ...defaultPreferences,
-              pageColor: page.backgroundColor,
+              pageColor: page.backgroundColor || selectedCover?.bgColor || '#ffffff',
               pageWidth: page.pageSize?.width || 800,
               pageHeight: page.pageSize?.height || 1000
             },
             wordCount: wordCount,
             lastSaved: new Date(page.updatedAt),
-            textBlocks: textBlocks // Keep reference to text blocks
+            textBlocks: textBlocks
           };
         })
       );
 
       setPages(transformedPages.length > 0 ? transformedPages : []);
       setCurrentPageIndex(0);
+      setLastSavedState(JSON.stringify(transformedPages));
+      setHasUnsavedChanges(false);
     } catch (error) {
       console.error('Error loading journal pages:', error);
     }
-  }, [currentJournal]);
+  }, [currentJournal, selectedCover]);
 
-  // Load journal data when currentJournal changes
   useEffect(() => {
     if (currentJournal) {
       loadJournalPages();
     }
   }, [currentJournal, loadJournalPages]);
 
+  // Track unsaved changes
+  useEffect(() => {
+    if (pages.length > 0 && lastSavedState) {
+      const currentState = JSON.stringify(pages);
+      setHasUnsavedChanges(currentState !== lastSavedState);
+    }
+  }, [pages, lastSavedState]);
+
+  // Warn before leaving page with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
   const handleCoverSelect = (cover) => {
     setSelectedCover(cover);
 
-    // Create initial page in local state (not saved to backend yet)
     const initialPage = {
       id: Date.now(),
       backendId: null,
@@ -131,6 +190,35 @@ function Journal() {
     setPages([initialPage]);
     setCurrentPageIndex(0);
     setShowCoverSelection(false);
+    setLastSavedState(JSON.stringify([initialPage]));
+    setHasUnsavedChanges(false);
+  };
+
+  const handleBackButton = () => {
+    if (hasUnsavedChanges) {
+      const confirmLeave = window.confirm(
+        'You have unsaved changes. Are you sure you want to leave? Your changes will be lost.'
+      );
+      if (!confirmLeave) return;
+    }
+
+    if (showCoverSelection) {
+      navigate('/journal');
+    } else if (isNewJournal) {
+      setShowCoverSelection(true);
+    } else {
+      navigate('/journal');
+    }
+  };
+
+  const handlePageChange = (newIndex) => {
+    if (hasUnsavedChanges) {
+      const confirmChange = window.confirm(
+        'You have unsaved changes on this page. Are you sure you want to switch pages? Your changes will be lost.'
+      );
+      if (!confirmChange) return;
+    }
+    setCurrentPageIndex(newIndex);
   };
 
   const saveJournal = async () => {
@@ -139,7 +227,6 @@ function Journal() {
       return;
     }
 
-    // Check if user is authenticated
     const token = localStorage.getItem('token');
     if (!token) {
       alert('You need to be logged in to save a journal. Redirecting to login page...');
@@ -152,7 +239,6 @@ function Journal() {
 
       const firstPage = pages[0];
 
-      // Create the journal and its first page in one go
       const journalData = {
         title: firstPage.title || 'My Fyto Journal',
         coverImage: {
@@ -183,11 +269,9 @@ function Journal() {
 
       setCurrentJournal(newJournal);
 
-      // Update the first page in local state with its new backend ID
       const updatedPages = [...pages];
       updatedPages[0].backendId = savedFirstPage._id;
 
-      // If there are more pages, save them now
       if (pages.length > 1) {
         for (let i = 1; i < pages.length; i++) {
           const page = pages[i];
@@ -204,7 +288,6 @@ function Journal() {
           const savedPage = pageResponse.data;
           updatedPages[i].backendId = savedPage._id;
 
-          // Save blocks for the additional pages
           if (page.content && page.content.trim()) {
             await journalService.createBlock(savedPage._id, {
               type: 'text',
@@ -236,16 +319,16 @@ function Journal() {
         }
       }
 
-      // Update word count for the whole journal
       await journalService.updateWordCount(newJournal._id);
 
       setPages(updatedPages);
+      setLastSavedState(JSON.stringify(updatedPages));
+      setHasUnsavedChanges(false);
 
       alert('Journal saved successfully!');
     } catch (error) {
       console.error('Error saving journal:', error);
 
-      // Check if it's an authentication error
       if (error.response?.status === 401 || error.response?.data?.message?.includes('token')) {
         alert('Your session has expired. Please log in again.');
         localStorage.removeItem('token');
@@ -272,18 +355,25 @@ function Journal() {
   };
 
   const addNewPage = () => {
+    // Calculate next entry number
+    const entryNumber = pages.length + 1;
+    const newTitle = entryNumber === 1 ? 'My Fyto Journal' : `My Fyto Journal ${entryNumber}`;
+
     const newPage = {
       id: Date.now(),
       backendId: null,
       elements: [],
       content: '',
-      title: currentPage?.title || 'My Fyto Journal',
+      title: newTitle,
       date: new Date().toLocaleDateString('en-US', {
         month: 'long',
         day: 'numeric',
         year: 'numeric'
       }),
-      preferences: { ...defaultPreferences },
+      preferences: { 
+        ...defaultPreferences,
+        pageColor: selectedCover?.bgColor || currentPage?.preferences.pageColor || '#ffffff'
+      },
       wordCount: 0,
       lastSaved: null,
       textBlocks: []
@@ -295,6 +385,9 @@ function Journal() {
 
   const deletePage = () => {
     if (pages.length > 1) {
+      const confirmDelete = window.confirm('Are you sure you want to delete this page?');
+      if (!confirmDelete) return;
+
       const newPages = pages.filter((_, idx) => idx !== currentPageIndex);
       setPages(newPages);
       setCurrentPageIndex(Math.min(currentPageIndex, newPages.length - 1));
@@ -324,21 +417,60 @@ function Journal() {
     setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
   };
 
+  // Show cover selection for new journal
   if (showCoverSelection) {
-    return <CoverSelection onCoverSelect={handleCoverSelect} saving={saving} />;
+    return (
+      <>
+        <button onClick={handleBackButton} className="back-button-cover">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Back
+        </button>
+        <CoverSelection onCoverSelect={handleCoverSelect} saving={saving} />
+      </>
+    );
   }
 
-  if (!currentPage) {
+  // Show loading while fetching journals for continue mode
+  if (loadingJournals) {
     return (
-      <div className="app-container">
+      <div className="journal-app-container">
         <Header />
         <div style={{
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          height: '100vh',
+          height: 'calc(100vh - 60px)',
           fontSize: '18px',
-          color: '#6b7c5e'
+          color: '#2f6b48',
+          fontFamily: 'Poppins, sans-serif'
+        }}>
+          Loading your journals...
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if no pages
+  if (!currentPage) {
+    return (
+      <div className="journal-app-container">
+        <Header />
+        <button onClick={handleBackButton} className="back-button-cover">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Back
+        </button>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: 'calc(100vh - 60px)',
+          fontSize: '18px',
+          color: '#2f6b48',
+          fontFamily: 'Poppins, sans-serif'
         }}>
           No pages found. Please create a new journal.
         </div>
@@ -347,65 +479,46 @@ function Journal() {
   }
 
   return (
-    <div className="app-container">
+    <div className="journal-app-container">
       <Header />
 
-      {/* Floating Save Button */}
+      <button 
+        onClick={handleBackButton} 
+        className="back-button"
+        style={{ left: sidebarOpen ? '300px' : '80px' }}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        Back
+      </button>
+
       {!currentJournal && selectedCover && pages.length > 0 && (
         <button
           onClick={saveJournal}
           disabled={saving}
-          style={{
-            position: 'fixed',
-            bottom: '30px',
-            right: '30px',
-            backgroundColor: '#4CAF50',
-            color: 'white',
-            border: 'none',
-            borderRadius: '50px',
-            padding: '15px 30px',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            cursor: saving ? 'not-allowed' : 'pointer',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            opacity: saving ? 0.7 : 1,
-            transition: 'all 0.3s ease'
-          }}
-          onMouseEnter={(e) => {
-            if (!saving) {
-              e.currentTarget.style.transform = 'scale(1.05)';
-              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.4)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-          }}
+          title={saving ? 'Saving...' : 'Save Journal'}
+          className="journal-save-button"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
             <polyline points="17 21 17 13 7 13 7 21"></polyline>
             <polyline points="7 3 7 8 15 8"></polyline>
           </svg>
-          {saving ? 'Saving...' : 'Save Journal'}
         </button>
       )}
 
-      <div className="main-layout">
+      <div className="journal-main-layout">
         <Sidebar
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
           pages={pages}
           currentPageIndex={currentPageIndex}
-          setCurrentPageIndex={setCurrentPageIndex}
+          setCurrentPageIndex={handlePageChange}
           addNewPage={addNewPage}
         />
 
-        <main className="main-content-area">
+        <main className="journal-content-area">
           <JournalPage
             currentPage={currentPage}
             currentPageIndex={currentPageIndex}
@@ -417,7 +530,7 @@ function Journal() {
             setDraggedElement={setDraggedElement}
             resizingElement={resizingElement}
             setResizingElement={setResizingElement}
-            setCurrentPageIndex={setCurrentPageIndex}
+            setCurrentPageIndex={handlePageChange}
             updatePreferences={updatePreferences}
             addElement={addElement}
             deletePage={deletePage}
@@ -425,6 +538,7 @@ function Journal() {
             toggleDropdown={toggleDropdown}
             saving={saving}
             currentJournal={currentJournal}
+            hasUnsavedChanges={hasUnsavedChanges}
           />
         </main>
       </div>

@@ -1,73 +1,13 @@
+/* Import Poppins for general use */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 /* Cover Selection Wrapper */
 .cover-selection-wrapper {
   min-height: 100vh;
   background: #F0F7EF;
   display: flex;
   flex-direction: column;
-}
-
-/* Header styling (same as main app) */
-.cover-selection-wrapper .app-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 2rem;
-  height: 60px;
-}
-
-.cover-selection-wrapper .header-left {
-  display: flex;
-  align-items: center;
-}
-
-.cover-selection-wrapper .logo-container {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.cover-selection-wrapper .logo-icon-space {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-  border-radius: 6px;
-  border: 2px solid #81c784;
-}
-
-.cover-selection-wrapper .app-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #2d5016;
-  margin: 0;
-}
-
-.cover-selection-wrapper .header-right {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.cover-selection-wrapper .icon-button {
-  padding: 0.5rem;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #6b7280;
-  border-radius: 6px;
-}
-
-.cover-selection-wrapper .icon-button:hover {
-  background: #f3f4f6;
-  color: #374151;
+  font-family: 'Poppins', sans-serif;
 }
 
 /* Cover Selection Container */
@@ -77,6 +17,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 60px;
 }
 
 /* Welcome Banner */
@@ -87,30 +28,29 @@
 
 .welcome-title {
   font-size: 2.5rem;
-  font-weight: 300;
-  color: #4a5568;
+  font-weight: 600;
+  color: #2d5016;
   margin: 0 0 0.5rem 0;
-  font-family: 'Georgia', serif;
-  letter-spacing: 0.5px;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: -0.5px;
 }
 
 .welcome-subtitle {
   font-size: 1.1rem;
-  color: #718096;
+  color: #5a7a4d;
   font-weight: 400;
   margin: 0;
-  font-family: 'Georgia', serif;
-  font-style: italic;
+  font-family: 'Poppins', sans-serif;
 }
 
 /* Cover Instruction */
 .cover-instruction {
   font-size: 1rem;
-  color: #718096;
+  color: #5a7a4d;
   margin-bottom: 2.5rem;
   font-weight: 400;
   text-align: center;
-  font-family: 'Georgia', serif;
+  font-family: 'Poppins', sans-serif;
 }
 
 /* Covers Grid */
@@ -153,7 +93,7 @@
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* Cover Content */
+/* Cover Content - Uses Georgia for elegance */
 .cover-content {
   width: 100%;
   height: 100%;
@@ -184,7 +124,7 @@
   opacity: 0.2;
 }
 
-/* Cover Title Section */
+/* Cover Title Section - Georgia font for elegance */
 .cover-title-section {
   text-align: center;
   margin-top: auto;
@@ -230,14 +170,15 @@
   height: 100%;
 }
 
-/* Cover Name */
+/* Cover Name - Back to Poppins */
 .cover-name {
   text-align: center;
   margin-top: 1.5rem;
   font-size: 1rem;
   font-weight: 500;
-  font-family: 'Georgia', serif;
+  font-family: 'Poppins', sans-serif;
   letter-spacing: 0.5px;
+  color: #2d5016;
 }
 
 /* Responsive Design */
@@ -295,14 +236,6 @@
 }
 
 @media (max-width: 480px) {
-  .cover-selection-wrapper .app-header {
-    padding: 0.75rem 1rem;
-  }
-
-  .cover-selection-wrapper .app-title {
-    font-size: 1.5rem;
-  }
-
   .welcome-title {
     font-size: 1.5rem;
   }
