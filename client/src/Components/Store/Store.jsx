@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Store.css';
 import Header from '../Shared/Header';
-import { useConfirmedPosts } from '../Context/ConfirmedPostsContext'; // Add this import
+import { useConfirmedPosts } from '../Context/ConfirmedPostsContext'; 
 
 const Store = () => {
   const [activeTab, setActiveTab] = useState(() => {
@@ -240,12 +240,7 @@ const Store = () => {
                       
                       {isConfirmed && (
                         <div className="confirmed-overlay">
-                          <div className="confirmed-badge">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                              <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                            Confirmed
-                          </div>
+                          
                           <div className="unavailable-text">NO LONGER AVAILABLE</div>
                         </div>
                       )}
