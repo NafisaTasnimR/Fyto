@@ -653,7 +653,7 @@ const SocialPage = () => {
             <input
               type="text"
               placeholder="Search users by username..."
-              className="search-input"
+              className="search-input1"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               autoFocus

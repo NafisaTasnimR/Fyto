@@ -738,16 +738,18 @@
   display: flex;
   gap: 8px;
   align-items: center;
+  width: 100%;
 }
 
-.search-input-container {
+.search-input1-container {
   position: relative;
   display: flex;
   align-items: center;
   flex: 1;
+  max-width: calc(100% - 40px);
 }
 
-.search-input {
+.search-input1 {
   flex: 1;
   padding: 10px 16px;
   border: 1px solid #dbdbdb;
@@ -761,9 +763,9 @@
   width: 100%;
 }
 
-.search-input:focus {
+.search-input1:focus {
   background-color: #fff;
-  border-color: #0095f6;
+  border-color: black;
 }
 
 .search-close-btn {
