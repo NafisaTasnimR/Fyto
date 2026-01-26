@@ -112,7 +112,7 @@ const SocialPage = () => {
       const currentUserId = payload._id;
 
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/posts`,
+        `${process.env.REACT_APP_API_URL}/api/posts`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
