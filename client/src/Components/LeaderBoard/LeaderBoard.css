@@ -1,0 +1,95 @@
+.leaderboard {
+  background: #fff;
+  border-radius: 0;
+  padding: 20px;
+  box-shadow: none;
+  position: static;
+  top: auto;
+  max-height: none;
+  overflow-y: visible;
+}
+
+.leaderboard-header {
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.leaderboard-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.leaderboard-item:hover {
+  background-color: #f5f5f5;
+}
+
+.rank-badge {
+  font-size: 16px;
+  font-weight: 700;
+  min-width: 30px;
+  text-align: center;
+  color: #666;
+}
+
+.leaderboard-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.leaderboard-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.leaderboard-username {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.leaderboard-points {
+  font-size: 12px;
+  color: #666;
+}
+
+/* Scrollbar styling */
+.leaderboard::-webkit-scrollbar {
+  width: 6px;
+}
+
+.leaderboard::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.leaderboard::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.leaderboard::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
