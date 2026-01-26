@@ -680,9 +680,9 @@
 .main-content {
   flex: 1;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-start;
-  padding: 20px 0;
+  padding: 20px 0 20px 200px;
   margin-left: 80px;
   margin-right: 0;
   transition: margin-left 0.3s ease;
@@ -1809,7 +1809,7 @@
   position: fixed;
   right: 0;
   top: 60px;
-  width: 320px;
+  width: 360px;
   height: calc(100vh - 60px);
   padding: 20px;
   background-color: #fff;

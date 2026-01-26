@@ -23,7 +23,7 @@ const SocialPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [sidebarForceShadow, setSidebarForceShadow] = useState(false);
-  const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(true);
+  const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(false);
 
   React.useEffect(() => {
     // When panels are closed, briefly force the sidebar to show its shadow
