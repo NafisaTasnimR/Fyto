@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './SocialPage.css';
 import Header from '../Shared/Header';
+import LeaderBoard from '../LeaderBoard/LeaderBoard';
 
 const SocialPage = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const SocialPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [sidebarForceShadow, setSidebarForceShadow] = useState(false);
+  const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(false);
 
   React.useEffect(() => {
     // When panels are closed, briefly force the sidebar to show its shadow
@@ -605,7 +607,6 @@ const SocialPage = () => {
         className={`sidebar ${sidebarOpen ? 'open' : 'closed'} ${sidebarCollapsed ? 'collapsed' : ''} ${sidebarForceShadow ? 'force-shadow' : ''}`}
         onMouseEnter={() => setSidebarCollapsed(false)}
         onMouseLeave={() => setSidebarCollapsed(true)}
-        onClick={() => setSidebarCollapsed((s) => !s)}
       >
         <nav className="sidebar-nav">
           <button
@@ -613,6 +614,7 @@ const SocialPage = () => {
             onClick={() => {
               setActiveNav('home');
               setShowSearchResults(false);
+              setShowNotifications(false);
             }}
           >
             <img src="/home.png" alt="home" className="nav-icon-img" />
@@ -651,7 +653,7 @@ const SocialPage = () => {
             <input
               type="text"
               placeholder="Search users by username..."
-              className="search-input"
+              className="search-input1"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               autoFocus
@@ -1067,6 +1069,21 @@ const SocialPage = () => {
               ))
             )}
           </div>
+        </div>
+      </div>
+
+      <div className={`right-sidebar ${rightSidebarCollapsed ? 'collapsed' : ''}`}>
+        <div className="right-sidebar-header">
+          <button
+            className="right-sidebar-toggle-btn"
+            onClick={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
+          >
+            <img src="/trophy.png" alt="" className="trophy-icon" />
+            <span className="right-sidebar-label">Leaderboard</span>
+          </button>
+        </div>
+        <div className="right-sidebar-content">
+          <LeaderBoard />
         </div>
       </div>
 

@@ -204,6 +204,10 @@ const LoginSignup = ({ mode = 'login', onClose, onModeChange }) => {
       <div className="login-signup-container" onClick={(e) => e.stopPropagation()}>
         <button className="close-modal" onClick={onClose}>&times;</button>
         <div className="form-wrapper">
+          <div className="logo-header">
+            <img src="/2.png" alt="Fyto Logo" className="logo-image" />
+            <span className="logo-text">Fyto</span>
+          </div>
           <h2>{isLogin ? 'Login' : 'Sign In'}</h2>
 
           {error && <div className="error-message">{error}</div>}
@@ -304,7 +308,7 @@ const LoginSignup = ({ mode = 'login', onClose, onModeChange }) => {
                 </span>
               </div>
             )}
-            <button type="submit" className="submit-btn" disabled={isLoading}>
+            <button type="submit" className="submit-btn1" disabled={isLoading}>
               {isLoading ? 'Please wait...' : 'Submit'}
             </button>
           </form>

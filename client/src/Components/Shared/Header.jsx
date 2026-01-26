@@ -3,8 +3,7 @@ import { NavLink } from 'react-router-dom';
 import '../LandingPage/LandingPage.css';
 
 export default function Header() {
-  // simple profile button (no dropdown)
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   return (
     <>
@@ -22,10 +21,26 @@ export default function Header() {
               <NavLink end to="/challenges" className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>Challenges</NavLink>
           </div>
 
-          <div className="profile-section">
-            <NavLink to="/profile" className="profile-button">
-              <img src="/user.png" alt="Profile" className="profile-avatar" />
-            </NavLink>
+          <div className="menu-section">
+            <button 
+              className="menu-button" 
+              onClick={() => setShowMenu(!showMenu)}
+            >
+              <img src="/more.png" alt="Menu" className="menu-icon" />
+            </button>
+            
+            {showMenu && (
+              <div className="menu-dropdown">
+                <NavLink to="/profile" className="menu-item" onClick={() => setShowMenu(false)}>
+                  <img src="/user.png" alt="Profile" className="menu-item-icon" />
+                  <span>Profile</span>
+                </NavLink>
+                <NavLink to="/" className="menu-item" onClick={() => setShowMenu(false)}>
+                  <img src="/exit.png" alt="Logout" className="menu-item-icon" />
+                  <span>Logout</span>
+                </NavLink>  
+              </div>
+            )}
           </div>
         </div>
       </header>
