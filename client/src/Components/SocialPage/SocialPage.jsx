@@ -194,7 +194,7 @@ const SocialPage = () => {
 
       const [usersResponse, postsResponse] = await Promise.all([
         axios.get(
-          `${process.env.REACT_APP_API_URL}/api/auth/search?query=${encodeURIComponent(query)}`,
+          `${process.env.REACT_APP_API_URL}/api/users/search?query=${encodeURIComponent(query)}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -205,7 +205,7 @@ const SocialPage = () => {
           return { data: { success: false, users: [] } };
         }),
         axios.get(
-          `${process.env.REACT_APP_API_URL}/posts/search?query=${encodeURIComponent(query)}`,
+          `${process.env.REACT_APP_API_URL}/api/posts/search?query=${encodeURIComponent(query)}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -280,7 +280,7 @@ const SocialPage = () => {
       const token = localStorage.getItem('token');
 
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/posts/${postId}/like`,
+        `${process.env.REACT_APP_API_URL}/api/posts/${postId}/like`,
         {},
         {
           headers: {
