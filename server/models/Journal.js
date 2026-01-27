@@ -27,7 +27,7 @@ const JournalSchema = new Schema(
             default: 0
         },
 
-        // Optional future features
+
         isPublic: {
             type: Boolean,
             default: false

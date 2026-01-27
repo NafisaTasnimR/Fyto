@@ -27,7 +27,7 @@ const JournalLanding = () => {
         <div className="journal-options-container">
           <div className="journal-option-card" onClick={handleCreateNew}>
             <div className="journal-option-icon create-icon">
-              {/* Replace with your PNG: <img src="/create-journal.png" alt="Create Journal" /> */}
+              
               <img src="/create-journal.png" alt="Create Journal" />
             </div>
             <h2 className="journal-option-title">Create New Journal</h2>
@@ -44,7 +44,7 @@ const JournalLanding = () => {
 
           <div className="journal-option-card" onClick={handleViewJournals}>
             <div className="journal-option-icon view-icon">
-              {/* Replace with your PNG: <img src="/view-journal.png" alt="View Journals" /> */}
+              
               <img src="/view-journal.png" alt="View Journals" />
             </div>
             <h2 className="journal-option-title">Continue Writing</h2>

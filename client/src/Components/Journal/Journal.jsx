@@ -42,7 +42,7 @@ function Journal() {
 
   const currentPage = pages[currentPageIndex];
 
-  // Load existing journals for "continue" mode
+  
   useEffect(() => {
     if (isContinue && !currentJournal) {
       loadExistingJournals();
@@ -143,7 +143,7 @@ function Journal() {
     }
   }, [currentJournal, loadJournalPages]);
 
-  // Track unsaved changes
+  
   useEffect(() => {
     if (pages.length > 0 && lastSavedState) {
       const currentState = JSON.stringify(pages);
@@ -151,7 +151,7 @@ function Journal() {
     }
   }, [pages, lastSavedState]);
 
-  // Warn before leaving page with unsaved changes
+  
   useEffect(() => {
     const handleBeforeUnload = (e) => {
       if (hasUnsavedChanges) {
@@ -355,7 +355,7 @@ function Journal() {
   };
 
   const addNewPage = () => {
-    // Calculate next entry number
+    
     const entryNumber = pages.length + 1;
     const newTitle = entryNumber === 1 ? 'My Fyto Journal' : `My Fyto Journal ${entryNumber}`;
 
@@ -417,7 +417,7 @@ function Journal() {
     setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
   };
 
-  // Show cover selection for new journal
+  
   if (showCoverSelection) {
     return (
       <>
@@ -431,7 +431,7 @@ function Journal() {
     );
   }
 
-  // Show loading while fetching journals for continue mode
+  
   if (loadingJournals) {
     return (
       <div className="journal-app-container">
@@ -451,7 +451,7 @@ function Journal() {
     );
   }
 
-  // Show message if no pages
+  
   if (!currentPage) {
     return (
       <div className="journal-app-container">

@@ -2,7 +2,7 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #e8f5e9 100%);
   padding-top: 80px;
-  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+   font-family: 'Poppins', 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .challenges-content {
@@ -46,19 +46,6 @@
   background: #66bb6a;
   color: white;
   box-shadow: 0 4px 12px rgba(102, 187, 106, 0.3);
-}
-
-.challenge-tab.active::after {
-  content: '';
-  position: absolute;
-  bottom: -0.75rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-top: 10px solid #66bb6a;
 }
 
 .challenge-content-area {

@@ -3,7 +3,7 @@ import Page from "../models/Page.js";
 import Block from "../models/Block.js";
 import mongoose from "mongoose";
 
-// Create a new journal
+
 export const createJournal = async (req, res) => {
     try {
         const { title, coverImage } = req.body;
@@ -43,7 +43,7 @@ export const createJournal = async (req, res) => {
     }
 };
 
-// Create a new journal with its first page
+
 export const createJournalWithFirstPage = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -52,7 +52,7 @@ export const createJournalWithFirstPage = async (req, res) => {
         const { title, coverImage, firstPage } = req.body;
         const userId = req.user._id;
 
-        // 1. Create the Journal
+        
         const journal = new Journal({
             userId,
             title,
@@ -60,7 +60,6 @@ export const createJournalWithFirstPage = async (req, res) => {
         });
         const savedJournal = await journal.save({ session });
 
-        // 2. Create the first Page
         const page = new Page({
             journalId: savedJournal._id,
             pageNumber: 1,
@@ -69,7 +68,7 @@ export const createJournalWithFirstPage = async (req, res) => {
         });
         const savedPage = await page.save({ session });
 
-        // 3. Create initial blocks for the first page (if any)
+        
         if (firstPage.content && firstPage.content.trim()) {
             const textBlock = new Block({
                 pageId: savedPage._id,
@@ -119,7 +118,7 @@ export const createJournalWithFirstPage = async (req, res) => {
     }
 };
 
-// Get all journals for a user
+
 export const getUserJournals = async (req, res) => {
     try {
         const userId = req.user._id;
@@ -143,7 +142,7 @@ export const getUserJournals = async (req, res) => {
     }
 };
 
-// Get a specific journal by ID
+
 export const getJournalById = async (req, res) => {
     try {
         const { journalId } = req.params;
@@ -161,7 +160,7 @@ export const getJournalById = async (req, res) => {
             });
         }
 
-        // Get all pages for this journal
+       
         const pages = await Page.find({ journalId })
             .sort({ pageNumber: 1 })
             .lean();
@@ -183,7 +182,6 @@ export const getJournalById = async (req, res) => {
     }
 };
 
-// Update journal details
 export const updateJournal = async (req, res) => {
     try {
         const { journalId } = req.params;
@@ -223,7 +221,7 @@ export const updateJournal = async (req, res) => {
     }
 };
 
-// Delete a journal
+
 export const deleteJournal = async (req, res) => {
     try {
         const { journalId } = req.params;
@@ -241,17 +239,17 @@ export const deleteJournal = async (req, res) => {
             });
         }
 
-        // Get all pages for this journal
+        
         const pages = await Page.find({ journalId });
         const pageIds = pages.map(page => page._id);
 
-        // Delete all blocks associated with these pages
+       
         await Block.deleteMany({ pageId: { $in: pageIds } });
 
-        // Delete all pages
+        
         await Page.deleteMany({ journalId });
 
-        // Delete the journal
+        
         await Journal.deleteOne({ _id: journalId });
 
         return res.status(200).json({
@@ -268,7 +266,7 @@ export const deleteJournal = async (req, res) => {
     }
 };
 
-// Update word count for a journal
+
 export const updateWordCount = async (req, res) => {
     try {
         const { journalId } = req.params;
@@ -286,17 +284,17 @@ export const updateWordCount = async (req, res) => {
             });
         }
 
-        // Get all pages for this journal
+       
         const pages = await Page.find({ journalId });
         const pageIds = pages.map(page => page._id);
 
-        // Get all text blocks for these pages
+      
         const blocks = await Block.find({
             pageId: { $in: pageIds },
             type: "text"
         });
 
-        // Calculate total word count
+       
         const totalWordCount = blocks.reduce((count, block) => {
             if (block.text) {
                 const words = block.text.trim().split(/\s+/).filter(word => word.length > 0);

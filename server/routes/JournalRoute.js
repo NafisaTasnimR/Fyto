@@ -45,10 +45,10 @@ import {
 
 const router = express.Router();
 
-// All routes require authentication
+
 router.use(verifyToken);
 
-// ==================== JOURNAL ROUTES ====================
+
 
 router.post("/with-first-page", validateCreateJournal, createJournalWithFirstPage);
 
@@ -64,7 +64,7 @@ router.delete("/:journalId", validateJournalId, deleteJournal);
 
 router.post("/:journalId/word-count", validateJournalId, updateWordCount);
 
-// ==================== PAGE ROUTES ====================
+
 
 router.post("/:journalId/pages", validateCreatePage, createPage);
 
@@ -78,7 +78,7 @@ router.put("/pages/:pageId", validateUpdatePage, updatePage);
 
 router.delete("/pages/:pageId", validatePageId, deletePage);
 
-// ==================== BLOCK ROUTES ====================
+
 
 router.post("/pages/:pageId/blocks", validateCreateBlock, createBlock);
 

@@ -2,14 +2,14 @@ import Block from "../models/Block.js";
 import Page from "../models/Page.js";
 import Journal from "../models/Journal.js";
 
-// Create a new block (text or image)
+
 export const createBlock = async (req, res) => {
     try {
         const { pageId } = req.params;
         const userId = req.user._id;
         const { type, position, text, styles, image } = req.body;
 
-        // Verify page exists and belongs to user
+        
         const page = await Page.findById(pageId).populate('journalId');
         if (!page) {
             return res.status(404).json({
@@ -25,7 +25,7 @@ export const createBlock = async (req, res) => {
             });
         }
 
-        // Get the next order number
+       
         const lastBlock = await Block.findOne({ pageId })
             .sort({ order: -1 })
             .limit(1);
@@ -74,13 +74,13 @@ export const createBlock = async (req, res) => {
     }
 };
 
-// Get all blocks for a page
+
 export const getPageBlocks = async (req, res) => {
     try {
         const { pageId } = req.params;
         const userId = req.user._id;
 
-        // Verify page exists and belongs to user
+        
         const page = await Page.findById(pageId).populate('journalId');
         if (!page) {
             return res.status(404).json({
@@ -115,7 +115,7 @@ export const getPageBlocks = async (req, res) => {
     }
 };
 
-// Get a specific block
+
 export const getBlockById = async (req, res) => {
     try {
         const { blockId } = req.params;
@@ -135,7 +135,7 @@ export const getBlockById = async (req, res) => {
             });
         }
 
-        // Verify ownership
+        
         if (block.pageId.journalId.userId.toString() !== userId) {
             return res.status(403).json({
                 success: false,
@@ -157,7 +157,7 @@ export const getBlockById = async (req, res) => {
     }
 };
 
-// Update a block
+
 export const updateBlock = async (req, res) => {
     try {
         const { blockId } = req.params;
@@ -178,7 +178,7 @@ export const updateBlock = async (req, res) => {
             });
         }
 
-        // Verify ownership
+        
         if (block.pageId.journalId.userId.toString() !== userId) {
             return res.status(403).json({
                 success: false,
@@ -186,7 +186,7 @@ export const updateBlock = async (req, res) => {
             });
         }
 
-        // Update based on block type
+        
         if (position) block.position = position;
 
         if (block.type === "text") {
@@ -218,7 +218,7 @@ export const updateBlock = async (req, res) => {
     }
 };
 
-// Update block styles (for text blocks)
+
 export const updateBlockStyles = async (req, res) => {
     try {
         const { blockId } = req.params;
@@ -239,7 +239,7 @@ export const updateBlockStyles = async (req, res) => {
             });
         }
 
-        // Verify ownership
+       
         if (block.pageId.journalId.userId.toString() !== userId) {
             return res.status(403).json({
                 success: false,
@@ -276,7 +276,7 @@ export const updateBlockStyles = async (req, res) => {
     }
 };
 
-// Update block position
+
 export const updateBlockPosition = async (req, res) => {
     try {
         const { blockId } = req.params;
@@ -297,7 +297,7 @@ export const updateBlockPosition = async (req, res) => {
             });
         }
 
-        // Verify ownership
+       
         if (block.pageId.journalId.userId.toString() !== userId) {
             return res.status(403).json({
                 success: false,
@@ -325,7 +325,7 @@ export const updateBlockPosition = async (req, res) => {
     }
 };
 
-// Delete a block
+
 export const deleteBlock = async (req, res) => {
     try {
         const { blockId } = req.params;
@@ -345,7 +345,7 @@ export const deleteBlock = async (req, res) => {
             });
         }
 
-        // Verify ownership
+        
         if (block.pageId.journalId.userId.toString() !== userId) {
             return res.status(403).json({
                 success: false,
@@ -356,10 +356,10 @@ export const deleteBlock = async (req, res) => {
         const pageId = block.pageId._id;
         const deletedOrder = block.order;
 
-        // Delete the block
+        
         await Block.deleteOne({ _id: blockId });
 
-        // Update order for subsequent blocks
+        
         await Block.updateMany(
             { pageId, order: { $gt: deletedOrder } },
             { $inc: { order: -1 } }
@@ -379,14 +379,14 @@ export const deleteBlock = async (req, res) => {
     }
 };
 
-// Reorder blocks
+
 export const reorderBlocks = async (req, res) => {
     try {
         const { pageId } = req.params;
         const userId = req.user._id;
-        const { blockOrder } = req.body; // Array of block IDs in desired order
+        const { blockOrder } = req.body; 
 
-        // Verify page exists and belongs to user
+        
         const page = await Page.findById(pageId).populate('journalId');
         if (!page) {
             return res.status(404).json({
@@ -409,7 +409,7 @@ export const reorderBlocks = async (req, res) => {
             });
         }
 
-        // Update order based on the new arrangement
+        
         const updatePromises = blockOrder.map((blockId, index) =>
             Block.updateOne(
                 { _id: blockId, pageId },
@@ -433,14 +433,14 @@ export const reorderBlocks = async (req, res) => {
     }
 };
 
-// Bulk update blocks (for efficient saving)
+
 export const bulkUpdateBlocks = async (req, res) => {
     try {
         const { pageId } = req.params;
         const userId = req.user._id;
-        const { blocks } = req.body; // Array of block updates
+        const { blocks } = req.body; 
 
-        // Verify page exists and belongs to user
+        
         const page = await Page.findById(pageId).populate('journalId');
         if (!page) {
             return res.status(404).json({
@@ -463,7 +463,7 @@ export const bulkUpdateBlocks = async (req, res) => {
             });
         }
 
-        // Update all blocks
+       
         const updatePromises = blocks.map(blockUpdate => {
             const { _id, ...updateData } = blockUpdate;
             return Block.findByIdAndUpdate(_id, updateData, { new: true });

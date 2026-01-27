@@ -4,7 +4,7 @@ import './ExtraChallenges.css';
 const ExtraChallenges = () => {
   const [completedChallenges, setCompletedChallenges] = useState([]);
 
-  // Challenge data
+
   const challenges = [
     { id: 'mp1', title: 'Green Thumb Trader', description: 'Buy 10 plants from marketplace', points: 20, progress: 3, total: 10, status: 'in-progress' },
     { id: 'mp2', title: 'Plant Parent Provider', description: 'Sell 5 plants on marketplace', points: 25, progress: 0, total: 5, status: 'available' },
@@ -76,7 +76,7 @@ const ExtraChallenges = () => {
 
           return (
             <div key={challenge.id} className={`challenge-list-item ${isCompleted ? 'completed' : ''}`}>
-              <img src={`/stickers/${challenge.id}.png`} alt={challenge.title} className="challenge-sticker" />
+              <img src={`/${challenge.id}.png`} alt={challenge.title} className="challenge-sticker" />
               <div className="challenge-list-content">
                 <div className="challenge-info">
                   <h3 className="challenge-title">{challenge.title}</h3>
@@ -104,8 +104,8 @@ const ExtraChallenges = () => {
                   {statusBadge.text}
                 </span>
                 <div className="points-badge">
+                  <img src="/Extra-Challenge-point.png" alt="points" className="points-icon" />
                   <span className="points-value">{challenge.points}</span>
-                  <span className="points-label">pts</span>
                 </div>
               </div>
             </div>

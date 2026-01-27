@@ -11,14 +11,14 @@ const NewPost = () => {
   const [formData, setFormData] = useState({
     treeName: '',
     treeType: '',
-    customTreeType: '', // for when user selects "Other"
-    treePart: '', // seed, sapling, mature tree, etc.
-    customTreePart: '', // for when user selects "Other"
+    customTreeType: '', 
+    treePart: '', 
+    customTreePart: '', 
     description: '',
-    postType: 'sell', // 'sell', 'donate', or 'exchange'
+    postType: 'sell', 
     price: '',
-    exchangeFor: '', // what user wants in exchange
-    contactType: 'phone', // 'phone' or 'email'
+    exchangeFor: '', 
+    contactType: 'phone', 
     contact: '',
     image: null,
     imagePreview: null
@@ -63,7 +63,6 @@ const NewPost = () => {
       [name]: value
     }));
 
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -85,9 +84,9 @@ const NewPost = () => {
     setFormData(prev => ({
       ...prev,
       contactType: type,
-      contact: '' // Clear contact when switching types
+      contact: '' 
     }));
-    // Clear contact error when switching
+    
     if (errors.contact) {
       setErrors(prev => ({
         ...prev,
@@ -103,7 +102,7 @@ const NewPost = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Check file size (max 5MB)
+     
       if (file.size > 5 * 1024 * 1024) {
         setErrors(prev => ({
           ...prev,
@@ -112,7 +111,7 @@ const NewPost = () => {
         return;
       }
 
-      // Check file type
+      
       if (!file.type.startsWith('image/')) {
         setErrors(prev => ({
           ...prev,
@@ -121,7 +120,7 @@ const NewPost = () => {
         return;
       }
 
-      // Compress and convert image to base64
+      
       compressImage(file);
     }
   };
@@ -131,11 +130,11 @@ const NewPost = () => {
     reader.onload = (e) => {
       const img = new Image();
       img.onload = () => {
-        // Create canvas
+       
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
 
-        // Calculate new dimensions (max 1200px width/height)
+       
         let width = img.width;
         let height = img.height;
         const maxSize = 1200;
@@ -155,10 +154,10 @@ const NewPost = () => {
         canvas.width = width;
         canvas.height = height;
 
-        // Draw and compress
+        
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Convert to base64 with compression (0.7 quality)
+        
         const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
 
         setFormData(prev => ({
@@ -196,7 +195,7 @@ const NewPost = () => {
     return false;
   }
 
-  // Must start with 01 or 8801
+  
   if (
     !digitsOnly.startsWith("01") &&
     !digitsOnly.startsWith("8801")
@@ -249,7 +248,7 @@ const NewPost = () => {
       newErrors.exchangeFor = 'Please specify what you want in exchange';
     }
 
-    // Contact validation
+    
     if (!formData.contact.trim()) {
       newErrors.contact = 'Contact information is required';
     } else {
@@ -285,7 +284,7 @@ const NewPost = () => {
           return;
         }
 
-        // Prepare marketplace post data
+        
         const finalTreeType = formData.treeType === 'Other' ? formData.customTreeType : formData.treeType;
         const finalTreePart = formData.treePart === 'Other' ? formData.customTreePart : formData.treePart;
 
@@ -298,10 +297,10 @@ const NewPost = () => {
           postType: formData.postType,
           price: formData.postType === 'sell' ? parseFloat(formData.price) : 0,
           contactInfo: formData.contact,
-          treeAge: 0 // You can add age field if needed
+          treeAge: 0 
         };
 
-        // If exchange, add what they want in description
+        
         if (formData.postType === 'exchange') {
           marketplaceData.description += `\n\nLooking for: ${formData.exchangeFor}`;
         }
@@ -328,7 +327,6 @@ const NewPost = () => {
         alert('Failed to create post. Please try again.');
       }
     } else {
-      // Scroll to first error
       const firstError = document.querySelector('.error-message');
       if (firstError) {
         firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -345,7 +343,6 @@ const NewPost = () => {
   
          <Header />
 
-      {/* Main Content */}
       <main className="new-post-main">
         <button 
           className="back-button" 
@@ -360,7 +357,7 @@ const NewPost = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="post-form">
-          {/* Image Upload Section */}
+          
           <div className="form-section">
             <label className="section-label">Tree Photo *</label>
             <div className="image-upload-container">
@@ -396,7 +393,7 @@ const NewPost = () => {
             {errors.image && <span className="error-message">{errors.image}</span>}
           </div>
 
-          {/* Tree Name */}
+          
           <div className="form-section">
             <label htmlFor="treeName" className="section-label">Tree Name *</label>
             <input
@@ -411,7 +408,7 @@ const NewPost = () => {
             {errors.treeName && <span className="error-message">{errors.treeName}</span>}
           </div>
 
-          {/* Tree Type */}
+         
           <div className="form-section">
             <label htmlFor="treeType" className="section-label">Tree Type *</label>
             <select
@@ -428,7 +425,7 @@ const NewPost = () => {
             </select>
             {errors.treeType && <span className="error-message">{errors.treeType}</span>}
 
-            {/* Show custom input if Other is selected */}
+           
             {formData.treeType === 'Other' && (
               <div style={{ marginTop: '12px' }}>
                 <input
@@ -444,7 +441,7 @@ const NewPost = () => {
             )}
           </div>
 
-          {/* Tree Part */}
+          
           <div className="form-section">
             <label htmlFor="treePart" className="section-label">What are you offering? *</label>
             <select
@@ -461,7 +458,7 @@ const NewPost = () => {
             </select>
             {errors.treePart && <span className="error-message">{errors.treePart}</span>}
 
-            {/* Show custom input if Other is selected */}
+           
             {formData.treePart === 'Other' && (
               <div style={{ marginTop: '12px' }}>
                 <input
@@ -477,7 +474,7 @@ const NewPost = () => {
             )}
           </div>
 
-          {/* Description */}
+          
           <div className="form-section">
             <label htmlFor="description" className="section-label">Description *</label>
             <textarea
@@ -495,7 +492,7 @@ const NewPost = () => {
             {errors.description && <span className="error-message">{errors.description}</span>}
           </div>
 
-          {/* Post Type - Sell, Exchange, or Donate */}
+          
           <div className="form-section">
             <label className="section-label">Post Type *</label>
             <div className="post-type-buttons">
@@ -536,7 +533,7 @@ const NewPost = () => {
             </div>
           </div>
 
-          {/* Price (disabled if donate or exchange) */}
+         
           <div className="form-section">
             <label htmlFor="price" className="section-label">
               Price {formData.postType === 'sell' ? '*' : '(Only for selling)'}
@@ -557,7 +554,7 @@ const NewPost = () => {
             {errors.price && <span className="error-message">{errors.price}</span>}
           </div>
 
-          {/* Exchange For (only shown for exchange) */}
+          
           {formData.postType === 'exchange' && (
             <div className="form-section">
               <label htmlFor="exchangeFor" className="section-label">What do you want in exchange? *</label>
@@ -574,7 +571,7 @@ const NewPost = () => {
             </div>
           )}
 
-          {/* Contact Type Selection */}
+         
           <div className="form-section">
             <label className="section-label">Contact Method *</label>
             <div className="contact-type-buttons">
@@ -602,7 +599,7 @@ const NewPost = () => {
             </div>
           </div>
 
-          {/* Contact Information */}
+          
           <div className="form-section">
             <label htmlFor="contact" className="section-label">
               {formData.contactType === 'phone' ? 'Phone Number *' : 'Email Address *'}
@@ -629,7 +626,7 @@ const NewPost = () => {
             )}
           </div>
 
-          {/* Action Buttons */}
+          
           <div className="form-actions">
             <button type="button" className="cancel-btn" onClick={handleCancel}>
               Cancel

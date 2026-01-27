@@ -85,7 +85,7 @@ function JournalPage({
       elements: currentPage.elements.filter(el => el.id !== elementId)
     });
 
-    // Delete from backend
+    
     try {
       await journalService.deleteBlock(elementId);
     } catch (error) {
@@ -100,7 +100,7 @@ function JournalPage({
       )
     });
 
-    // Update in backend (debounced for position changes)
+    
     if (updates.x !== undefined || updates.y !== undefined) {
       try {
         await journalService.updateBlockPosition(elementId, {
@@ -193,7 +193,7 @@ function JournalPage({
     const file = event.target.files[0];
     if (!file) return;
 
-    // Validate file
+   
     const validation = validateImageFile(file);
     if (!validation.valid) {
       alert(validation.error);
@@ -201,13 +201,13 @@ function JournalPage({
     }
 
     try {
-      // Compress image
+    
       const compressedImage = await compressImage(file, 800, 800, 0.85);
 
-      // Update element with compressed image
+      
       updateElement(elementId, { imageUrl: compressedImage });
 
-      // Save to backend if page exists
+      
       if (currentPage?.backendId) {
         const element = currentPage.elements.find(el => el.id === elementId);
         if (element) {

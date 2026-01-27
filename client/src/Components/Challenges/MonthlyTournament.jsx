@@ -6,7 +6,7 @@ const MonthlyTournament = () => {
   const [daysRemaining, setDaysRemaining] = useState(5);
   const [currentRank, setCurrentRank] = useState(8);
 
-  // Current month tournament data
+  
   const tournamentData = {
     month: 'January 2026',
     theme: 'New Year, New Growth',
@@ -16,7 +16,7 @@ const MonthlyTournament = () => {
     daysRemaining: 5
   };
 
-  // Tournament challenges
+  
   const challenges = [
     {
       id: 'tc1',
@@ -70,7 +70,7 @@ const MonthlyTournament = () => {
     }
   ];
 
-  // Bonus challenge
+  
   const bonusChallenge = {
     title: 'Complete all challenges within first 15 days',
     points: 100,
@@ -79,7 +79,7 @@ const MonthlyTournament = () => {
     icon: '/images/challenges/bonus.png'
   };
 
-  // Leaderboard data
+ 
   const [leaderboard, setLeaderboard] = useState([
     { rank: 1, username: 'PlantMaster99', avatar: '/images/avatars/user1.png', points: 380, completedChallenges: 5, badge: 'gold' },
     { rank: 2, username: 'GreenThumbPro', avatar: '/images/avatars/user2.png', points: 350, completedChallenges: 5, badge: 'gold' },
@@ -93,7 +93,7 @@ const MonthlyTournament = () => {
     { rank: 10, username: 'LeafyLaura', avatar: '/images/avatars/user10.png', points: 120, completedChallenges: 2, badge: null }
   ]);
 
-  // Simulate real-time updates
+  
   useEffect(() => {
     const interval = setInterval(() => {
       setLeaderboard(prev => {
@@ -198,13 +198,6 @@ const MonthlyTournament = () => {
           <img src="/challenges.png" alt="Challenges" className="tab-icon" />
           Challenges
         </button>
-        <button 
-          className={`tab-btn ${activeTab === 'leaderboard' ? 'active' : ''}`}
-          onClick={() => setActiveTab('leaderboard')}
-        >
-          <img src="/monthly-leaderboard.png" alt="Leaderboard" className="tab-icon" />
-          Leaderboard
-        </button>
       </div>
 
       <div className="tournament-content">
@@ -270,63 +263,6 @@ const MonthlyTournament = () => {
                   {bonusChallenge.status === 'expired' ? 'Expired' : `Deadline: ${bonusChallenge.deadline}`}
                 </span>
               </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'leaderboard' && (
-          <div className="leaderboard-section">
-            <div className="leaderboard-header">
-              <h2>Live Rankings</h2>
-              <div className="live-indicator">
-                <span className="live-dot"></span>
-                <span>Live Updates</span>
-              </div>
-            </div>
-
-            <div className="leaderboard-table">
-              <div className="leaderboard-table-header">
-                <span className="col-rank">Rank</span>
-                <span className="col-user">User</span>
-                <span className="col-challenges">Completed</span>
-                <span className="col-points">Points</span>
-              </div>
-
-              <div className="leaderboard-body">
-                {leaderboard.map(user => (
-                  <div 
-                    key={user.rank} 
-                    className={`leaderboard-row ${getRankClass(user.rank)} ${user.isCurrentUser ? 'current-user' : ''}`}
-                  >
-                    <div className="col-rank">
-                      <span className="rank-number">{user.rank}</span>
-                      {user.badge && (
-                        <img src={getBadgeImage(user.badge)} alt={user.badge} className="badge-image" />
-                      )}
-                    </div>
-                    
-                    <div className="col-user">
-                      <img src={user.avatar} alt={user.username} className="user-avatar" />
-                      <span className="username">
-                        {user.username}
-                        {user.isCurrentUser && <span className="you-tag">You</span>}
-                      </span>
-                    </div>
-                    
-                    <div className="col-challenges">
-                      <span className="challenges-count">{user.completedChallenges}/5</span>
-                    </div>
-                    
-                    <div className="col-points">
-                      <span className="points-count">{user.points}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="leaderboard-footer">
-              <p>Rankings update in real-time as participants complete challenges</p>
             </div>
           </div>
         )}

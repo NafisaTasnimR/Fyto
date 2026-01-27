@@ -16,7 +16,7 @@ const Store = () => {
   const [error, setError] = useState(null);
   const [showFilterModal, setShowFilterModal] = useState(false);
   
-  // Filter states
+ 
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
   const [availabilityFilter, setAvailabilityFilter] = useState('all');
   
@@ -60,7 +60,7 @@ const Store = () => {
 
       if (response.data.success) {
         const posts = response.data.posts || [];
-        // Remove the temporary test code that was setting posts[0].status
+        
         setMarketplacePosts(posts);
       }
       setLoading(false);
@@ -74,7 +74,7 @@ const Store = () => {
   const getFilteredProjects = () => {
     let filtered = marketplacePosts;
 
-    // Search filter
+    
     if (searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(post =>
@@ -85,7 +85,7 @@ const Store = () => {
       );
     }
 
-    // Price filter
+    
     if (priceRange.min !== '' || priceRange.max !== '') {
       filtered = filtered.filter(post => {
         const price = post.price || 0;
@@ -95,10 +95,10 @@ const Store = () => {
       });
     }
 
-    // Availability filter
+    
     if (availabilityFilter === 'available') {
       filtered = filtered.filter(post => {
-        // Check both backend status AND context confirmation
+        
         const isBackendUnavailable = post.status === 'confirmed' || 
                                      post.status === 'sold' || 
                                      post.status === 'unavailable';
@@ -108,7 +108,7 @@ const Store = () => {
       });
     } else if (availabilityFilter === 'unavailable') {
       filtered = filtered.filter(post => {
-        // Check both backend status AND context confirmation
+        
         const isBackendUnavailable = post.status === 'confirmed' || 
                                      post.status === 'sold' ||
                                      post.status === 'unavailable';
@@ -167,7 +167,7 @@ const Store = () => {
     <div className="store-page">
       <Header />
 
-      {/* Tabs and Search Navigation */}
+      
       <div className="marketplace-navbar-wrapper">
         <div className="marketplace-tabs-container">
           {tabs.map((tab) => (
@@ -203,7 +203,7 @@ const Store = () => {
         </div>
       </div>
 
-      {/* Main Content */}
+     
       <div className="store-content">
         {loading ? (
           <div className="store-message">Loading marketplace posts...</div>
@@ -213,7 +213,7 @@ const Store = () => {
           <>
             <div className="store-grid">
               {displayedProjects.map((post) => {
-                // Check BOTH backend status AND context confirmation
+                
                 const isBackendUnavailable = post.status === 'confirmed' || 
                                             post.status === 'sold' ||
                                             post.status === 'unavailable';
@@ -273,7 +273,7 @@ const Store = () => {
         )}
       </div>
 
-      {/* Floating Action Button */}
+      
       <button className="store-fab" onClick={handleNewPost} title="Create new post">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
           <line x1="12" y1="5" x2="12" y2="19" />
@@ -281,7 +281,7 @@ const Store = () => {
         </svg>
       </button>
 
-      {/* Filter Modal */}
+      
       {showFilterModal && (
         <div className="filter-modal-overlay" onClick={() => setShowFilterModal(false)}>
           <div className="filter-modal" onClick={(e) => e.stopPropagation()}>
@@ -291,7 +291,7 @@ const Store = () => {
             </div>
 
             <div className="filter-modal-content">
-              {/* Price Range Filter */}
+             
               <div className="filter-section">
                 <h4>Price Range (৳)</h4>
                 <div className="price-inputs">
@@ -313,7 +313,7 @@ const Store = () => {
                 </div>
               </div>
 
-              {/* Availability Filter */}
+              
               <div className="filter-section">
                 <h4>Availability</h4>
                 <div className="radio-group">

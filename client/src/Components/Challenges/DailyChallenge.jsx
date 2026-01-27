@@ -7,15 +7,15 @@ const DailyChallenge = ({ selectedDate }) => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [result, setResult] = useState(null);
 
-  // Streak calendar data - streak only counts consecutive days from today backwards
+  
   const [streakData, setStreakData] = useState({
-    currentStreak: 4, // Only consecutive days from today (27) backwards: 24,25,26,27
+    currentStreak: 4, 
     completedDates: ['2026-01-24', '2026-01-25', '2026-01-26', '2026-01-27', '2026-01-01', '2026-01-03', '2026-01-15'] // Can have random completed dates
   });
 
-  // Calculate streak - only consecutive days from today backwards
+ 
   const calculateStreak = (completedDates) => {
-    const today = new Date('2026-01-27'); // Current date
+    const today = new Date('2026-01-27'); 
     let streak = 0;
     let checkDate = new Date(today);
     
@@ -23,16 +23,16 @@ const DailyChallenge = ({ selectedDate }) => {
       const dateStr = checkDate.toISOString().split('T')[0];
       if (completedDates.includes(dateStr)) {
         streak++;
-        checkDate.setDate(checkDate.getDate() - 1); // Go back one day
+        checkDate.setDate(checkDate.getDate() - 1); 
       } else {
-        break; // Streak broken
+        break; 
       }
     }
     
     return streak;
   };
 
-  // Sample challenges with MCQ format - in production, fetch from backend
+ 
   const challenges = {
     '2026-01-01': {
       type: 'riddle',
@@ -58,7 +58,7 @@ const DailyChallenge = ({ selectedDate }) => {
       ],
       correctAnswer: 1,
       points: 10,
-      image: '/challenge-images/jan-02.jpg' // Add your challenge image here
+      image: '/challenge-images/jan-02.jpg'
     },
     '2026-01-27': {
       type: 'image',
@@ -71,7 +71,7 @@ const DailyChallenge = ({ selectedDate }) => {
       ],
       correctAnswer: 0,
       points: 10,
-      image: '/challenge-images/jan-27.jpg' // Add your challenge image here
+      image: '/challenge-images/jan-27.jpg' 
     }
   };
 
@@ -112,9 +112,9 @@ const DailyChallenge = ({ selectedDate }) => {
     });
   };
 
-  // Mini calendar component
+  
   const StreakCalendar = ({ onDateClick }) => {
-    const currentDate = new Date(2026, 0); // January 2026
+    const currentDate = new Date(2026, 0); 
     const daysInMonth = new Date(2026, 1, 0).getDate();
     const firstDay = new Date(2026, 0, 1).getDay();
     
@@ -177,7 +177,7 @@ const DailyChallenge = ({ selectedDate }) => {
   return (
     <div className="daily-challenge-container">
       <div className="challenge-layout">
-        {/* Main Challenge Area */}
+        
         <div className="challenge-main">
           <div className="challenge-type-badge">
             <span className={`type-pill ${challenge.type}`}>
@@ -243,7 +243,7 @@ const DailyChallenge = ({ selectedDate }) => {
             </>
           ) : null}
 
-          {/* Result Modal */}
+          
           {isSubmitted && (
             <div className="result-modal-overlay">
               <div className="result-modal">
@@ -284,7 +284,6 @@ const DailyChallenge = ({ selectedDate }) => {
           )}
         </div>
 
-        {/* Sidebar with mini calendar */}
         <div className="challenge-sidebar">
           <StreakCalendar onDateClick={handleDateClick} />
         </div>

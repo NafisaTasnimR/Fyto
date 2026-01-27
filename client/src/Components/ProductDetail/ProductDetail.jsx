@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useConfirmedPosts } from '../Context/ConfirmedPostsContext';
 import './ProductDetail.css';
-import header from '../Shared/Header.jsx';
 import Header from '../Shared/Header.jsx';
 
 const ProductDetail = () => {
@@ -51,13 +50,13 @@ const ProductDetail = () => {
 
   const handleConfirm = () => {
     if (selectedOption) {
-      // Confirm the post in context
+      
       confirmPost(id, selectedOption);
 
-      // Show success message
+     
       alert(`Success! You have confirmed: ${selectedOption} for ${post.treeName}\n\nYou will now be redirected to the store.`);
 
-      // Navigate back to store
+      
       navigate('/store');
     } else {
       alert('Please select an option');
@@ -89,7 +88,7 @@ const ProductDetail = () => {
     );
   }
 
-  // Check if post is unavailable - check BOTH backend status AND context
+ 
   const isBackendUnavailable = post.status === 'confirmed' || 
                                post.status === 'sold' || 
                                post.status === 'unavailable';
@@ -98,10 +97,10 @@ const ProductDetail = () => {
 
   return (
     <div className="product-detail-container">
-      {/* Header */}
+      
       <Header />
 
-      {/* Main Content */}
+      
       <main className="product-main">
         <button 
           className="back-button" 
@@ -110,7 +109,7 @@ const ProductDetail = () => {
         >
           <span className="back-arrow">←</span>
         </button>
-        {/* Product Image */}
+       
         <div className="product-image-section">
           <img
             src={post.photos && post.photos.length > 0 ? post.photos[0] : '/tree-placeholder.png'}
@@ -119,11 +118,11 @@ const ProductDetail = () => {
           />
         </div>
 
-        {/* Product Info */}
+        
         <div className="product-info-section">
           <h2 className="product-detail-title">{post.treeName} - {post.treeType}</h2>
 
-          {/* Post Type Badge */}
+         
           <div className="post-type-badge-container">
             <span className={`post-type-badge ${post.postType}`}>
               {post.postType === 'sell' ? (
@@ -158,7 +157,7 @@ const ProductDetail = () => {
             )}
           </div>
 
-          {/* Tree Information Grid */}
+          
           <div className="product-meta-info">
             <div className="meta-item">
               <span className="meta-label">Tree Type:</span>
@@ -202,13 +201,13 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          {/* Condition */}
+         
           <div className="condition-section">
             <h3 className="section-title">Status</h3>
             <div className="condition-badge">{isUnavailable ? 'Not Available' : post.status}</div>
           </div>
 
-          {/* Exchange For (only for exchange posts) */}
+          
           {post.postType === 'exchange' && (
             <div className="exchange-section">
               <h3 className="section-title">Looking for in Exchange</h3>
@@ -224,13 +223,13 @@ const ProductDetail = () => {
             </div>
           )}
 
-          {/* Description */}
+          
           <div className="description-section">
             <h3 className="section-title">Description</h3>
             <p className="description-text">{post.description}</p>
           </div>
 
-          {/* Selection Options */}
+          
           <div className="options-section">
             <h3 className="section-title">Select Option</h3>
             {isUnavailable ? (
@@ -271,7 +270,7 @@ const ProductDetail = () => {
             )}
           </div>
 
-          {/* Confirm Button */}
+          
           <div className="action-section">
             <button
               className="confirm-btn"
