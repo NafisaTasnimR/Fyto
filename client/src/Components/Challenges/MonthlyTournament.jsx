@@ -25,7 +25,8 @@ const MonthlyTournament = () => {
       status: 'completed',
       progress: 3,
       total: 3,
-      completedDate: '2026-01-15'
+      completedDate: '2026-01-15',
+      icon: '/images/challenges/seed.png'
     },
     {
       id: 'tc2',
@@ -34,7 +35,8 @@ const MonthlyTournament = () => {
       status: 'completed',
       progress: 1,
       total: 1,
-      completedDate: '2026-01-18'
+      completedDate: '2026-01-18',
+      icon: '/images/challenges/calendar.png'
     },
     {
       id: 'tc3',
@@ -43,7 +45,8 @@ const MonthlyTournament = () => {
       status: 'in-progress',
       progress: 14,
       total: 20,
-      completedDate: null
+      completedDate: null,
+      icon: '/images/challenges/identify.png'
     },
     {
       id: 'tc4',
@@ -52,7 +55,8 @@ const MonthlyTournament = () => {
       status: 'available',
       progress: 0,
       total: 1,
-      completedDate: null
+      completedDate: null,
+      icon: '/images/challenges/journal.png'
     },
     {
       id: 'tc5',
@@ -61,7 +65,8 @@ const MonthlyTournament = () => {
       status: 'in-progress',
       progress: 2,
       total: 5,
-      completedDate: null
+      completedDate: null,
+      icon: '/images/challenges/help.png'
     }
   ];
 
@@ -70,21 +75,22 @@ const MonthlyTournament = () => {
     title: 'Complete all challenges within first 15 days',
     points: 100,
     deadline: '2026-01-15',
-    status: 'expired'
+    status: 'expired',
+    icon: '/images/challenges/bonus.png'
   };
 
   // Leaderboard data
   const [leaderboard, setLeaderboard] = useState([
-    { rank: 1, username: 'PlantMaster99', avatar: '🌻', points: 380, completedChallenges: 5, badge: 'gold' },
-    { rank: 2, username: 'GreenThumbPro', avatar: '🌿', points: 350, completedChallenges: 5, badge: 'gold' },
-    { rank: 3, username: 'BotanicalBella', avatar: '🌺', points: 310, completedChallenges: 5, badge: 'silver' },
-    { rank: 4, username: 'FernFanatic', avatar: '🍃', points: 290, completedChallenges: 4, badge: 'silver' },
-    { rank: 5, username: 'SucculentSage', avatar: '🌵', points: 270, completedChallenges: 4, badge: 'bronze' },
-    { rank: 6, username: 'CactusKing', avatar: '🌵', points: 250, completedChallenges: 4, badge: 'bronze' },
-    { rank: 7, username: 'OrchidOracle', avatar: '🌸', points: 220, completedChallenges: 3, badge: 'bronze' },
-    { rank: 8, username: 'You', avatar: '👤', points: 200, completedChallenges: 3, badge: null, isCurrentUser: true },
-    { rank: 9, username: 'MossyMike', avatar: '🌱', points: 180, completedChallenges: 3, badge: null },
-    { rank: 10, username: 'LeafyLaura', avatar: '🍀', points: 160, completedChallenges: 2, badge: null }
+    { rank: 1, username: 'PlantMaster99', avatar: '/images/avatars/user1.png', points: 380, completedChallenges: 5, badge: 'gold' },
+    { rank: 2, username: 'GreenThumbPro', avatar: '/images/avatars/user2.png', points: 350, completedChallenges: 5, badge: 'gold' },
+    { rank: 3, username: 'BotanicalBella', avatar: '/images/avatars/user3.png', points: 310, completedChallenges: 5, badge: 'silver' },
+    { rank: 4, username: 'FernFanatic', avatar: '/images/avatars/user4.png', points: 290, completedChallenges: 4, badge: 'silver' },
+    { rank: 5, username: 'SucculentSage', avatar: '/images/avatars/user5.png', points: 270, completedChallenges: 4, badge: 'bronze' },
+    { rank: 6, username: 'CactusKing', avatar: '/images/avatars/user6.png', points: 250, completedChallenges: 4, badge: 'bronze' },
+    { rank: 7, username: 'OrchidOracle', avatar: '/images/avatars/user7.png', points: 220, completedChallenges: 3, badge: 'bronze' },
+    { rank: 8, username: 'You', avatar: '/images/avatars/default.png', points: 150, completedChallenges: 3, badge: null, isCurrentUser: true },
+    { rank: 9, username: 'MossyMike', avatar: '/images/avatars/user9.png', points: 130, completedChallenges: 3, badge: null },
+    { rank: 10, username: 'LeafyLaura', avatar: '/images/avatars/user10.png', points: 120, completedChallenges: 2, badge: null }
   ]);
 
   // Simulate real-time updates
@@ -117,13 +123,13 @@ const MonthlyTournament = () => {
     return Math.min((progress / total) * 100, 100);
   };
 
-  const getBadgeEmoji = (badge) => {
+  const getBadgeImage = (badge) => {
     const badges = {
-      gold: '🥇',
-      silver: '🥈',
-      bronze: '🥉'
+      gold: '/images/badges/gold.png',
+      silver: '/images/badges/silver.png',
+      bronze: '/images/badges/bronze.png'
     };
-    return badges[badge] || '';
+    return badges[badge] || null;
   };
 
   const getRankClass = (rank) => {
@@ -144,21 +150,21 @@ const MonthlyTournament = () => {
           
           <div className="tournament-stats">
             <div className="stat-box">
-              <span className="stat-icon">📅</span>
+              <img src="/daysLeft.png" alt="Calendar" className="stat-icon" />
               <div className="stat-content">
                 <span className="stat-value">{daysRemaining}</span>
                 <span className="stat-label">Days Left</span>
               </div>
             </div>
             <div className="stat-box">
-              <span className="stat-icon">🏆</span>
+              <img src="/trophy.png" alt="Trophy" className="stat-icon" />
               <div className="stat-content">
                 <span className="stat-value">#{currentRank}</span>
                 <span className="stat-label">Your Rank</span>
               </div>
             </div>
             <div className="stat-box">
-              <span className="stat-icon">⭐</span>
+              <img src="/star.png" alt="Star" className="stat-icon" />
               <div className="stat-content">
                 <span className="stat-value">{calculateTotalPoints()}</span>
                 <span className="stat-label">Your Points</span>
@@ -190,22 +196,15 @@ const MonthlyTournament = () => {
           className={`tab-btn ${activeTab === 'challenges' ? 'active' : ''}`}
           onClick={() => setActiveTab('challenges')}
         >
-          <span className="tab-icon">📋</span>
+          <img src="/challenges.png" alt="Challenges" className="tab-icon" />
           Challenges
         </button>
         <button 
           className={`tab-btn ${activeTab === 'leaderboard' ? 'active' : ''}`}
           onClick={() => setActiveTab('leaderboard')}
         >
-          <span className="tab-icon">🏆</span>
+          <img src="/monthly-leaderboard.png" alt="Leaderboard" className="tab-icon" />
           Leaderboard
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'rewards' ? 'active' : ''}`}
-          onClick={() => setActiveTab('rewards')}
-        >
-          <span className="tab-icon">🎁</span>
-          Rewards
         </button>
       </div>
 
@@ -219,6 +218,8 @@ const MonthlyTournament = () => {
                 return (
                   <div key={challenge.id} className={`tournament-challenge-card ${challenge.status}`}>
                     <div className="challenge-number">{index + 1}</div>
+                    
+                    <img src="/challenges.png" alt={challenge.title} className="challenge-icon" />
                     
                     <div className="challenge-main-content">
                       <div className="challenge-header-row">
@@ -260,14 +261,14 @@ const MonthlyTournament = () => {
 
             <div className="bonus-challenge-card">
               <div className="bonus-header">
-                <span className="bonus-icon">⚡</span>
+                <img src="/bonusChallenge.png" alt="Bonus" className="bonus-icon" />
                 <h3>Bonus Challenge</h3>
               </div>
               <p className="bonus-title">{bonusChallenge.title}</p>
               <div className="bonus-info">
                 <span className="bonus-points">+{bonusChallenge.points} points</span>
                 <span className={`bonus-status ${bonusChallenge.status}`}>
-                  {bonusChallenge.status === 'expired' ? '❌ Expired' : `⏰ Deadline: ${bonusChallenge.deadline}`}
+                  {bonusChallenge.status === 'expired' ? 'Expired' : `Deadline: ${bonusChallenge.deadline}`}
                 </span>
               </div>
             </div>
@@ -300,11 +301,13 @@ const MonthlyTournament = () => {
                   >
                     <div className="col-rank">
                       <span className="rank-number">{user.rank}</span>
-                      {user.badge && <span className="badge-emoji">{getBadgeEmoji(user.badge)}</span>}
+                      {user.badge && (
+                        <img src={getBadgeImage(user.badge)} alt={user.badge} className="badge-image" />
+                      )}
                     </div>
                     
                     <div className="col-user">
-                      <span className="user-avatar">{user.avatar}</span>
+                      <img src={user.avatar} alt={user.username} className="user-avatar" />
                       <span className="username">
                         {user.username}
                         {user.isCurrentUser && <span className="you-tag">You</span>}
@@ -325,66 +328,6 @@ const MonthlyTournament = () => {
 
             <div className="leaderboard-footer">
               <p>Rankings update in real-time as participants complete challenges</p>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'rewards' && (
-          <div className="rewards-section">
-            <div className="rewards-grid">
-              <div className="reward-card gold">
-                <div className="reward-rank">
-                  <span className="rank-medal">🥇</span>
-                  <h3>1st Place</h3>
-                </div>
-                <ul className="reward-list">
-                  <li><span className="reward-icon">⭐</span> 500 Bonus Points</li>
-                  <li><span className="reward-icon">🏆</span> Gold Trophy Badge</li>
-                  <li><span className="reward-icon">✨</span> Featured Profile (1 month)</li>
-                  <li><span className="reward-icon">👑</span> Tournament Champion Title</li>
-                </ul>
-              </div>
-
-              <div className="reward-card silver">
-                <div className="reward-rank">
-                  <span className="rank-medal">🥈</span>
-                  <h3>2nd Place</h3>
-                </div>
-                <ul className="reward-list">
-                  <li><span className="reward-icon">⭐</span> 300 Bonus Points</li>
-                  <li><span className="reward-icon">🏆</span> Silver Trophy Badge</li>
-                  <li><span className="reward-icon">✨</span> Featured Profile (2 weeks)</li>
-                </ul>
-              </div>
-
-              <div className="reward-card bronze">
-                <div className="reward-rank">
-                  <span className="rank-medal">🥉</span>
-                  <h3>3rd Place</h3>
-                </div>
-                <ul className="reward-list">
-                  <li><span className="reward-icon">⭐</span> 150 Bonus Points</li>
-                  <li><span className="reward-icon">🏆</span> Bronze Trophy Badge</li>
-                  <li><span className="reward-icon">✨</span> Featured Profile (1 week)</li>
-                </ul>
-              </div>
-
-              <div className="reward-card participant">
-                <div className="reward-rank">
-                  <span className="rank-medal">🌟</span>
-                  <h3>Top 10</h3>
-                </div>
-                <ul className="reward-list">
-                  <li><span className="reward-icon">⭐</span> 50 Bonus Points</li>
-                  <li><span className="reward-icon">🏅</span> Participant Badge</li>
-                  <li><span className="reward-icon">🎖️</span> Tournament Veteran Tag</li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="rewards-info">
-              <h3>How Rewards Work</h3>
-              <p>Complete tournament challenges to earn points and climb the leaderboard. Rewards are distributed automatically at the end of each month based on final rankings. All participants who complete at least one challenge receive a participation badge!</p>
             </div>
           </div>
         )}
