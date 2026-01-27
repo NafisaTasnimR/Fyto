@@ -43,7 +43,7 @@ const ExtraChallenges = () => {
         
         <div className="stats-overview">
           <div className="stat-card">
-            <img src="/trophy.png" alt="trophy" className="stat-icon" />
+            <img src="/champion.png" alt="trophy" className="stat-icon" />
             <div className="stat-info">
               <span className="stat-value">{completedChallenges.length}</span>
               <span className="stat-label">Completed</span>

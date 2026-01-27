@@ -58,7 +58,7 @@ const DailyChallenge = ({ selectedDate }) => {
       ],
       correctAnswer: 1,
       points: 10,
-      image: '/challenge-images/jan-02.jpg'
+      image: '/hibiscus.jpg'
     },
     '2026-01-27': {
       type: 'image',
@@ -71,7 +71,7 @@ const DailyChallenge = ({ selectedDate }) => {
       ],
       correctAnswer: 0,
       points: 10,
-      image: '/challenge-images/jan-27.jpg' 
+      image: '/hibiscus.jpg'
     }
   };
 

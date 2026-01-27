@@ -94,7 +94,7 @@ const LoginSignup = ({ mode = 'login', onClose, onModeChange }) => {
 
           setTimeout(() => {
             onClose && onClose();
-            navigate('/social');
+            navigate('/profile');
           }, 1500);
         } else {
           setSuccessMessage('Account created successfully! Please login.');
@@ -176,7 +176,7 @@ const LoginSignup = ({ mode = 'login', onClose, onModeChange }) => {
 
           setTimeout(() => {
             onClose && onClose();
-            navigate('/social');
+            navigate('/profile');
           }, 1500);
         } else {
           setSuccessMessage('Account created successfully! Please login.');

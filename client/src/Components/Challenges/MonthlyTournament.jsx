@@ -156,7 +156,7 @@ const MonthlyTournament = () => {
               </div>
             </div>
             <div className="stat-box">
-              <img src="/trophy.png" alt="Trophy" className="stat-icon" />
+              <img src="/champion.png" alt="Trophy" className="stat-icon" />
               <div className="stat-content">
                 <span className="stat-value">#{currentRank}</span>
                 <span className="stat-label">Your Rank</span>

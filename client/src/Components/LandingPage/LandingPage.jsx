@@ -184,7 +184,7 @@ export default function LandingPage() {
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon"><img src="/paper.png" alt="journal" /></div>
+              <div className="feature-icon"><img src="/writting.png" alt="journal" /></div>
               <h3>Digital Plant Journal</h3>
               <p>Track watering, growth, and plant health.</p>
             </div>
@@ -197,8 +197,8 @@ export default function LandingPage() {
 
             <div className="feature-card">
               <div className="feature-icon"><img src="/find.png" alt="plant care" /></div>
-              <h3>Plant Care </h3>
-              <p>Search thousands of plants with sunlight, water, and care info.</p>
+              <h3>Plant Information </h3>
+              <p>Search thousands of plants information.</p>
             </div>
           </div>
         </div>
