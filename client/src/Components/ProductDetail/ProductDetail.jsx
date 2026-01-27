@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useConfirmedPosts } from '../Context/ConfirmedPostsContext';
 import './ProductDetail.css';
+import header from '../Shared/Header.jsx';
+import Header from '../Shared/Header.jsx';
 
 const ProductDetail = () => {
   const [selectedOption, setSelectedOption] = useState('');
@@ -97,33 +99,17 @@ const ProductDetail = () => {
   return (
     <div className="product-detail-container">
       {/* Header */}
-      <header className="header">
-        <div className="header-left">
-          <button className="back-btn" onClick={handleBack}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-          </button>
-
-          <div className="logo-container">
-            <svg className="logo-icon" width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="20" cy="20" r="18" fill="#2E7D32" />
-              <path d="M20 8C20 8 16 14 16 18C16 20.21 17.79 22 20 22C22.21 22 24 20.21 24 18C24 14 20 8 20 8Z" fill="#81C784" />
-              <path d="M20 18L23 22C23 22 21.5 24 20 24C18.5 24 17 22 17 22L20 18Z" fill="#A5D6A7" />
-              <rect x="19" y="22" width="2" height="10" rx="1" fill="#6D4C41" />
-              <circle cx="20" cy="32" r="4" fill="#4CAF50" />
-            </svg>
-            <h1 className="logo">Fyto</h1>
-          </div>
-        </div>
-
-        <div className="header-right">
-          <button className="menu-icon">☰</button>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main className="product-main">
+        <button 
+          className="back-button" 
+          onClick={() => navigate('/store')}
+          title="Back to Store"
+        >
+          <span className="back-arrow">←</span>
+        </button>
         {/* Product Image */}
         <div className="product-image-section">
           <img

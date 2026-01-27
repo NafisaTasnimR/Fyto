@@ -96,7 +96,6 @@ const MonthlyTournament = () => {
   // Simulate real-time updates
   useEffect(() => {
     const interval = setInterval(() => {
-      // Randomly update some user points (simulate competition)
       setLeaderboard(prev => {
         const updated = [...prev];
         const randomIndex = Math.floor(Math.random() * updated.length);
@@ -108,7 +107,7 @@ const MonthlyTournament = () => {
           rank: index + 1
         }));
       });
-    }, 10000); // Update every 10 seconds
+    }, 10000); 
 
     return () => clearInterval(interval);
   }, []);
