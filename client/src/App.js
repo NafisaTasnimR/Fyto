@@ -11,6 +11,7 @@ import ScrollToTop from './Components/Scrolltotop/Scrolltotop';
 import JournalLanding from './Components/Journal/JournalLanding';
 import Journal from './Components/Journal/Journal';
 import ProfilePage from './Components/ProfilePage/ProfilePage';
+import Challenges from './Components/Challenges/Challenges';
 import './App.css';
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
           <Route path="/journal/continue" element={<Journal />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/social" element={<SocialPage />} />
+          <Route path="/challenges" element={<Challenges />} />
         </Routes>
       </Router>
     </ConfirmedPostsProvider>

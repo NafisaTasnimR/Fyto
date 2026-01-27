@@ -422,10 +422,9 @@ function Journal() {
     return (
       <>
         <button onClick={handleBackButton} className="back-button-cover">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          Back
         </button>
         <CoverSelection onCoverSelect={handleCoverSelect} saving={saving} />
       </>
@@ -458,10 +457,9 @@ function Journal() {
       <div className="journal-app-container">
         <Header />
         <button onClick={handleBackButton} className="back-button-cover">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          Back
         </button>
         <div style={{
           display: 'flex',
@@ -484,13 +482,12 @@ function Journal() {
 
       <button 
         onClick={handleBackButton} 
-        className="back-button"
+        className="back-button-journal"
         style={{ left: sidebarOpen ? '300px' : '80px' }}
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
-        Back
       </button>
 
       {!currentJournal && selectedCover && pages.length > 0 && (

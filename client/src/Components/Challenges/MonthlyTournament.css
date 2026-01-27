@@ -1,0 +1,853 @@
+.monthly-tournament-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem 0;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.tournament-header {
+  margin-bottom: 2rem;
+}
+
+.tournament-banner {
+  background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
+  border-radius: 20px;
+  padding: 2.5rem;
+  color: white;
+  box-shadow: 0 8px 24px rgba(46, 125, 50, 0.3);
+  margin-bottom: 1.5rem;
+}
+
+.tournament-title-section h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.tournament-theme {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: #ffd700;
+}
+
+.tournament-description {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  margin-bottom: 2rem;
+  font-weight: 400;
+}
+
+.tournament-stats {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  padding: 1.25rem 1.75rem;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.stat-box:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+.tournament-progress-overview {
+  background: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: #2e7d32;
+}
+
+.progress-percentage {
+  font-size: 1.25rem;
+  color: #43a047;
+}
+
+.tournament-progress-bar {
+  width: 100%;
+  height: 24px;
+  background: #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.tournament-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #66bb6a 0%, #43a047 100%);
+  border-radius: 12px;
+  transition: width 0.8s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.tournament-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.3) 50%, 
+    transparent 100%
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.progress-points {
+  position: relative;
+  z-index: 1;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.tournament-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 0.85rem 1.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #558b2f;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.tab-btn:hover {
+  background: #f1f8e9;
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+  color: white;
+  border-color: #43a047;
+  box-shadow: 0 4px 12px rgba(67, 160, 71, 0.3);
+}
+
+.tab-icon {
+  font-size: 1.25rem;
+}
+
+.tournament-content {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  min-height: 500px;
+}
+
+/* Challenges Tab */
+.challenges-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.challenges-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tournament-challenge-card {
+  background: #fafafa;
+  border-radius: 15px;
+  padding: 1.5rem;
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.tournament-challenge-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: #bdbdbd;
+}
+
+.tournament-challenge-card.completed::before {
+  background: linear-gradient(180deg, #66bb6a 0%, #43a047 100%);
+}
+
+.tournament-challenge-card.in-progress::before {
+  background: linear-gradient(180deg, #ff9800 0%, #f57c00 100%);
+}
+
+.tournament-challenge-card.completed {
+  background: linear-gradient(135deg, #f1f8e9 0%, #dcedc8 100%);
+  border-color: #c5e1a5;
+}
+
+.tournament-challenge-card.in-progress {
+  background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+  border-color: #ffd54f;
+}
+
+.tournament-challenge-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.challenge-number {
+  background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.challenge-main-content {
+  flex: 1;
+}
+
+.challenge-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.challenge-title {
+  font-size: 1.15rem;
+  color: #2e7d32;
+  font-weight: 600;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.challenge-points-badge {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+  min-width: 60px;
+}
+
+.points-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #5d4037;
+  line-height: 1;
+}
+
+.points-text {
+  font-size: 0.7rem;
+  color: #5d4037;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.challenge-progress-section {
+  margin-top: 1rem;
+}
+
+.progress-details {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.progress-text {
+  font-weight: 600;
+  color: #558b2f;
+}
+
+.progress-percent-text {
+  font-weight: 600;
+  color: #757575;
+}
+
+.challenge-progress-bar {
+  height: 10px;
+  background: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.challenge-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #66bb6a 0%, #43a047 100%);
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+
+.completion-badge {
+  margin-top: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #e8f5e9;
+  color: #2e7d32;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.completion-icon {
+  width: 20px;
+  height: 20px;
+  background: #66bb6a;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+
+.bonus-challenge-card {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border: 3px solid #ffb74d;
+  border-radius: 15px;
+  padding: 1.75rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.bonus-challenge-card::before {
+  content: '⚡';
+  position: absolute;
+  right: -20px;
+  top: -20px;
+  font-size: 120px;
+  opacity: 0.1;
+}
+
+.bonus-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.bonus-icon {
+  font-size: 2rem;
+}
+
+.bonus-header h3 {
+  font-size: 1.5rem;
+  color: #f57c00;
+  font-weight: 700;
+  margin: 0;
+}
+
+.bonus-title {
+  font-size: 1.1rem;
+  color: #424242;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.bonus-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.bonus-points {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f57c00;
+}
+
+.bonus-status {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.bonus-status.expired {
+  background: #ffcdd2;
+  color: #c62828;
+}
+
+/* Leaderboard Tab */
+.leaderboard-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.leaderboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.leaderboard-header h2 {
+  font-size: 1.75rem;
+  color: #2e7d32;
+  font-weight: 700;
+  margin: 0;
+}
+
+.live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #e8f5e9;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  color: #2e7d32;
+  font-size: 0.95rem;
+}
+
+.live-dot {
+  width: 10px;
+  height: 10px;
+  background: #66bb6a;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+}
+
+.leaderboard-table {
+  background: #fafafa;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.leaderboard-table-header {
+  display: grid;
+  grid-template-columns: 120px 1fr 150px 120px;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.leaderboard-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.leaderboard-row {
+  display: grid;
+  grid-template-columns: 120px 1fr 150px 120px;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.leaderboard-row:hover {
+  background: white;
+}
+
+.leaderboard-row.top-three {
+  background: linear-gradient(135deg, #fffde7 0%, #fff9c4 100%);
+}
+
+.leaderboard-row.current-user {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border: 2px solid #2196f3;
+  font-weight: 600;
+}
+
+.col-rank {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.rank-number {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2e7d32;
+  min-width: 30px;
+}
+
+.badge-emoji {
+  font-size: 1.5rem;
+}
+
+.col-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.username {
+  font-size: 1rem;
+  color: #424242;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.you-tag {
+  background: #2196f3;
+  color: white;
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.col-challenges {
+  text-align: center;
+}
+
+.challenges-count {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #558b2f;
+}
+
+.col-points {
+  text-align: right;
+}
+
+.points-count {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+.leaderboard-footer {
+  text-align: center;
+  padding: 1rem;
+  color: #757575;
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+/* Rewards Tab */
+.rewards-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.rewards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.reward-card {
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.reward-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+  transform: rotate(45deg);
+}
+
+.reward-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.reward-card.gold {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  border: 3px solid #ffc107;
+}
+
+.reward-card.silver {
+  background: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
+  border: 3px solid #bdbdbd;
+}
+
+.reward-card.bronze {
+  background: linear-gradient(135deg, #d7ccc8 0%, #efebe9 100%);
+  border: 3px solid #a1887f;
+}
+
+.reward-card.participant {
+  background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);
+  border: 3px solid #4fc3f7;
+}
+
+.reward-rank {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.rank-medal {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.reward-rank h3 {
+  font-size: 1.5rem;
+  color: #424242;
+  font-weight: 700;
+  margin: 0;
+}
+
+.reward-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.reward-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  color: #424242;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.reward-list li:last-child {
+  border-bottom: none;
+}
+
+.reward-icon {
+  font-size: 1.25rem;
+}
+
+.rewards-info {
+  background: linear-gradient(135deg, #f1f8e9 0%, #dcedc8 100%);
+  border-radius: 15px;
+  padding: 2rem;
+  border-left: 4px solid #66bb6a;
+}
+
+.rewards-info h3 {
+  font-size: 1.5rem;
+  color: #2e7d32;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.rewards-info p {
+  color: #424242;
+  line-height: 1.7;
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .tournament-stats {
+    justify-content: center;
+  }
+
+  .leaderboard-table-header,
+  .leaderboard-row {
+    grid-template-columns: 100px 1fr 120px 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .monthly-tournament-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .tournament-banner {
+    padding: 1.75rem;
+  }
+
+  .tournament-title-section h1 {
+    font-size: 2rem;
+  }
+
+  .tournament-theme {
+    font-size: 1.25rem;
+  }
+
+  .tournament-stats {
+    flex-direction: column;
+  }
+
+  .stat-box {
+    width: 100%;
+  }
+
+  .tournament-tabs {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .tournament-content {
+    padding: 1.5rem;
+  }
+
+  .tournament-challenge-card {
+    flex-direction: column;
+  }
+
+  .challenge-number {
+    align-self: flex-start;
+  }
+
+  .leaderboard-table-header {
+    font-size: 0.8rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .leaderboard-table-header,
+  .leaderboard-row {
+    grid-template-columns: 70px 1fr 80px 80px;
+    gap: 0.5rem;
+  }
+
+  .leaderboard-row {
+    padding: 1rem;
+  }
+
+  .rank-number {
+    font-size: 1rem;
+  }
+
+  .badge-emoji {
+    font-size: 1.25rem;
+  }
+
+  .user-avatar {
+    width: 35px;
+    height: 35px;
+    font-size: 1.25rem;
+  }
+
+  .username {
+    font-size: 0.9rem;
+  }
+
+  .rewards-grid {
+    grid-template-columns: 1fr;
+  }
+}

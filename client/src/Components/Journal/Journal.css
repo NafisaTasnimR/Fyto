@@ -26,40 +26,64 @@ body {
 }
 
 /* Back Button - For Journal Editor (with sidebar) */
-.back-button {
+.back-button-journal {
   position: fixed;
   top: 80px;
   left: 300px;
   background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 10px;
-  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
   cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 500;
   color: #2f6b48;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
   z-index: 99;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+/* Tooltip */
+.back-button-journal::after {
+  content: 'Back';
+  position: absolute;
+  left: 60px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #2f6b48;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
   font-family: 'Poppins', sans-serif;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.back-button-journal:hover::after {
+  opacity: 1;
 }
 
 /* When sidebar is closed (narrow), back button moves closer */
-.left-sidebar.closed ~ .journal-content-area .back-button,
-.journal-main-layout:has(.left-sidebar.closed) .back-button {
+.left-sidebar.closed ~ .journal-content-area .back-button-journal,
+.journal-main-layout:has(.left-sidebar.closed) .back-button-journal {
   left: 80px;
 }
 
-.back-button:hover {
+.back-button-journal:hover {
   background: #f9fafb;
   border-color: #2f6b48;
-  box-shadow: 0 2px 8px rgba(47, 107, 72, 0.15);
+  box-shadow: 0 2px 8px rgba(47, 107, 72, 0.1);
 }
 
-.back-button svg {
+.back-button-journal svg {
   flex-shrink: 0;
 }
 
@@ -69,26 +93,50 @@ body {
   top: 80px;
   left: 20px;
   background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
   cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 500;
   color: #2f6b48;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
   z-index: 99;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+/* Tooltip */
+.back-button-cover::after {
+  content: 'Back';
+  position: absolute;
+  left: 60px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #2f6b48;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
   font-family: 'Poppins', sans-serif;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.back-button-cover:hover::after {
+  opacity: 1;
 }
 
 .back-button-cover:hover {
   background: #f9fafb;
   border-color: #2f6b48;
-  box-shadow: 0 2px 8px rgba(47, 107, 72, 0.15);
+  box-shadow: 0 2px 8px rgba(47, 107, 72, 0.1);
 }
 
 .back-button-cover svg {
@@ -827,7 +875,7 @@ body {
 
 /* Responsive Design */
 @media (max-width: 992px) {
-  .back-button {
+  .back-button-journal {
     left: 20px;
   }
 
@@ -876,18 +924,28 @@ body {
     padding: 2rem 1.5rem;
   }
 
-  .back-button {
+  .back-button-journal {
     top: 70px;
     left: 10px;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8rem;
+    width: 44px;
+    height: 44px;
+  }
+
+  .back-button-journal svg {
+    width: 20px;
+    height: 20px;
   }
 
   .back-button-cover {
     top: 70px;
     left: 10px;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8rem;
+    width: 44px;
+    height: 44px;
+  }
+
+  .back-button-cover svg {
+    width: 20px;
+    height: 20px;
   }
 
   .sidebar-toggle-floating {
@@ -925,7 +983,7 @@ body {
   .delete-button,
   .resize-handle,
   .journal-save-button,
-  .back-button,
+  .back-button-journal,
   .back-button-cover {
     display: none !important;
   }
