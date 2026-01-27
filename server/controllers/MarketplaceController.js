@@ -84,7 +84,7 @@ export const deleteMarketplacePost = async (req, res) => {
     }
 };
 
-// Get all available marketplace posts (no filtering, sorted by date)
+
 export const getAllAvailablePosts = async (req, res) => {
     try {
         const { page = 1, limit = 10 } = req.query;
@@ -120,7 +120,7 @@ export const getAllAvailablePosts = async (req, res) => {
     }
 };
 
-// Search/filter marketplace posts
+
 export const searchMarketplacePosts = async (req, res) => {
     try {
         const {
@@ -194,7 +194,7 @@ export const searchMarketplacePosts = async (req, res) => {
     }
 };
 
-// Get single marketplace post details
+
 export const getMarketplacePostById = async (req, res) => {
     try {
         const { postId } = req.params;
@@ -222,30 +222,30 @@ export const getMarketplacePostById = async (req, res) => {
     }
 };
 
-// Get all posts by logged-in user
+
 export const getUserMarketplacePosts = async (req, res) => {
     try {
         const userId = req.user._id;
         const { status, page = 1, limit = 10 } = req.query;
 
-        // Build query filter
+        
         const filter = { userId };
 
-        // Filter by status if provided
+        
         if (status) {
             filter.status = status;
         }
 
-        // Pagination
+        
         const skip = (Number(page) - 1) * Number(limit);
 
-        // Fetch posts
+        
         const posts = await MarketplacePost.find(filter)
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(Number(limit));
 
-        // Get total count
+        
         const total = await MarketplacePost.countDocuments(filter);
 
         return res.status(200).json({
@@ -267,7 +267,7 @@ export const getUserMarketplacePosts = async (req, res) => {
     }
 };
 
-// Update marketplace post status (available/unavailable)
+
 export const updateMarketplacePostStatus = async (req, res) => {
     try {
         const { postId } = req.params;
@@ -309,7 +309,7 @@ export const updateMarketplacePostStatus = async (req, res) => {
     }
 };
 
-// Mark post as sold/exchanged (set status to unavailable)
+
 export const markPostAsSold = async (req, res) => {
     try {
         const { postId } = req.params;

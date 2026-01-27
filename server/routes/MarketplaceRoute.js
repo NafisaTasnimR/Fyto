@@ -18,7 +18,7 @@ import {
 
 const router = express.Router();
 
-// All routes require authentication
+
 router.use(verifyToken);
 
 router.post('/', validateCreatePost, createMarketplacePost);

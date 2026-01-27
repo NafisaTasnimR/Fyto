@@ -10,6 +10,7 @@
   display: flex;
   flex-direction: column;
   background-color: #F0F7EF;
+  font-family: 'Poppins', 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Header Styles */
@@ -88,7 +89,44 @@
   max-width: 800px;
   width: 100%;
   margin: 0 auto;
-  padding: 40px;
+  padding: 90px 40px 40px 40px;
+  position: relative;
+}
+
+.back-button {
+  position: fixed;
+  top: 90px;
+  left: 30px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-size: 20px;
+  color: #2e7d32;
+  font-weight: bold;
+  z-index: 50;
+}
+
+.back-button:hover {
+  transform: translateX(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.back-arrow {
+  display: inline-block;
+  transition: opacity 0.3s ease;
+  opacity: 1;
+}
+
+.back-button:hover .back-arrow {
+  opacity: 1;
 }
 
 .form-header {

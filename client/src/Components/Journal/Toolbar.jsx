@@ -13,7 +13,7 @@ function Toolbar({
 }) {
   const [hasTextSelected, setHasTextSelected] = React.useState(false);
 
-  // Check if text is selected
+  
   React.useEffect(() => {
     const checkSelection = () => {
       const selection = window.getSelection();
@@ -54,7 +54,7 @@ function Toolbar({
   ];
   const paddingSizes = [0, 20, 40, 60, 80, 100];
 
-  // Text formatting functions
+  
   const applyTextFormat = (command, value = null) => {
     document.execCommand(command, false, value);
     if (contentRef && contentRef.current) {
@@ -62,13 +62,13 @@ function Toolbar({
     }
   };
 
-  // Handle text color like Word/Google Docs
+  
   const handleTextColorChange = (color) => {
     const selection = window.getSelection();
     const hasSelection = selection && selection.toString().trim().length > 0;
     
     if (hasSelection && contentRef && contentRef.current && contentRef.current.contains(selection.anchorNode)) {
-      // If text is selected within the content area, change only the selected text color
+      
       const range = selection.getRangeAt(0);
       const selectedText = range.extractContents();
       const span = document.createElement('span');
@@ -76,13 +76,13 @@ function Toolbar({
       span.appendChild(selectedText);
       range.insertNode(span);
       
-      // Trigger change event to save content
+      
       if (contentRef.current) {
         const event = new Event('input', { bubbles: true });
         contentRef.current.dispatchEvent(event);
         contentRef.current.focus();
         
-        // Restore selection after the colored span
+        
         const newRange = document.createRange();
         newRange.setStartAfter(span);
         newRange.collapse(true);
@@ -90,7 +90,7 @@ function Toolbar({
         selection.addRange(newRange);
       }
     } else {
-      // If no text is selected, change the default text color for the whole page
+      
       updatePreferences({ textColor: color });
     }
   };
@@ -109,7 +109,7 @@ function Toolbar({
       </div>
 
       <div className="toolbar-right">
-        {/* Bold */}
+        
         <button 
           onClick={() => applyTextFormat('bold')}
           className="toolbar-icon-btn"
@@ -121,7 +121,7 @@ function Toolbar({
           </svg>
         </button>
 
-        {/* Italic */}
+       
         <button 
           onClick={() => applyTextFormat('italic')}
           className="toolbar-icon-btn"
@@ -134,7 +134,7 @@ function Toolbar({
           </svg>
         </button>
 
-        {/* Underline */}
+        
         <button 
           onClick={() => applyTextFormat('underline')}
           className="toolbar-icon-btn"
@@ -146,7 +146,7 @@ function Toolbar({
           </svg>
         </button>
 
-        {/* Strikethrough */}
+       
         <button 
           onClick={() => applyTextFormat('strikeThrough')}
           className="toolbar-icon-btn"
@@ -161,14 +161,14 @@ function Toolbar({
 
         <div style={{ width: '1px', height: '24px', background: '#e5e7eb', margin: '0 0.5rem' }}></div>
 
-        {/* Font Family */}
+        
         <div className="toolbar-dropdown">
           <button 
             className="toolbar-icon-btn"
             onClick={() => toggleDropdown('font')}
             title="Font Family"
           >
-            <img src="font-style.png" alt="Font" className="toolbar-icon" />
+            <img src="/font-style.png" alt="Font" className="toolbar-icon" />
           </button>
           {activeDropdown === 'font' && (
             <div className="dropdown-panel">
@@ -190,14 +190,14 @@ function Toolbar({
           )}
         </div>
 
-        {/* Font Size */}
+     
         <div className="toolbar-dropdown">
           <button 
             className="toolbar-icon-btn"
             onClick={() => toggleDropdown('size')}
             title="Font Size"
           >
-            <img src="font-size.png" alt="Size" className="toolbar-icon" />
+            <img src="/font-size.png" alt="Size" className="toolbar-icon" />
           </button>
           {activeDropdown === 'size' && (
             <div className="dropdown-panel">
@@ -220,7 +220,7 @@ function Toolbar({
           )}
         </div>
 
-        {/* Text Color - Works like Word/Docs */}
+        
         <div className="toolbar-dropdown">
           <button 
             className="toolbar-icon-btn"
@@ -232,7 +232,7 @@ function Toolbar({
               borderColor: hasTextSelected ? '#3498db' : ''
             }}
           >
-            <img src="text-color.png" alt="Text Color" className="toolbar-icon" />
+            <img src="/text-color.png" alt="Text Color" className="toolbar-icon" />
             <div style={{
               position: 'absolute',
               bottom: '2px',
@@ -272,14 +272,14 @@ function Toolbar({
           )}
         </div>
 
-        {/* Page Color */}
+        
         <div className="toolbar-dropdown">
           <button 
             className="toolbar-icon-btn"
             onClick={() => toggleDropdown('pageColor')}
             title="Page Color"
           >
-            <img src="paper.png" alt="Page Color" className="toolbar-icon" />
+            <img src="/paper.png" alt="Page Color" className="toolbar-icon" />
           </button>
           {activeDropdown === 'pageColor' && (
             <ColorPicker
@@ -290,14 +290,14 @@ function Toolbar({
           )}
         </div>
 
-        {/* Text Formatting */}
+        
         <div className="toolbar-dropdown">
           <button 
             className="toolbar-icon-btn"
             onClick={() => toggleDropdown('formatting')}
             title="Text Formatting"
           >
-            <img src="text-format.png" alt="Format" className="toolbar-icon" />
+            <img src="/text-format.png" alt="Format" className="toolbar-icon" />
           </button>
           {activeDropdown === 'formatting' && (
             <div className="dropdown-panel">
@@ -333,14 +333,14 @@ function Toolbar({
           )}
         </div>
 
-        {/* Page Layout */}
+        
         <div className="toolbar-dropdown">
           <button 
             className="toolbar-icon-btn"
             onClick={() => toggleDropdown('layout')}
             title="Page Layout"
           >
-            <img src="paper-size.png" alt="Layout" className="toolbar-icon" />
+            <img src="/paper-size.png" alt="Layout" className="toolbar-icon" />
           </button>
           {activeDropdown === 'layout' && (
             <div className="dropdown-panel">
@@ -379,23 +379,23 @@ function Toolbar({
           )}
         </div>
 
-        {/* Add Photo */}
+       
         <button 
           onClick={addElement} 
           className="toolbar-icon-btn"
           title="Add Photo"
         >
-          <img src="image.png" alt="Add Photo" className="toolbar-icon" />
+          <img src="/image.png" alt="Add Photo" className="toolbar-icon" />
         </button>
 
-        {/* Delete Page */}
+        
         {pagesLength > 1 && (
           <button 
             onClick={deletePage} 
             className="toolbar-icon-btn delete-btn"
             title="Delete Page"
           >
-            <img src="cancel.png" alt="Delete" className="toolbar-icon" />
+            <img src="/cancel.png" alt="Delete" className="toolbar-icon" />
           </button>
         )}
       </div>

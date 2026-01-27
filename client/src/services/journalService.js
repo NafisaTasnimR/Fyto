@@ -2,12 +2,12 @@ import axios from 'axios';
 
 const API_URL = `${process.env.REACT_APP_API_URL}/api/journals`;
 
-// Get auth token from localStorage
+
 const getAuthToken = () => {
     return localStorage.getItem('token');
 };
 
-// Create axios instance with auth header
+
 const getAuthHeaders = () => {
     const token = getAuthToken();
     return {
@@ -18,7 +18,7 @@ const getAuthHeaders = () => {
     };
 };
 
-// ==================== JOURNAL APIs ====================
+
 
 export const createJournalWithFirstPage = async (journalData) => {
     const response = await axios.post(`${API_URL}/with-first-page`, journalData, getAuthHeaders());
@@ -28,6 +28,14 @@ export const createJournalWithFirstPage = async (journalData) => {
 export const createJournal = async (journalData) => {
     const response = await axios.post(API_URL, journalData, getAuthHeaders());
     return response;
+};
+export const getJournals = async () => {
+  const token = localStorage.getItem('token');
+  return await axios.get(`${API_URL}/api/journals`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };
 
 export const getUserJournals = async () => {
@@ -55,7 +63,7 @@ export const updateWordCount = async (journalId) => {
     return response.data;
 };
 
-// ==================== PAGE APIs ====================
+
 
 export const createPage = async (journalId, pageData) => {
     const response = await axios.post(`${API_URL}/${journalId}/pages`, pageData, getAuthHeaders());
@@ -87,7 +95,7 @@ export const reorderPages = async (journalId, pageOrder) => {
     return response.data;
 };
 
-// ==================== BLOCK APIs ====================
+
 
 export const createBlock = async (pageId, blockData) => {
     const response = await axios.post(`${API_URL}/pages/${pageId}/blocks`, blockData, getAuthHeaders());

@@ -26,13 +26,13 @@ const SocialPage = () => {
   const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(false);
 
   React.useEffect(() => {
-    // When panels are closed, briefly force the sidebar to show its shadow
+
     if (!showSearchResults && !showNotifications) {
       setSidebarForceShadow(true);
       const t = setTimeout(() => setSidebarForceShadow(false), 220);
       return () => clearTimeout(t);
     }
-    // if either panel opens, ensure force-shadow is disabled
+
     setSidebarForceShadow(false);
   }, [showSearchResults, showNotifications]);
   const [newPostData, setNewPostData] = useState({
@@ -108,7 +108,7 @@ const SocialPage = () => {
         return;
       }
 
-      // Decode token to get user ID
+
       const tokenParts = token.split('.');
       const payload = JSON.parse(atob(tokenParts[1]));
       const currentUserId = payload._id;
@@ -167,7 +167,7 @@ const SocialPage = () => {
     return postDate.toLocaleDateString();
   };
 
-  // Search functionality
+
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       if (searchQuery.trim()) {
@@ -191,7 +191,7 @@ const SocialPage = () => {
         return;
       }
 
-      // Call both search endpoints in parallel
+
       const [usersResponse, postsResponse] = await Promise.all([
         axios.get(
           `${process.env.REACT_APP_API_URL}/api/auth/search?query=${encodeURIComponent(query)}`,
@@ -220,7 +220,7 @@ const SocialPage = () => {
       const users = usersResponse.data.success ? (usersResponse.data.users || []) : [];
       const posts = postsResponse.data.success ? (postsResponse.data.posts || []) : [];
 
-      // Combine users and posts with type identifiers
+
       const combinedResults = [
         ...users.map(user => ({ type: 'user', data: user })),
         ...posts.map(post => ({ type: 'post', data: post }))
@@ -245,7 +245,7 @@ const SocialPage = () => {
   };
 
   const handleViewPost = (post) => {
-    // Get current user ID from token
+
     const token = localStorage.getItem('token');
     let currentUserId = null;
     if (token) {
@@ -258,7 +258,7 @@ const SocialPage = () => {
       }
     }
 
-    // Format the post for display
+
     const formattedPost = {
       id: post._id,
       username: post.authorId?.username || 'Unknown User',
@@ -450,7 +450,7 @@ const SocialPage = () => {
   const Post = ({ post }) => {
     return (
       <div className="post">
-        {/* Post Header */}
+
         <div className="post-header">
           <img
             src={post.userAvatar}
@@ -471,7 +471,7 @@ const SocialPage = () => {
           </div>
         </div>
 
-        {/* Post Image - Only show if image exists */}
+
         {post.postImage && (
           <div
             className="post-image-container"
@@ -486,7 +486,7 @@ const SocialPage = () => {
           </div>
         )}
 
-        {/* Post Caption (moved before actions) */}
+
         <div
           className="post-caption"
           onClick={() => {
@@ -1087,7 +1087,7 @@ const SocialPage = () => {
         </div>
       </div>
 
-      {/* Full-Screen Image Viewer */}
+
       {showImageViewer && viewingImage && (
         <div
           className="image-viewer-overlay"

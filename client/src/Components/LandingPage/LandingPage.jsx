@@ -15,7 +15,7 @@ export default function LandingPage() {
     setShowModal(false);
   };
 
-  // local auth state for landing page only
+  
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     try {
       return Boolean(localStorage.getItem('fytoAuth'));
@@ -41,7 +41,7 @@ export default function LandingPage() {
     };
   }, []);
 
-  // profile menu UI
+  
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileRef = useRef(null);
   useEffect(() => {
@@ -55,11 +55,11 @@ export default function LandingPage() {
     return () => document.removeEventListener('click', onDocClick);
   }, [showProfileMenu]);
 
-  // Landing page uses its own header with login/signup buttons
+  
 
   return (
     <div className="landing-container">
-      {/* FIXED HEADER */}
+      
       <header className="fixed-header">
         <div className="header-content">
           <div className="logo">
@@ -102,8 +102,7 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* HERO SECTION */}
-      {/* TOP HERO - new banner above main hero (large centered header with search + CTAs) */}
+      
       <section className="top-hero">
         <div className="top-hero-content">
           <div className="top-hero-visuals scroller">
@@ -127,7 +126,7 @@ export default function LandingPage() {
                 <img src="/q6.png" alt="plant" />
               </div>
 
-              {/* duplicate for seamless scroll */}
+              
               <div className="polaroid p1">
                 <img src="/q1.png" alt="plant" />
               </div>
@@ -161,7 +160,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* FEATURES / HOW IT WORKS HERO (new) */}
+      
       <section className="features-hero">
         <div className="features-inner">
           <h2>Explore Fyto</h2>
@@ -207,14 +206,14 @@ export default function LandingPage() {
       
       
 
-      {/* SECONDARY SECTION */}
+      
       <section className="secondary-hero">
         <div className="secondary-image" style={{
           backgroundColor: '#f0f7ef'
         }}>
           <img src="/cat.png" alt="cat" className="secondary-image-item cat-img" />
           <img src="/champion.png" alt="champion" className="secondary-image-item champion-img" />
-          {/*<img src="/yay.png" alt="yay" className="secondary-image-item yay-img" /> */}
+          
           <img src="/help.png" alt="help" className="secondary-image-item help-img" />
         </div>
         <div className="secondary-content">
@@ -225,7 +224,7 @@ export default function LandingPage() {
       </section>
 
 
-      {/* LOGIN/SIGNUP MODAL */}
+      
       {showModal && (
         <LoginSignup 
           mode={modalMode} 

@@ -1,6 +1,6 @@
 import { body, param, validationResult } from "express-validator";
 
-// Middleware to handle validation errors
+
 export const handleValidationErrors = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -13,7 +13,7 @@ export const handleValidationErrors = (req, res, next) => {
     next();
 };
 
-// Validation for creating a journal
+
 export const validateCreateJournal = [
     body("title")
         .trim()
@@ -44,7 +44,7 @@ export const validateCreateJournal = [
     handleValidationErrors
 ];
 
-// Validation for updating a journal
+
 export const validateUpdateJournal = [
     param("journalId")
         .isMongoId()
@@ -68,7 +68,7 @@ export const validateUpdateJournal = [
     handleValidationErrors
 ];
 
-// Validation for journal ID param
+
 export const validateJournalId = [
     param("journalId")
         .isMongoId()
@@ -76,7 +76,7 @@ export const validateJournalId = [
     handleValidationErrors
 ];
 
-// Validation for creating a page
+
 export const validateCreatePage = [
     param("journalId")
         .isMongoId()
@@ -103,7 +103,7 @@ export const validateCreatePage = [
     handleValidationErrors
 ];
 
-// Validation for updating a page
+
 export const validateUpdatePage = [
     param("pageId")
         .isMongoId()
@@ -126,7 +126,7 @@ export const validateUpdatePage = [
     handleValidationErrors
 ];
 
-// Validation for page ID param
+
 export const validatePageId = [
     param("pageId")
         .isMongoId()
@@ -134,7 +134,7 @@ export const validatePageId = [
     handleValidationErrors
 ];
 
-// Validation for creating a block
+
 export const validateCreateBlock = [
     param("pageId")
         .isMongoId()
@@ -226,7 +226,7 @@ export const validateCreateBlock = [
     handleValidationErrors
 ];
 
-// Validation for updating a block
+
 export const validateUpdateBlock = [
     param("blockId")
         .isMongoId()
@@ -254,7 +254,7 @@ export const validateUpdateBlock = [
     handleValidationErrors
 ];
 
-// Validation for block ID param
+
 export const validateBlockId = [
     param("blockId")
         .isMongoId()
@@ -262,7 +262,7 @@ export const validateBlockId = [
     handleValidationErrors
 ];
 
-// Validation for reordering pages
+
 export const validateReorderPages = [
     param("journalId")
         .isMongoId()
@@ -276,7 +276,7 @@ export const validateReorderPages = [
     handleValidationErrors
 ];
 
-// Validation for reordering blocks
+
 export const validateReorderBlocks = [
     param("pageId")
         .isMongoId()
@@ -290,7 +290,7 @@ export const validateReorderBlocks = [
     handleValidationErrors
 ];
 
-// Validation for bulk update blocks
+
 export const validateBulkUpdateBlocks = [
     param("pageId")
         .isMongoId()

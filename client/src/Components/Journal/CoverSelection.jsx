@@ -1,13 +1,6 @@
 import React from 'react';
 import './CoverSelection.css';
-
-const MenuIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <line x1="3" y1="12" x2="21" y2="12"></line>
-    <line x1="3" y1="6" x2="21" y2="6"></line>
-    <line x1="3" y1="18" x2="21" y2="18"></line>
-  </svg>
-);
+import Header from '../Shared/Header';
 
 const CoverSelection = ({ onCoverSelect, saving }) => {
   const covers = [
@@ -42,19 +35,7 @@ const CoverSelection = ({ onCoverSelect, saving }) => {
 
   return (
     <div className="cover-selection-wrapper">
-      <header className="app-header">
-        <div className="header-left">
-          <div className="logo-container">
-            <div className="logo-icon-space"></div>
-            <h1 className="app-title">Fyto</h1>
-          </div>
-        </div>
-        <div className="header-right">
-          <button className="icon-button">
-            <MenuIcon />
-          </button>
-        </div>
-      </header>
+      <Header />
 
       <div className="cover-selection-container">
         <div className="welcome-banner">

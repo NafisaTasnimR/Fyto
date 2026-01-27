@@ -56,7 +56,7 @@ const LoginSignup = ({ mode = 'login', onClose, onModeChange }) => {
     setError('');
     setSuccessMessage('');
 
-    // Frontend validation
+    
     if (!isLogin) {
       if (formData.password !== formData.confirmPassword) {
         setError('Passwords do not match');
@@ -133,11 +133,11 @@ const LoginSignup = ({ mode = 'login', onClose, onModeChange }) => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Sanitize username to be alphanumeric only
+      
       const displayName = user.displayName || user.email.split('@')[0];
       const sanitizedUsername = displayName.replace(/[^a-zA-Z0-9]/g, '') + Math.floor(Math.random() * 1000);
 
-      // Use Google UID as password for consistent authentication
+      
       const googlePassword = user.uid;
 
       const endpoint = isLogin ? "/login" : "/register";

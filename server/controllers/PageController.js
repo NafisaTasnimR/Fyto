@@ -2,14 +2,14 @@ import Page from "../models/Page.js";
 import Block from "../models/Block.js";
 import Journal from "../models/Journal.js";
 
-// Create a new page in a journal
+
 export const createPage = async (req, res) => {
     try {
         const { journalId } = req.params;
         const userId = req.user._id;
         const { backgroundColor, pageSize } = req.body;
 
-        // Verify journal belongs to user
+        
         const journal = await Journal.findOne({ _id: journalId, userId });
         if (!journal) {
             return res.status(404).json({
@@ -18,7 +18,7 @@ export const createPage = async (req, res) => {
             });
         }
 
-        // Get the next page number
+        
         const lastPage = await Page.findOne({ journalId })
             .sort({ pageNumber: -1 })
             .limit(1);
@@ -49,13 +49,13 @@ export const createPage = async (req, res) => {
     }
 };
 
-// Get all pages for a journal
+
 export const getJournalPages = async (req, res) => {
     try {
         const { journalId } = req.params;
         const userId = req.user._id;
 
-        // Verify journal belongs to user
+        
         const journal = await Journal.findOne({ _id: journalId, userId });
         if (!journal) {
             return res.status(404).json({
@@ -83,7 +83,7 @@ export const getJournalPages = async (req, res) => {
     }
 };
 
-// Get a specific page with all its blocks
+
 export const getPageById = async (req, res) => {
     try {
         const { pageId } = req.params;
@@ -98,7 +98,7 @@ export const getPageById = async (req, res) => {
             });
         }
 
-        // Verify journal belongs to user
+        
         if (page.journalId.userId.toString() !== userId) {
             return res.status(403).json({
                 success: false,
@@ -106,7 +106,7 @@ export const getPageById = async (req, res) => {
             });
         }
 
-        // Get all blocks for this page
+    
         const blocks = await Block.find({ pageId })
             .sort({ order: 1 })
             .lean();
@@ -128,7 +128,7 @@ export const getPageById = async (req, res) => {
     }
 };
 
-// Update page settings
+
 export const updatePage = async (req, res) => {
     try {
         const { pageId } = req.params;
@@ -144,7 +144,7 @@ export const updatePage = async (req, res) => {
             });
         }
 
-        // Verify journal belongs to user
+       
         if (page.journalId.userId.toString() !== userId) {
             return res.status(403).json({
                 success: false,
@@ -172,7 +172,7 @@ export const updatePage = async (req, res) => {
     }
 };
 
-// Delete a page
+
 export const deletePage = async (req, res) => {
     try {
         const { pageId } = req.params;
@@ -187,7 +187,6 @@ export const deletePage = async (req, res) => {
             });
         }
 
-        // Verify journal belongs to user
         if (page.journalId.userId.toString() !== userId) {
             return res.status(403).json({
                 success: false,
@@ -198,13 +197,10 @@ export const deletePage = async (req, res) => {
         const journalId = page.journalId._id;
         const deletedPageNumber = page.pageNumber;
 
-        // Delete all blocks associated with this page
         await Block.deleteMany({ pageId });
 
-        // Delete the page
         await Page.deleteOne({ _id: pageId });
 
-        // Update page numbers for subsequent pages
         await Page.updateMany(
             { journalId, pageNumber: { $gt: deletedPageNumber } },
             { $inc: { pageNumber: -1 } }
@@ -224,14 +220,13 @@ export const deletePage = async (req, res) => {
     }
 };
 
-// Reorder pages
 export const reorderPages = async (req, res) => {
     try {
         const { journalId } = req.params;
         const userId = req.user._id;
-        const { pageOrder } = req.body; // Array of page IDs in desired order
+        const { pageOrder } = req.body; 
 
-        // Verify journal belongs to user
+        
         const journal = await Journal.findOne({ _id: journalId, userId });
         if (!journal) {
             return res.status(404).json({
@@ -247,7 +242,7 @@ export const reorderPages = async (req, res) => {
             });
         }
 
-        // Update page numbers based on the new order
+        
         const updatePromises = pageOrder.map((pageId, index) =>
             Page.updateOne(
                 { _id: pageId, journalId },

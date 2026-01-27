@@ -199,7 +199,7 @@ export const getAllPosts = async (req, res) => {
     }
 };
 
-// Toggle like on a post
+
 export const toggleLike = async (req, res) => {
     try {
         const { postId } = req.params;
@@ -267,7 +267,7 @@ export const getPostById = async (req, res) => {
     }
 };
 
-// Search posts by content
+
 export const searchPosts = async (req, res) => {
     try {
         const { query } = req.query;
@@ -279,7 +279,7 @@ export const searchPosts = async (req, res) => {
             });
         }
 
-        // Search posts where content contains the query (case-insensitive)
+        
         const posts = await Post.find({
             content: { $regex: query, $options: 'i' }
         })
