@@ -66,6 +66,7 @@
   background: #e6e6e6;
   box-shadow: inset 0 0 0 6px rgba(0, 0, 0, 0.02);
   flex: 0 0 110px;
+  position: relative;
 }
 
 .profile-photo img {
@@ -74,6 +75,36 @@
   object-fit: cover;
   display: block;
   border-radius: 50%;
+}
+
+.camera-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #4a9d6f;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.camera-btn:hover {
+  background: #4a9d6f;
+  transform: scale(1.05);
+}
+
+.camera-btn img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  border-radius: 0;
 }
 
 .profile-info {
@@ -87,6 +118,13 @@
 .username1 {
   font-size: 30px;
   margin: 0;
+  padding-right: 15px;
+}
+
+.user-details {
+  font-size: 14px;
+  color: #666;
+  margin: 4px 0 0 0;
   padding-right: 15px;
 }
 
@@ -373,4 +411,296 @@
 .infos-box .posts-feed {
   padding-left: 0;
   /* keep posts layout clean within feed */
+}
+
+/* Edit Profile Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.edit-modal {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  max-width: 450px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #222;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #999;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close-btn:hover {
+  color: #222;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #222;
+  font-size: 14px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #4a9d6f;
+  box-shadow: 0 0 0 3px rgba(74, 157, 111, 0.1);
+}
+
+.form-input.disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  color: #999;
+}
+
+.password-field-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.password-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+}
+
+.password-display span {
+  color: #666;
+  font-size: 14px;
+}
+
+.edit-password-btn {
+  background: none;
+  border: none;
+  color: #4a9d6f;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 0;
+}
+
+.edit-password-btn:hover {
+  color: #3d8b5e;
+  text-decoration: underline;
+}
+
+.password-group {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.password-criteria {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  margin-bottom: 4px;
+  font-size: 12px;
+}
+
+.password-criteria span {
+  color: #ccc;
+  transition: color 0.3s;
+}
+
+.password-criteria span.active {
+  color: #4caf50;
+  font-weight: 600;
+}
+
+.password-strength {
+  font-size: 12px;
+  margin-top: 3px;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.password-strength.weak { color: #f44336; }
+.password-strength.medium { color: #ff9800; }
+.password-strength.strong { color: #4caf50; }
+
+.password-mismatch {
+  color: #f44336;
+  font-size: 12px;
+  margin: 6px 0 0 0;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid #e5e5e5;
+  justify-content: flex-end;
+}
+
+.btn-cancel {
+  padding: 10px 20px;
+  border: 1px solid #ddd;
+  background: white;
+  color: #222;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.btn-cancel:hover {
+  background: #f5f5f5;
+}
+
+.btn-save {
+  padding: 10px 20px;
+  border: none;
+  background: #4a9d6f;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.btn-save:hover {
+  background: #3d8b5e;
+}
+
+.btn-save:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.btn-save:disabled:hover {
+  background: #ccc;
+}
+
+/* Profile Picture Upload Modal */
+.profile-pic-upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.profile-pic-preview {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #e5e5e5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-input-label {
+  display: inline-block;
+}
+
+.file-input-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background: #4a9d6f;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: background 0.3s ease;
+}
+
+.file-input-btn:hover {
+  background: #3d8b5e;
+}
+
+.file-name {
+  text-align: center;
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+  word-break: break-all;
 }

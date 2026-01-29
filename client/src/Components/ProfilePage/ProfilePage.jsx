@@ -24,6 +24,14 @@ export default function ProfilePage({ onEdit }) {
   const [activeCommentsPost, setActiveCommentsPost] = useState(null)
   const [replyInputs, setReplyInputs] = useState({})
   const [openReply, setOpenReply] = useState({ postId: null, commentId: null })
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [showProfilePicModal, setShowProfilePicModal] = useState(false)
+  const [editFormData, setEditFormData] = useState({ username: '' })
+  const [passwordFormData, setPasswordFormData] = useState({ previousPassword: '', newPassword: '', confirmPassword: '' })
+  const [profilePicFile, setProfilePicFile] = useState(null)
+  const [profilePicPreview, setProfilePicPreview] = useState(null)
+  const [showPasswords, setShowPasswords] = useState({ previous: false, new: false, confirm: false })
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -32,6 +40,14 @@ export default function ProfilePage({ onEdit }) {
         const userData = await getCurrentUser()
         console.log('User data received:', userData)
         setUser(userData.data)
+        setEditFormData({
+          username: userData.data.username || '',
+        })
+        setPasswordFormData({
+          previousPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        })
       } catch (error) {
         console.error('Error fetching user data:', error)
         console.error('Error details:', error.response?.data || error.message)
@@ -378,6 +394,173 @@ export default function ProfilePage({ onEdit }) {
     }
   }
 
+  const handleEditFormChange = (e) => {
+    const { name, value } = e.target
+    setEditFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const handlePasswordFormChange = (e) => {
+    const { name, value } = e.target
+    setPasswordFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const getPasswordStrength = (password) => {
+    if (!password) return { strength: '', text: '' }
+
+    const hasLower = /[a-z]/.test(password)
+    const hasUpper = /[A-Z]/.test(password)
+    const hasNumber = /[0-9]/.test(password)
+    const hasSymbol = /[^a-zA-Z0-9]/.test(password)
+
+    const criteria = [hasLower, hasUpper, hasNumber, hasSymbol].filter(Boolean).length
+
+    if (password.length < 4) return { strength: 'weak', text: 'Password strength is Weak' }
+    if (criteria <= 2 || password.length < 8) return { strength: 'weak', text: 'Password strength is Weak' }
+    if (criteria === 3) return { strength: 'medium', text: 'Password strength is Medium' }
+    return { strength: 'strong', text: 'Password strength is Strong' }
+  }
+
+  const togglePasswordVisibility = (field) => {
+    setShowPasswords((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }))
+  }
+
+  const handleSaveChanges = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/users/update`,
+        {
+          username: editFormData.username,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+
+      if (response.data.success) {
+        setUser((prev) => ({
+          ...prev,
+          username: editFormData.username,
+        }))
+        setShowEditModal(false)
+        alert('Profile updated successfully!')
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error)
+      alert('Error updating profile: ' + (error.response?.data?.message || error.message))
+    }
+  }
+
+  const handleSavePassword = async () => {
+    try {
+      // Validation
+      if (!passwordFormData.previousPassword) {
+        alert('Please enter your current password')
+        return
+      }
+
+      if (passwordFormData.newPassword !== passwordFormData.confirmPassword) {
+        alert('New password and confirm password do not match')
+        return
+      }
+
+      if (passwordFormData.newPassword.length < 6) {
+        alert('New password must be at least 6 characters long')
+        return
+      }
+
+      const token = localStorage.getItem('token')
+      const response = await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/users/update`,
+        {
+          previousPassword: passwordFormData.previousPassword,
+          newPassword: passwordFormData.newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+
+      if (response.data.success) {
+        setShowPasswordModal(false)
+        setPasswordFormData({ previousPassword: '', newPassword: '', confirmPassword: '' })
+        alert('Password updated successfully!')
+      }
+    } catch (error) {
+      console.error('Error updating password:', error)
+      alert('Error updating password: ' + (error.response?.data?.message || error.message))
+    }
+  }
+
+  const handleProfilePicChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setProfilePicFile(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setProfilePicPreview(reader.result)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleSaveProfilePic = async () => {
+    try {
+      if (!profilePicFile) {
+        alert('Please select a picture')
+        return
+      }
+
+      const formData = new FormData()
+      formData.append('profilePic', profilePicFile)
+
+      const token = localStorage.getItem('token')
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/users/upload-profile-pic`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      )
+
+      if (response.data.success) {
+        setUser((prev) => ({
+          ...prev,
+          profilePic: response.data.profilePicUrl,
+        }))
+        setShowProfilePicModal(false)
+        setProfilePicFile(null)
+        setProfilePicPreview(null)
+        alert('Profile picture updated successfully!')
+      }
+    } catch (error) {
+      console.error('Error updating profile picture:', error)
+      alert('Error updating profile picture: ' + (error.response?.data?.message || error.message))
+    }
+  }
+
+  const handleCancelProfilePic = () => {
+    setShowProfilePicModal(false)
+    setProfilePicFile(null)
+    setProfilePicPreview(null)
+  }
+
   return (
     <div className="profile-page">
       <Header />
@@ -387,13 +570,28 @@ export default function ProfilePage({ onEdit }) {
           <div className="profile-top">
             <div className="profile-photo" aria-hidden="false">
               <img src={user?.profilePic || "/boy.png"} alt="Profile" />
+              <button
+                className="camera-btn"
+                onClick={() => setShowProfilePicModal(true)}
+                aria-label="Change profile picture"
+              >
+                <img src="/camera.png" alt="Camera" />
+              </button>
             </div>
 
             <div className="profile-info">
-              <h2 className="username1">{user?.name || 'Loading...'}</h2>
+              <div>
+                <h2 className="username1">{user?.username || 'Loading...'}</h2>
+                <p className="user-details">
+                  <span>{user?.name}</span>
+                </p>
+                <p className="user-details">
+                  <span>{user?.email}</span>
+                </p>
+              </div>
               <button
                 className="edit-btn primary"
-                onClick={() => onEdit && onEdit()}
+                onClick={() => setShowEditModal(true)}
                 aria-label="Edit profile"
               >
                 Edit profile
@@ -616,6 +814,262 @@ export default function ProfilePage({ onEdit }) {
             <div className="comment-composer">
               <input type="text" placeholder="Write a comment..." className="composer-input" />
               <button className="composer-send">➤</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEditModal && (
+        <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
+          <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Edit Profile</h2>
+              <button
+                className="modal-close-btn"
+                onClick={() => setShowEditModal(false)}
+                aria-label="Close modal"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <div className="form-group">
+                <label>Name</label>
+                <input
+                  type="text"
+                  value={user?.name || ''}
+                  disabled
+                  className="form-input disabled"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Username</label>
+                <input
+                  type="text"
+                  name="username"
+                  value={editFormData.username}
+                  onChange={handleEditFormChange}
+                  className="form-input"
+                  placeholder="Enter username"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Email</label>
+                <input
+                  type="email"
+                  value={user?.email || ''}
+                  disabled
+                  className="form-input disabled"
+                />
+              </div>
+
+              <div className="form-group">
+                <div className="password-field-header">
+                  <label>Password</label>
+                </div>
+                <div className="password-display">
+                  <span>••••••••</span>
+                  <button
+                    type="button"
+                    className="edit-password-btn"
+                    onClick={() => setShowPasswordModal(true)}
+                  >
+                    Edit
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                className="btn-cancel"
+                onClick={() => setShowEditModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn-save"
+                onClick={handleSaveChanges}
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showPasswordModal && (
+        <div className="modal-overlay" onClick={() => setShowPasswordModal(false)}>
+          <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Change Password</h2>
+              <button
+                className="modal-close-btn"
+                onClick={() => setShowPasswordModal(false)}
+                aria-label="Close modal"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <div className="form-group password-group">
+                <label>Current Password</label>
+                <input
+                  type={showPasswords.previous ? 'text' : 'password'}
+                  name="previousPassword"
+                  value={passwordFormData.previousPassword}
+                  onChange={handlePasswordFormChange}
+                  className="form-input"
+                  placeholder="Enter current password"
+                />
+                <span
+                  className="password-toggle"
+                  onClick={() => togglePasswordVisibility('previous')}
+                >
+                  <img
+                    src={showPasswords.previous ? '/view.png' : '/eyebrow.png'}
+                    alt="toggle password visibility"
+                  />
+                </span>
+              </div>
+
+              <div className="form-group password-group">
+                <label>New Password</label>
+                <input
+                  type={showPasswords.new ? 'text' : 'password'}
+                  name="newPassword"
+                  value={passwordFormData.newPassword}
+                  onChange={handlePasswordFormChange}
+                  className="form-input"
+                  placeholder="Enter new password"
+                />
+                <span
+                  className="password-toggle"
+                  onClick={() => togglePasswordVisibility('new')}
+                >
+                  <img
+                    src={showPasswords.new ? '/view.png' : '/eyebrow.png'}
+                    alt="toggle password visibility"
+                  />
+                </span>
+              </div>
+              {passwordFormData.newPassword && (
+                <>
+                  <div className="password-criteria">
+                    <span className={passwordFormData.newPassword && /[a-z]/.test(passwordFormData.newPassword) ? 'active' : ''}>Lower</span>
+                    <span className={passwordFormData.newPassword && /[A-Z]/.test(passwordFormData.newPassword) ? 'active' : ''}>Upper</span>
+                    <span className={passwordFormData.newPassword && /[0-9]/.test(passwordFormData.newPassword) ? 'active' : ''}>Number</span>
+                    <span className={passwordFormData.newPassword && /[^a-zA-Z0-9]/.test(passwordFormData.newPassword) ? 'active' : ''}>Symbol</span>
+                  </div>
+                  <div className={`password-strength ${getPasswordStrength(passwordFormData.newPassword).strength}`}>
+                    {getPasswordStrength(passwordFormData.newPassword).text}
+                  </div>
+                </>
+              )}
+
+              <div className="form-group password-group">
+                <label>Confirm Password</label>
+                <input
+                  type={showPasswords.confirm ? 'text' : 'password'}
+                  name="confirmPassword"
+                  value={passwordFormData.confirmPassword}
+                  onChange={handlePasswordFormChange}
+                  className="form-input"
+                  placeholder="Confirm new password"
+                />
+                <span
+                  className="password-toggle"
+                  onClick={() => togglePasswordVisibility('confirm')}
+                >
+                  <img
+                    src={showPasswords.confirm ? '/view.png' : '/eyebrow.png'}
+                    alt="toggle password visibility"
+                  />
+                </span>
+              </div>
+              {passwordFormData.confirmPassword && passwordFormData.newPassword !== passwordFormData.confirmPassword && (
+                <p className="password-mismatch">Passwords do not match</p>
+              )}
+            </div>
+
+            <div className="modal-footer">
+              <button
+                className="btn-cancel"
+                onClick={() => setShowPasswordModal(false)}
+              >
+                Back
+              </button>
+              <button
+                className="btn-save"
+                onClick={handleSavePassword}
+              >
+                Save Password
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showProfilePicModal && (
+        <div className="modal-overlay" onClick={() => handleCancelProfilePic()}>
+          <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Change Profile Picture</h2>
+              <button
+                className="modal-close-btn"
+                onClick={() => handleCancelProfilePic()}
+                aria-label="Close modal"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <div className="profile-pic-upload-container">
+                <div className="profile-pic-preview">
+                  <img
+                    src={profilePicPreview || user?.profilePic || "/boy.png"}
+                    alt="Profile Preview"
+                    className="preview-image"
+                  />
+                </div>
+
+                <label className="file-input-label">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleProfilePicChange}
+                    className="file-input"
+                  />
+                  <span className="file-input-btn">Choose Photo</span>
+                </label>
+
+                {profilePicFile && (
+                  <p className="file-name">
+                    Selected: {profilePicFile.name}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                className="btn-cancel"
+                onClick={() => handleCancelProfilePic()}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn-save"
+                onClick={handleSaveProfilePic}
+                disabled={!profilePicFile}
+              >
+                Save Picture
+              </button>
             </div>
           </div>
         </div>
