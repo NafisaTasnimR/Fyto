@@ -7,6 +7,10 @@ import Header from '../Shared/Header.jsx';
 const NewPost = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const [showCropper, setShowCropper] = useState(false);
+  const [cropperImage, setCropperImage] = useState(null);
+  const canvasRef = useRef(null);
+  const [cropData, setCropData] = useState({ x: 0, y: 0, scale: 1 });
 
   const [formData, setFormData] = useState({
     treeName: '',
@@ -128,51 +132,55 @@ const NewPost = () => {
   const compressImage = (file) => {
     const reader = new FileReader();
     reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-       
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-
-       
-        let width = img.width;
-        let height = img.height;
-        const maxSize = 1200;
-
-        if (width > height) {
-          if (width > maxSize) {
-            height = (height * maxSize) / width;
-            width = maxSize;
-          }
-        } else {
-          if (height > maxSize) {
-            width = (width * maxSize) / height;
-            height = maxSize;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-
-        
-        ctx.drawImage(img, 0, 0, width, height);
-
-        
-        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-
-        setFormData(prev => ({
-          ...prev,
-          image: file,
-          imagePreview: compressedBase64
-        }));
-        setErrors(prev => ({
-          ...prev,
-          image: ''
-        }));
-      };
-      img.src = e.target.result;
+      setCropperImage(e.target.result);
+      setShowCropper(true);
     };
     reader.readAsDataURL(file);
+  };
+
+  const applyCrop = () => {
+    if (!cropperImage) return;
+
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      const cropSize = 400;
+      canvas.width = cropSize;
+      canvas.height = cropSize;
+
+      const scaledWidth = img.width * cropData.scale;
+      const scaledHeight = img.height * cropData.scale;
+      const x = (cropSize / 2) - (scaledWidth / 2) + cropData.x;
+      const y = (cropSize / 2) - (scaledHeight / 2) + cropData.y;
+
+      ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+
+      const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+      setFormData(prev => ({
+        ...prev,
+        imagePreview: compressedBase64
+      }));
+      setErrors(prev => ({
+        ...prev,
+        image: ''
+      }));
+      setShowCropper(false);
+      setCropperImage(null);
+      setCropData({ x: 0, y: 0, scale: 1 });
+    };
+    img.src = cropperImage;
+  };
+
+  const cancelCrop = () => {
+    setShowCropper(false);
+    setCropperImage(null);
+    setCropData({ x: 0, y: 0, scale: 1 });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleRemoveImage = () => {
@@ -343,13 +351,97 @@ const NewPost = () => {
   
          <Header />
 
+      {showCropper && (
+        <div className="crop-modal-overlay">
+          <div className="crop-modal">
+            <h3 className="crop-modal-title">Adjust Image Position</h3>
+            <div className="crop-container">
+              <div className="crop-preview-box">
+                <img 
+                  src={cropperImage} 
+                  alt="Crop preview" 
+                  className="crop-preview-image"
+                  style={{
+                    transform: `translate(${cropData.x}px, ${cropData.y}px) scale(${cropData.scale})`
+                  }}
+                  draggable
+                  onDragStart={(e) => {
+                    e.dataTransfer.effectAllowed = 'move';
+                    const startX = e.clientX;
+                    const startY = e.clientY;
+                    const startDataX = cropData.x;
+                    const startDataY = cropData.y;
+                    
+                    const handleDragOver = (moveEvent) => {
+                      moveEvent.preventDefault();
+                      const deltaX = moveEvent.clientX - startX;
+                      const deltaY = moveEvent.clientY - startY;
+                      setCropData(prev => ({
+                        ...prev,
+                        x: startDataX + deltaX,
+                        y: startDataY + deltaY
+                      }));
+                    };
+                    
+                    const handleDragEnd = () => {
+                      document.removeEventListener('dragover', handleDragOver);
+                      document.removeEventListener('dragend', handleDragEnd);
+                    };
+                    
+                    document.addEventListener('dragover', handleDragOver);
+                    document.addEventListener('dragend', handleDragEnd);
+                  }}
+                />
+              </div>
+              <div className="crop-controls">
+                <div className="control-group">
+                  <label>Zoom</label>
+                  <input 
+                    type="range" 
+                    min="0.5" 
+                    max="3" 
+                    step="0.1" 
+                    value={cropData.scale}
+                    onChange={(e) => setCropData(prev => ({
+                      ...prev,
+                      scale: parseFloat(e.target.value)
+                    }))}
+                    className="crop-slider"
+                  />
+                  <span className="scale-value">{(cropData.scale * 100).toFixed(0)}%</span>
+                  <p className="control-hint">Drag the image to adjust position</p>
+                </div>
+              </div>
+            </div>
+            <div className="crop-actions">
+              <button 
+                type="button" 
+                className="crop-cancel-btn" 
+                onClick={cancelCrop}
+              >
+                Cancel
+              </button>
+              <button 
+                type="button" 
+                className="crop-apply-btn" 
+                onClick={applyCrop}
+              >
+                Apply & Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <main className="new-post-main">
         <button 
           className="back-button" 
           onClick={() => navigate('/store')}
           title="Back to Store"
         >
-          <span className="back-arrow">←</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
         </button>
         <div className="form-header">
           <h2 className="form-title">Create New Post</h2>

@@ -106,36 +106,29 @@ body {
   position: fixed;
   top: 90px;
   left: 30px;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: white;
-  border: none;
+  border: 1px solid #d1d5db;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  font-size: 20px;
-  color: #2e7d32;
-  font-weight: bold;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  color: #2f6b48;
   z-index: 50;
 }
 
 .back-button:hover {
-  transform: translateX(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: #f9fafb;
+  border-color: #2f6b48;
+  box-shadow: 0 2px 8px rgba(47, 107, 72, 0.1);
 }
 
-.back-arrow {
-  display: inline-block;
-  transition: opacity 0.3s ease;
-  opacity: 1;
-}
-
-.back-button:hover .back-arrow {
-  opacity: 1;
+.back-button svg {
+  flex-shrink: 0;
 }
 
 /* Product Image Section */
