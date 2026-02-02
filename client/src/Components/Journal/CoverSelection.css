@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 /* Cover Selection Wrapper */
-.cover-selection-wrapper {
+.journal-cover-selection-wrapper-m {
   min-height: 100vh;
   background: #F0F7EF;
   display: flex;
@@ -11,9 +11,9 @@
 }
 
 /* Cover Selection Container */
-.cover-selection-container {
+.journal-cover-selection-container-m {
   flex: 1;
-  padding: 4rem 2rem;
+  padding: 3rem 2rem 2rem 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -21,13 +21,13 @@
 }
 
 /* Welcome Banner */
-.welcome-banner {
+.journal-cover-welcome-banner-m {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 }
 
-.welcome-title {
-  font-size: 2.5rem;
+.journal-cover-welcome-title-m {
+  font-size: 2rem;
   font-weight: 600;
   color: #2d5016;
   margin: 0 0 0.5rem 0;
@@ -35,8 +35,8 @@
   letter-spacing: -0.5px;
 }
 
-.welcome-subtitle {
-  font-size: 1.1rem;
+.journal-cover-welcome-subtitle-m {
+  font-size: 1rem;
   color: #5a7a4d;
   font-weight: 400;
   margin: 0;
@@ -44,111 +44,111 @@
 }
 
 /* Cover Instruction */
-.cover-instruction {
-  font-size: 1rem;
+.journal-cover-instruction-m {
+  font-size: 0.95rem;
   color: #5a7a4d;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
   font-weight: 400;
   text-align: center;
   font-family: 'Poppins', sans-serif;
 }
 
-/* Covers Grid */
-.covers-grid {
+/* Covers Grid - More Compact */
+.journal-covers-grid-m {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 3rem;
-  max-width: 1200px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  max-width: 900px;
   width: 100%;
-  padding: 0 2rem;
+  padding: 0 1rem;
 }
 
-/* Cover Card */
-.cover-card {
+/* Cover Card - Smaller */
+.journal-cover-card-m {
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.cover-card:hover {
-  transform: translateY(-8px);
+.journal-cover-card-m:hover {
+  transform: translateY(-6px);
 }
 
-.cover-card:hover .cover-preview {
+.journal-cover-card-m:hover .journal-cover-preview-m {
   box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.08),
-    0 2px 8px rgba(0, 0, 0, 0.04);
+    0 15px 35px rgba(0, 0, 0, 0.1),
+    0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-/* Cover Preview */
-.cover-preview {
+/* Cover Preview - Smaller Aspect Ratio */
+.journal-cover-preview-m {
   width: 100%;
-  aspect-ratio: 800 / 600;
+  aspect-ratio: 4 / 3;
   border-radius: 8px;
   position: relative;
   overflow: hidden;
   box-shadow: 
-    0 10px 30px rgba(0, 0, 0, 0.06),
+    0 8px 20px rgba(0, 0, 0, 0.08),
     0 1px 4px rgba(0, 0, 0, 0.04);
   transition: all 0.3s ease;
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* Cover Content - Uses Georgia for elegance */
-.cover-content {
+/* Cover Content - Scaled Down */
+.journal-cover-content-m {
   width: 100%;
   height: 100%;
-  padding: 3rem 2.5rem;
+  padding: 1.5rem 1.25rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   position: relative;
 }
 
-/* Decorative Elements */
-.cover-decorative-circle {
+/* Decorative Elements - Smaller */
+.journal-cover-decorative-circle-m {
   position: absolute;
-  top: 2rem;
-  right: 2rem;
-  width: 60px;
-  height: 60px;
+  top: 1rem;
+  right: 1rem;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   opacity: 0.1;
 }
 
-.cover-decorative-line {
+.journal-cover-decorative-line-m {
   position: absolute;
-  bottom: 2rem;
-  left: 2.5rem;
-  right: 2.5rem;
+  bottom: 1rem;
+  left: 1.25rem;
+  right: 1.25rem;
   height: 1px;
   opacity: 0.2;
 }
 
-/* Cover Title Section - Georgia font for elegance */
-.cover-title-section {
+/* Cover Title Section */
+.journal-cover-title-section-m {
   text-align: center;
   margin-top: auto;
   margin-bottom: auto;
 }
 
-.cover-journal-title {
-  font-size: 2rem;
+.journal-cover-journal-title-m {
+  font-size: 1.25rem;
   font-weight: 400;
   font-family: 'Georgia', serif;
-  margin: 0 0 1rem 0;
-  letter-spacing: 2px;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: 1.5px;
   opacity: 0.9;
 }
 
-.cover-divider {
-  width: 80px;
+.journal-cover-divider-m {
+  width: 50px;
   height: 2px;
-  margin: 0 auto 1rem auto;
+  margin: 0 auto 0.5rem auto;
   opacity: 0.4;
 }
 
-.cover-subtitle-text {
-  font-size: 1rem;
+.journal-cover-subtitle-text-m {
+  font-size: 0.8rem;
   font-weight: 300;
   font-family: 'Georgia', serif;
   margin: 0;
@@ -156,99 +156,99 @@
   font-style: italic;
 }
 
-/* Leaf Decoration */
-.cover-leaf-decoration {
+/* Leaf Decoration - Smaller */
+.journal-cover-leaf-decoration-m {
   position: absolute;
-  bottom: 2.5rem;
-  right: 2.5rem;
-  width: 80px;
-  height: 80px;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  width: 50px;
+  height: 50px;
 }
 
-.leaf-svg {
+.journal-cover-leaf-svg-m {
   width: 100%;
   height: 100%;
 }
 
-/* Cover Name - Back to Poppins */
-.cover-name {
+/* Cover Name */
+.journal-cover-name-m {
   text-align: center;
-  margin-top: 1.5rem;
-  font-size: 1rem;
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 500;
   font-family: 'Poppins', sans-serif;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   color: #2d5016;
 }
 
 /* Responsive Design */
 @media (max-width: 992px) {
-  .welcome-title {
-    font-size: 2rem;
+  .journal-cover-welcome-title-m {
+    font-size: 1.75rem;
   }
 
-  .covers-grid {
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 2rem;
+  .journal-covers-grid-m {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
   }
 }
 
 @media (max-width: 768px) {
-  .cover-selection-container {
-    padding: 3rem 1rem;
+  .journal-cover-selection-container-m {
+    padding: 2rem 1rem;
   }
 
-  .welcome-title {
-    font-size: 1.75rem;
+  .journal-cover-welcome-title-m {
+    font-size: 1.5rem;
   }
 
-  .welcome-subtitle {
-    font-size: 1rem;
+  .journal-cover-welcome-subtitle-m {
+    font-size: 0.95rem;
   }
 
-  .covers-grid {
-    grid-template-columns: 1fr;
-    padding: 0 1rem;
-    gap: 2rem;
+  .journal-covers-grid-m {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    padding: 0 0.5rem;
+    gap: 1rem;
   }
 
-  .cover-journal-title {
-    font-size: 1.75rem;
+  .journal-cover-journal-title-m {
+    font-size: 1.1rem;
   }
 
-  .cover-content {
-    padding: 2rem 1.5rem;
+  .journal-cover-content-m {
+    padding: 1.25rem 1rem;
   }
 
-  .cover-decorative-circle {
-    width: 50px;
-    height: 50px;
-    top: 1.5rem;
-    right: 1.5rem;
+  .journal-cover-decorative-circle-m {
+    width: 35px;
+    height: 35px;
   }
 
-  .cover-leaf-decoration {
-    width: 60px;
-    height: 60px;
-    bottom: 1.5rem;
-    right: 1.5rem;
+  .journal-cover-leaf-decoration-m {
+    width: 40px;
+    height: 40px;
   }
 }
 
 @media (max-width: 480px) {
-  .welcome-title {
-    font-size: 1.5rem;
+  .journal-cover-welcome-title-m {
+    font-size: 1.25rem;
   }
 
-  .cover-instruction {
-    font-size: 0.95rem;
+  .journal-cover-instruction-m {
+    font-size: 0.875rem;
   }
 
-  .cover-journal-title {
-    font-size: 1.5rem;
+  .journal-cover-journal-title-m {
+    font-size: 1rem;
   }
 
-  .cover-subtitle-text {
-    font-size: 0.9rem;
+  .journal-cover-subtitle-text-m {
+    font-size: 0.75rem;
+  }
+
+  .journal-covers-grid-m {
+    grid-template-columns: 1fr;
   }
 }

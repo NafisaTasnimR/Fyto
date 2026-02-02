@@ -47,7 +47,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, pages, currentPageIndex, setCurr
               onClick={() => setCurrentPageIndex(idx)}
               className={`entry-item ${idx === currentPageIndex ? 'active' : ''}`}
             >
-              <div className="entry-title">{page.title}</div>
+              <div className="entry-title">Page {page.pageNumber || idx + 1}</div>
               <div className="entry-date">{page.date}</div>
             </div>
           ))}

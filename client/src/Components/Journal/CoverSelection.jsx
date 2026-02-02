@@ -34,47 +34,47 @@ const CoverSelection = ({ onCoverSelect, saving }) => {
   ];
 
   return (
-    <div className="cover-selection-wrapper">
+    <div className="journal-cover-selection-wrapper-m">
       <Header />
 
-      <div className="cover-selection-container">
-        <div className="welcome-banner">
-          <h1 className="welcome-title">Welcome to Fyto Journaling</h1>
-          <p className="welcome-subtitle">Begin your plant journey</p>
+      <div className="journal-cover-selection-container-m">
+        <div className="journal-cover-welcome-banner-m">
+          <h1 className="journal-cover-welcome-title-m">Welcome to Fyto Journaling</h1>
+          <p className="journal-cover-welcome-subtitle-m">Begin your plant journey</p>
         </div>
 
-        <p className="cover-instruction">Please select the cover page for your journal</p>
+        <p className="journal-cover-instruction-m">Please select the cover page for your journal</p>
 
-        <div className="covers-grid">
+        <div className="journal-covers-grid-m">
           {covers.map((cover) => (
             <div
               key={cover.id}
-              className="cover-card"
+              className="journal-cover-card-m"
               onClick={() => !saving && onCoverSelect(cover)}
               style={{ cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}
             >
               <div
-                className="cover-preview"
+                className="journal-cover-preview-m"
                 style={{
                   background: `linear-gradient(135deg, ${cover.primaryColor} 0%, ${cover.secondaryColor} 100%)`
                 }}
               >
-                <div className="cover-content">
-                  <div className="cover-decorative-circle" style={{ background: cover.accentColor }}></div>
-                  <div className="cover-decorative-line" style={{ background: cover.accentColor }}></div>
+                <div className="journal-cover-content-m">
+                  <div className="journal-cover-decorative-circle-m" style={{ background: cover.accentColor }}></div>
+                  <div className="journal-cover-decorative-line-m" style={{ background: cover.accentColor }}></div>
 
-                  <div className="cover-title-section">
-                    <h2 className="cover-journal-title" style={{ color: cover.accentColor }}>
+                  <div className="journal-cover-title-section-m">
+                    <h2 className="journal-cover-journal-title-m" style={{ color: cover.accentColor }}>
                       Fyto Journal
                     </h2>
-                    <div className="cover-divider" style={{ background: cover.accentColor }}></div>
-                    <p className="cover-subtitle-text" style={{ color: cover.accentColor }}>
+                    <div className="journal-cover-divider-m" style={{ background: cover.accentColor }}></div>
+                    <p className="journal-cover-subtitle-text-m" style={{ color: cover.accentColor }}>
                       My Plant Journey
                     </p>
                   </div>
 
-                  <div className="cover-leaf-decoration">
-                    <svg viewBox="0 0 100 100" className="leaf-svg" style={{ fill: cover.accentColor, opacity: 0.15 }}>
+                  <div className="journal-cover-leaf-decoration-m">
+                    <svg viewBox="0 0 100 100" className="journal-cover-leaf-svg-m" style={{ fill: cover.accentColor, opacity: 0.15 }}>
                       <path d="M50,10 Q70,30 70,50 Q70,70 50,90 Q30,70 30,50 Q30,30 50,10 Z" />
                       <line x1="50" y1="20" x2="50" y2="80" stroke={cover.accentColor} strokeWidth="1" opacity="0.3" />
                       <path d="M35,35 Q50,40 65,35" stroke={cover.accentColor} strokeWidth="1" fill="none" opacity="0.3" />
@@ -85,7 +85,7 @@ const CoverSelection = ({ onCoverSelect, saving }) => {
                 </div>
               </div>
 
-              <div className="cover-name" style={{ color: cover.accentColor }}>{cover.name}</div>
+              <div className="journal-cover-name-m" style={{ color: cover.accentColor }}>{cover.name}</div>
             </div>
           ))}
         </div>
