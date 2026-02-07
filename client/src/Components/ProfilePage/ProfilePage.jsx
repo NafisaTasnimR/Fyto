@@ -27,6 +27,7 @@ export default function ProfilePage({ onEdit }) {
   const [showEditModal, setShowEditModal] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [showProfilePicModal, setShowProfilePicModal] = useState(false)
+  const [openMarketplaceMenuId, setOpenMarketplaceMenuId] = useState(null)
   const [editFormData, setEditFormData] = useState({ username: '' })
   const [passwordFormData, setPasswordFormData] = useState({ previousPassword: '', newPassword: '', confirmPassword: '' })
   const [profilePicFile, setProfilePicFile] = useState(null)
@@ -190,6 +191,59 @@ export default function ProfilePage({ onEdit }) {
     } catch (error) {
       console.error('Error deleting post:', error)
       alert('Failed to delete post. Please try again.')
+    }
+  }
+
+  const handleDeleteMarketplacePost = async (postId) => {
+    if (!window.confirm('Are you sure you want to delete this marketplace post?')) {
+      return
+    }
+
+    try {
+      const token = localStorage.getItem('token')
+      await axios.delete(
+        `${process.env.REACT_APP_API_URL}/api/marketplace/${postId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      setMarketplacePosts(marketplacePosts.filter(post => post._id !== postId))
+      setOpenMarketplaceMenuId(null)
+      alert('Marketplace post deleted successfully!')
+    } catch (error) {
+      console.error('Error deleting marketplace post:', error)
+      alert('Failed to delete marketplace post. Please try again.')
+    }
+  }
+
+  const handleMarkMarketplacePostUnavailable = async (postId) => {
+    if (!window.confirm('Mark this post as unavailable?')) {
+      return
+    }
+
+    try {
+      const token = localStorage.getItem('token')
+      await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/marketplace/${postId}`,
+        { status: 'unavailable' },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      setMarketplacePosts(
+        marketplacePosts.map(post =>
+          post._id === postId ? { ...post, status: 'unavailable' } : post
+        )
+      )
+      setOpenMarketplaceMenuId(null)
+      alert('Post marked as unavailable!')
+    } catch (error) {
+      console.error('Error marking post unavailable:', error)
+      alert('Failed to update post status. Please try again.')
     }
   }
 
@@ -368,18 +422,75 @@ export default function ProfilePage({ onEdit }) {
         return (
           <div className="tab-panel">
             <h2 className="journal-heading">Marketplace</h2>
-            <div className="journal-list">
-              {marketplacePosts.length > 0 ? (
-                marketplacePosts.map((post) => (
-                  <div key={post._id} className="journal-item">
-                    <h3 className="journal-title">{post.treeName}</h3>
-                    <p>{post.description}</p>
+            {marketplacePosts.length > 0 ? (
+              <div className="profile-marketplace-list">
+                {marketplacePosts.map((post) => (
+                  <div key={post._id} className="profile-marketplace-item">
+                    <div className="profile-marketplace-item-image">
+                      <img
+                        src={post.photos && post.photos.length > 0 ? post.photos[0] : '/tree-placeholder.png'}
+                        alt={post.treeName}
+                      />
+                    </div>
+                    <div className="profile-marketplace-item-content">
+                      <div className="profile-marketplace-item-header">
+                        <div>
+                          <h3 className="profile-marketplace-item-title">
+                            {post.treeName} {post.treeType ? `- ${post.treeType}` : ''}
+                          </h3>
+                          <p className="profile-marketplace-item-author">{post.userId?.username || 'Anonymous'}</p>
+                          <p className="profile-marketplace-item-description">{post.description}</p>
+                        </div>
+                        <div className="profile-marketplace-item-meta">
+                          <span className="profile-marketplace-item-badge">
+                            {post.postType === 'sell'
+                              ? 'Buy'
+                              : post.postType === 'exchange'
+                              ? 'Exchange'
+                              : post.postType === 'donate'
+                              ? 'Donate'
+                              : 'Buy'}
+                          </span>
+                          {post.postType === 'sell' && post.price > 0 && (
+                            <span className="profile-marketplace-item-price">৳{post.price.toLocaleString()}</span>
+                          )}
+                          <div className="marketplace-post-menu-container">
+                            <button
+                              className="marketplace-post-menu-btn"
+                              onClick={() =>
+                                setOpenMarketplaceMenuId(
+                                  openMarketplaceMenuId === post._id ? null : post._id
+                                )
+                              }
+                            >
+                              ⋮
+                            </button>
+                            {openMarketplaceMenuId === post._id && (
+                              <div className="marketplace-post-menu-dropdown">
+                                <button
+                                  className="marketplace-post-menu-item"
+                                  onClick={() => handleMarkMarketplacePostUnavailable(post._id)}
+                                >
+                                  Mark Unavailable
+                                </button>
+                                <button
+                                  className="marketplace-post-menu-item delete"
+                                  onClick={() => handleDeleteMarketplacePost(post._id)}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                ))
-              ) : (
-                <p className="journal-item">No marketplace posts found.</p>
-              )}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <p className="journal-item">No marketplace posts found.</p>
+            )}
           </div>
         )
       case 'leaderboard':

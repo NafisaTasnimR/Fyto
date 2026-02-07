@@ -247,6 +247,207 @@
   margin: 0 0 12px;
 }
 
+/* Marketplace list - serial/vertical layout */
+.profile-marketplace-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.profile-marketplace-item {
+  display: flex;
+  gap: 14px;
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.profile-marketplace-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.profile-marketplace-item-image {
+  width: 140px;
+  height: 140px;
+  flex-shrink: 0;
+  overflow: hidden;
+  background-color: #f0f0f0;
+}
+
+.profile-marketplace-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-marketplace-item-content {
+  flex: 1;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.profile-marketplace-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+}
+
+.profile-marketplace-item-header > div:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-marketplace-item-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #191919;
+  margin: 0 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.profile-marketplace-item-author {
+  font-size: 12px;
+  color: #999;
+  margin: 0 0 4px;
+}
+
+.profile-marketplace-item-description {
+  font-size: 13px;
+  color: #555;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.3;
+}
+
+.profile-marketplace-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.profile-marketplace-item-badge {
+  background-color: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.profile-marketplace-item-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: #191919;
+  white-space: nowrap;
+}
+
+/* Menu for marketplace posts */
+.marketplace-post-menu-container {
+  position: relative;
+}
+
+.marketplace-post-menu-btn {
+  background: none;
+  border: none;
+  padding: 4px 6px;
+  cursor: pointer;
+  color: #999;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.2s;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.marketplace-post-menu-btn:hover {
+  background-color: #f0f0f0;
+  color: #191919;
+}
+
+.marketplace-post-menu-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  min-width: 150px;
+  overflow: hidden;
+}
+
+.marketplace-post-menu-item {
+  width: 100%;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: #333;
+  font-size: 13px;
+  transition: all 0.2s;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.marketplace-post-menu-item:last-child {
+  border-bottom: none;
+}
+
+.marketplace-post-menu-item:hover {
+  background-color: #f5f5f5;
+}
+
+.marketplace-post-menu-item.delete {
+  color: #d32f2f;
+}
+
+.marketplace-post-menu-item.delete:hover {
+  background-color: #ffebee;
+}
+
+@media (max-width: 720px) {
+  .profile-marketplace-item {
+    flex-direction: column;
+  }
+
+  .profile-marketplace-item-image {
+    width: 100%;
+    height: 200px;
+  }
+
+  .profile-marketplace-item-header {
+    flex-direction: column;
+  }
+
+  .profile-marketplace-item-meta {
+    justify-content: flex-start;
+  }
+}
+
 /* Override post overflow and add dropdown menu styles for posts inside profile page */
 .infos-box .post {
   overflow: visible !important;
