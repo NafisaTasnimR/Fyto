@@ -15,6 +15,8 @@ export default function ProfilePage({ onEdit }) {
   const [posts, setPosts] = useState([])
   const [marketplacePosts, setMarketplacePosts] = useState([])
   const [user, setUser] = useState(null)
+  const [challengePositions, setChallengePositions] = useState(null)
+  const [leaderboardTab, setLeaderboardTab] = useState('daily')
   const [openMenuPostId, setOpenMenuPostId] = useState(null)
   const [showImageViewer, setShowImageViewer] = useState(false)
   const [viewingImage, setViewingImage] = useState(null)
@@ -70,6 +72,23 @@ export default function ProfilePage({ onEdit }) {
         } else if (activeTab === 'marketplace') {
           const marketplaceData = await getUserMarketplacePosts()
           setMarketplacePosts(marketplaceData.posts)
+        } else if (activeTab === 'leaderboard') {
+          // Mock data for frontend design - replace with API call later
+          setChallengePositions({
+            daily: {
+              streakCount: 7,
+              position: 5
+            },
+            monthly: {
+              totalPoints: 450,
+              position: 12
+            },
+            overall: {
+              totalPoints: 2340,
+              position: 45
+            }
+          })
+          setLeaderboardTab('daily')
         }
       } catch (error) {
         console.error(`Error fetching ${activeTab}:`, error)
@@ -497,7 +516,85 @@ export default function ProfilePage({ onEdit }) {
         return (
           <div className="tab-panel">
             <h2 className="journal-heading">Leader board</h2>
-            <p className="journal-item">Leaderboard coming soon.</p>
+            {challengePositions && (challengePositions.daily || challengePositions.monthly || challengePositions.overall) ? (
+              <div className="leaderboard-section">
+                <div className="leaderboard-tabs1">
+                  <button
+                    className={`leaderboard-tab ${leaderboardTab === 'daily' ? 'active' : ''}`}
+                    onClick={() => setLeaderboardTab('daily')}
+                  >
+                    Daily
+                  </button>
+                  <button
+                    className={`leaderboard-tab ${leaderboardTab === 'monthly' ? 'active' : ''}`}
+                    onClick={() => setLeaderboardTab('monthly')}
+                  >
+                    Monthly
+                  </button>
+                  <button
+                    className={`leaderboard-tab ${leaderboardTab === 'overall' ? 'active' : ''}`}
+                    onClick={() => setLeaderboardTab('overall')}
+                  >
+                    Overall
+                  </button>
+                </div>
+
+                <div className="leaderboard-content">
+                  {leaderboardTab === 'daily' && challengePositions.daily && (
+                    <div className="leaderboard-stats">
+                      <div className="stat-item">
+                        <p className="stat-label">Streak Count</p>
+                        <p className="stat-value">{challengePositions.daily.streakCount}</p>
+                        <p className="stat-unit">days</p>
+                      </div>
+                      <div className="stat-divider"></div>
+                      <div className="stat-item">
+                        <p className="stat-label">Your Position</p>
+                        <p className="stat-value">#{challengePositions.daily.position}</p>
+                        <p className="stat-unit">in leaderboard</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {leaderboardTab === 'monthly' && challengePositions.monthly && (
+                    <div className="leaderboard-stats">
+                      <div className="stat-item">
+                        <p className="stat-label">Total Points</p>
+                        <p className="stat-value">{challengePositions.monthly.totalPoints}</p>
+                        <p className="stat-unit">points</p>
+                      </div>
+                      <div className="stat-divider"></div>
+                      <div className="stat-item">
+                        <p className="stat-label">Your Position</p>
+                        <p className="stat-value">#{challengePositions.monthly.position}</p>
+                        <p className="stat-unit">in leaderboard</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {leaderboardTab === 'overall' && challengePositions.overall && (
+                    <div className="leaderboard-stats">
+                      <div className="stat-item">
+                        <p className="stat-label">Total Points</p>
+                        <p className="stat-value">{challengePositions.overall.totalPoints}</p>
+                        <p className="stat-unit">points</p>
+                      </div>
+                      <div className="stat-divider"></div>
+                      <div className="stat-item">
+                        <p className="stat-label">Your Position</p>
+                        <p className="stat-value">#{challengePositions.overall.position}</p>
+                        <p className="stat-unit">in leaderboard</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="no-participation">
+                <img src="/alert.png" alt="Alert" className="no-participation-icon" />
+                <p className="no-participation-text">You haven't participated in any challenges</p>
+              </div>
+            )}
           </div>
         )
       default:
@@ -700,13 +797,22 @@ export default function ProfilePage({ onEdit }) {
                   <span>{user?.email}</span>
                 </p>
               </div>
-              <button
-                className="edit-btn primary"
-                onClick={() => setShowEditModal(true)}
-                aria-label="Edit profile"
-              >
-                Edit profile
-              </button>
+              <div className="profile-actions">
+                <div className="profile-points-section">
+                  <img src="/reward.png" alt="Reward" className="points-icon1" />
+                  <div className="points-info">
+      
+                    <p className="points-value1">{user?.points || 0}</p>
+                  </div>
+                </div>
+                <button
+                  className="edit-btn primary"
+                  onClick={() => setShowEditModal(true)}
+                  aria-label="Edit profile"
+                >
+                  Edit profile
+                </button>
+              </div>
             </div>
           </div>
 
