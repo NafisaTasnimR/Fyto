@@ -19,6 +19,7 @@ export default function Header() {
             <NavLink end to="/store" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Marketplace</NavLink>
             <NavLink end to="/journal" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Journal</NavLink>
             <NavLink end to="/challenges" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Challenges</NavLink>
+            <NavLink end to="/plant-info" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Plant Info</NavLink>
           </div>
 
           <div className="menu-section">
