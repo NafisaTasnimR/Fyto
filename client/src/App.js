@@ -13,6 +13,10 @@ import Journal from './Components/Journal/Journal';
 import ProfilePage from './Components/ProfilePage/ProfilePage';
 import Challenges from './Components/Challenges/Challenges';
 import './App.css';
+import PreviewSocialPage from './Components/LandingPage/PreviewSocialPage';
+import PreviewMarketplace from './Components/LandingPage/PreviewMarketplace';
+
+
 
 function App() {
   return (
@@ -32,6 +36,8 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/social" element={<SocialPage />} />
           <Route path="/challenges" element={<Challenges />} />
+          <Route path="/preview-social" element={<PreviewSocialPage />} />
+          <Route path="/preview-marketplace" element={<PreviewMarketplace />} />
         </Routes>
       </Router>
     </ConfirmedPostsProvider>

@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import LoginSignup from '../LoginSignup/LoginSignup';
+import { useNavigate } from 'react-router-dom';
 import './LandingPage.css';
 
 export default function LandingPage() {
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('login');
 
@@ -66,6 +68,29 @@ export default function LandingPage() {
             <img src="/2.png" alt="Fyto logo" className="site-logo" />
             <span>Fyto</span>
           </div>
+          
+          {!isAuthenticated && (
+            <nav className="center-nav-landing">
+              <button 
+                className="nav-link-landing"
+                onClick={() => navigate('/preview-social')}
+              >
+                Social
+              </button>
+              <button 
+                className="nav-link-landing"
+                onClick={() => navigate('/preview-marketplace')}
+              >
+                Marketplace
+              </button>
+              <button 
+                className="nav-link-landing"
+              >
+                Plant Info
+              </button>
+            </nav>
+          )}
+          
           {isAuthenticated ? (
             <div className="profile-section" ref={profileRef}>
               <button className="profile-button" onClick={() => setShowProfileMenu((s) => !s)}>
@@ -203,10 +228,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      
-      
 
-      
       <section className="secondary-hero">
         <div className="secondary-image" style={{
           backgroundColor: '#f0f7ef'
