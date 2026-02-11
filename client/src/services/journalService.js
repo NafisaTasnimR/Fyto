@@ -27,7 +27,7 @@ export const createJournalWithFirstPage = async (journalData) => {
 
 export const createJournal = async (journalData) => {
     const response = await axios.post(API_URL, journalData, getAuthHeaders());
-    return response;
+    return response.data;
 };
 export const getJournals = async () => {
   const token = localStorage.getItem('token');

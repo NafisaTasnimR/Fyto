@@ -45,8 +45,8 @@
 .journal-options-container-m {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
-  max-width: 800px;
+  gap: 1.5rem;
+  max-width: 700px;
   width: 100%;
   margin-bottom: 2.5rem;
 }
@@ -55,7 +55,7 @@
 .journal-option-card-m {
   background: white;
   border-radius: 12px;
-  padding: 2rem 1.75rem;
+  padding: 1.5rem 1.25rem;
   box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   cursor: pointer;
@@ -74,13 +74,13 @@
 
 /* Smaller Icons */
 .journal-option-icon-m {
-  width: 90px;
-  height: 90px;
+  width: 75px;
+  height: 75px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
   transition: all 0.3s ease;
   overflow: hidden;
 }
@@ -96,27 +96,27 @@
 }
 
 .journal-option-title-m {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 600;
   color: #2d3436;
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 0.5rem 0;
   font-family: 'Poppins', sans-serif;
 }
 
 .journal-option-description-m {
-  font-size: 0.925rem;
+  font-size: 0.85rem;
   color: #636e72;
-  line-height: 1.5;
-  margin: 0 0 1.5rem 0;
+  line-height: 1.4;
+  margin: 0 0 1rem 0;
   font-family: 'Poppins', sans-serif;
   flex: 1;
 }
 
 .journal-option-button-m {
-  padding: 0.75rem 1.75rem;
+  padding: 0.6rem 1.5rem;
   border: none;
   border-radius: 50px;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;

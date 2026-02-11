@@ -170,14 +170,6 @@ const ProductDetail = () => {
               <span className="meta-value">{post.offering}</span>
             </div>
             <div className="meta-item">
-              <span className="meta-label">Age:</span>
-              <span className="meta-value">{post.treeAge ? `${post.treeAge} years` : 'Not specified'}</span>
-            </div>
-            <div className="meta-item">
-              <span className="meta-label">Condition:</span>
-              <span className="meta-value">{post.condition}</span>
-            </div>
-            <div className="meta-item">
               <span className="meta-label">Owner:</span>
               <span className="meta-value">{post.userId?.username || 'Anonymous'}</span>
             </div>
