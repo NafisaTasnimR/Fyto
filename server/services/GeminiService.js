@@ -2,8 +2,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export const generateCareGuide = async (scientificName, location = "Bangladesh") => {
     try {
-        console.log("Using Gemini API for:", scientificName);
-        console.log("API Key present:", !!process.env.GEMINI_API_KEY);
+        console.log("🌿 Generating care guide for:", scientificName, "in", location);
+        console.log("🔑 API Key present:", !!process.env.GEMINI_API_KEY);
 
         // Initialize inside the function so env vars are loaded
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -40,7 +40,7 @@ Only return valid JSON.
 
         text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
 
-        console.log("📝 Cleaned response:", text.substring(0, 100) + "...");
+        console.log("Cleaned response:", text.substring(0, 100) + "...");
 
         return JSON.parse(text);
     } catch (error) {

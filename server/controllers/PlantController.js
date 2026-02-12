@@ -13,7 +13,11 @@ export const detectPlantAndCare = async (req, res) => {
         const plant = await identifyPlant(req.file.buffer);
         console.log("Plant identified:", plant);
 
-        const careInfo = await generateCareGuide(plant.scientificName);
+        // Get location from request body or query params, default to "Bangladesh"
+        const location = req.body.location || req.query.location || "Bangladesh";
+        console.log("Using location:", location);
+
+        const careInfo = await generateCareGuide(plant.scientificName, location);
         console.log("Care info received:", careInfo ? "Success" : "Not found");
 
         res.json({
