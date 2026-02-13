@@ -41,6 +41,8 @@ export default function ProfilePage({ onEdit }) {
   const [editingPost, setEditingPost] = useState(null)
   const [editPostCaption, setEditPostCaption] = useState('')
   const [editPostImage, setEditPostImage] = useState(null)
+  const [showDeleteMarketplaceModal, setShowDeleteMarketplaceModal] = useState(false)
+  const [marketplacePostToDelete, setMarketplacePostToDelete] = useState(null)
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -229,28 +231,38 @@ export default function ProfilePage({ onEdit }) {
     setPostToDelete(null)
   }
 
-  const handleDeleteMarketplacePost = async (postId) => {
-    if (!window.confirm('Are you sure you want to delete this marketplace post?')) {
-      return
-    }
+  const handleDeleteMarketplacePost = (postId) => {
+    setMarketplacePostToDelete(postId)
+    setShowDeleteMarketplaceModal(true)
+    setOpenMarketplaceMenuId(null)
+  }
 
+  const confirmDeleteMarketplacePost = async () => {
     try {
       const token = localStorage.getItem('token')
       await axios.delete(
-        `${process.env.REACT_APP_API_URL}/api/marketplace/${postId}`,
+        `${process.env.REACT_APP_API_URL}/api/marketplace/${marketplacePostToDelete}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       )
-      setMarketplacePosts(marketplacePosts.filter(post => post._id !== postId))
-      setOpenMarketplaceMenuId(null)
+      setMarketplacePosts(marketplacePosts.filter(post => post._id !== marketplacePostToDelete))
+      setShowDeleteMarketplaceModal(false)
+      setMarketplacePostToDelete(null)
       alert('Marketplace post deleted successfully!')
     } catch (error) {
       console.error('Error deleting marketplace post:', error)
       alert('Failed to delete marketplace post. Please try again.')
+      setShowDeleteMarketplaceModal(false)
+      setMarketplacePostToDelete(null)
     }
+  }
+
+  const cancelDeleteMarketplacePost = () => {
+    setShowDeleteMarketplaceModal(false)
+    setMarketplacePostToDelete(null)
   }
 
   const handleMarkMarketplacePostUnavailable = async (postId) => {
@@ -1414,6 +1426,43 @@ export default function ProfilePage({ onEdit }) {
                 onClick={handleSaveEditedPost}
               >
                 Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteMarketplaceModal && (
+        <div className="modal-overlay" onClick={() => cancelDeleteMarketplacePost()}>
+          <div className="delete-confirmation-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Delete Post</h2>
+              <button
+                className="modal-close-btn"
+                onClick={() => cancelDeleteMarketplacePost()}
+                aria-label="Close modal"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <p className="delete-warning">Are you sure you want to delete this marketplace post?</p>
+              <p className="delete-subtext">This action cannot be undone.</p>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                className="btn-cancel"
+                onClick={() => cancelDeleteMarketplacePost()}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn-delete"
+                onClick={confirmDeleteMarketplacePost}
+              >
+                Delete
               </button>
             </div>
           </div>
