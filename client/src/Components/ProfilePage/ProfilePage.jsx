@@ -37,6 +37,10 @@ export default function ProfilePage({ onEdit }) {
   const [showPasswords, setShowPasswords] = useState({ previous: false, new: false, confirm: false })
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [postToDelete, setPostToDelete] = useState(null)
+  const [showEditPostModal, setShowEditPostModal] = useState(false)
+  const [editingPost, setEditingPost] = useState(null)
+  const [editPostCaption, setEditPostCaption] = useState('')
+  const [editPostImage, setEditPostImage] = useState(null)
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -279,10 +283,34 @@ export default function ProfilePage({ onEdit }) {
   }
 
   const handleEditPost = (post) => {
-    // For now, just log - you can implement edit modal later
-    console.log('Edit post:', post)
-    alert('Edit functionality coming soon!')
+    setEditingPost(post)
+    setEditPostCaption(post.content || '')
+    setEditPostImage(post.images && post.images.length > 0 ? post.images[0] : null)
+    setShowEditPostModal(true)
     setOpenMenuPostId(null)
+  }
+
+  const handleSaveEditedPost = () => {
+    // Update the posts list with the edited caption (frontend only)
+    setPosts(prevPosts => 
+      prevPosts.map(p => 
+        p._id === editingPost._id 
+          ? { ...p, content: editPostCaption }
+          : p
+      )
+    )
+
+    setShowEditPostModal(false)
+    setEditingPost(null)
+    setEditPostCaption('')
+    setEditPostImage(null)
+  }
+
+  const handleCancelEditPost = () => {
+    setShowEditPostModal(false)
+    setEditingPost(null)
+    setEditPostCaption('')
+    setEditPostImage(null)
   }
 
   const renderContent = () => {
@@ -1335,6 +1363,57 @@ export default function ProfilePage({ onEdit }) {
                 disabled={!profilePicFile}
               >
                 Save Picture
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEditPostModal && editingPost && (
+        <div className="modal-overlay" onClick={() => handleCancelEditPost()}>
+          <div className="edit-modal edit-post-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Edit Post</h2>
+              <button
+                className="modal-close-btn"
+                onClick={() => handleCancelEditPost()}
+                aria-label="Close modal"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="modal-body">
+              {editPostImage && (
+                <div className="edit-post-image-container">
+                  <img src={editPostImage} alt="Post" className="edit-post-image" />
+                </div>
+              )}
+
+              <div className="form-group">
+                <label>Caption</label>
+                <textarea
+                  value={editPostCaption}
+                  onChange={(e) => setEditPostCaption(e.target.value)}
+                  className="form-textarea"
+                  placeholder="Write a caption..."
+                  rows={4}
+                />
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                className="btn-cancel"
+                onClick={() => handleCancelEditPost()}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn-save"
+                onClick={handleSaveEditedPost}
+              >
+                Save Changes
               </button>
             </div>
           </div>
