@@ -1,14 +1,12 @@
 import Comment from '../models/Comment.js';
 import Post from '../models/Post.js';
 
-// Create a comment on a post
 export const createComment = async (req, res) => {
     try {
         const { postId } = req.params;
         const { content } = req.body;
         const authorId = req.user._id;
 
-        // Verify post exists
         const post = await Post.findById(postId);
         if (!post) {
             return res.status(404).json({
@@ -42,14 +40,12 @@ export const createComment = async (req, res) => {
     }
 };
 
-// Create a reply to a comment
 export const createReply = async (req, res) => {
     try {
         const { commentId } = req.params;
         const { content } = req.body;
         const authorId = req.user._id;
 
-        // Verify parent comment exists
         const parentComment = await Comment.findById(commentId);
         if (!parentComment) {
             return res.status(404).json({
@@ -83,12 +79,10 @@ export const createReply = async (req, res) => {
     }
 };
 
-// Get all comments for a post (with nested replies)
 export const getCommentsByPost = async (req, res) => {
     try {
         const { postId } = req.params;
 
-        // Verify post exists
         const post = await Post.findById(postId);
         if (!post) {
             return res.status(404).json({
@@ -97,16 +91,13 @@ export const getCommentsByPost = async (req, res) => {
             });
         }
 
-        // Get all comments for the post
         const comments = await Comment.find({ postId })
             .populate('authorId', 'name username profilePic')
             .sort({ createdAt: -1 });
 
-        // Organize comments into a nested structure
         const commentMap = {};
         const topLevelComments = [];
 
-        // First pass: create a map of all comments
         comments.forEach(comment => {
             commentMap[comment._id] = {
                 ...comment.toObject(),
@@ -114,15 +105,12 @@ export const getCommentsByPost = async (req, res) => {
             };
         });
 
-        // Second pass: organize into parent-child structure
         comments.forEach(comment => {
             if (comment.parentComment) {
-                // This is a reply
                 if (commentMap[comment.parentComment]) {
                     commentMap[comment.parentComment].replies.push(commentMap[comment._id]);
                 }
             } else {
-                // This is a top-level comment
                 topLevelComments.push(commentMap[comment._id]);
             }
         });
@@ -142,7 +130,6 @@ export const getCommentsByPost = async (req, res) => {
     }
 };
 
-// Update a comment
 export const updateComment = async (req, res) => {
     try {
         const { commentId } = req.params;
@@ -158,7 +145,6 @@ export const updateComment = async (req, res) => {
             });
         }
 
-        // Check if user is the author
         if (comment.authorId.toString() !== userId.toString()) {
             return res.status(403).json({
                 success: false,
@@ -185,7 +171,6 @@ export const updateComment = async (req, res) => {
     }
 };
 
-// Delete a comment (and its replies)
 export const deleteComment = async (req, res) => {
     try {
         const { commentId } = req.params;
@@ -200,7 +185,6 @@ export const deleteComment = async (req, res) => {
             });
         }
 
-        // Check if user is the author or post owner
         const post = await Post.findById(comment.postId);
         const isAuthor = comment.authorId.toString() === userId.toString();
         const isPostOwner = post && post.authorId.toString() === userId.toString();
@@ -212,7 +196,6 @@ export const deleteComment = async (req, res) => {
             });
         }
 
-        // Delete the comment and all its replies
         await Comment.deleteMany({
             $or: [
                 { _id: commentId },
@@ -234,7 +217,6 @@ export const deleteComment = async (req, res) => {
     }
 };
 
-// Get a single comment by ID
 export const getCommentById = async (req, res) => {
     try {
         const { commentId } = req.params;
@@ -250,7 +232,6 @@ export const getCommentById = async (req, res) => {
             });
         }
 
-        // Get all replies to this comment
         const replies = await Comment.find({ parentComment: commentId })
             .populate('authorId', 'name username profilePic')
             .sort({ createdAt: 1 });

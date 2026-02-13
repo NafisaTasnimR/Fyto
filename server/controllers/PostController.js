@@ -279,7 +279,7 @@ export const searchPosts = async (req, res) => {
             });
         }
 
-        
+
         const posts = await Post.find({
             content: { $regex: query, $options: 'i' }
         })
@@ -296,6 +296,65 @@ export const searchPosts = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: 'Failed to search posts.',
+            error: error.message
+        });
+    }
+};
+
+
+export const getSharedPost = async (req, res) => {
+    try {
+        const { postId } = req.params;
+
+        const post = await Post.findById(postId)
+            .populate('authorId', 'name username profilePic');
+
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: 'Post not found.'
+            });
+        }
+
+        const Comment = (await import('../models/Comment.js')).default;
+        const comments = await Comment.find({ postId })
+            .populate('authorId', 'name username profilePic')
+            .sort({ createdAt: -1 });
+
+        const commentMap = {};
+        const topLevelComments = [];
+
+        comments.forEach(comment => {
+            commentMap[comment._id] = {
+                ...comment.toObject(),
+                replies: []
+            };
+        });
+
+        comments.forEach(comment => {
+            if (comment.parentComment) {
+                if (commentMap[comment.parentComment]) {
+                    commentMap[comment.parentComment].replies.push(commentMap[comment._id]);
+                }
+            } else {
+                topLevelComments.push(commentMap[comment._id]);
+            }
+        });
+
+        return res.status(200).json({
+            success: true,
+            post: {
+                ...post.toObject(),
+                likesCount: post.likes.length
+            },
+            comments: topLevelComments,
+            totalComments: comments.length
+        });
+    } catch (error) {
+        console.error('Get shared post error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to fetch post.',
             error: error.message
         });
     }

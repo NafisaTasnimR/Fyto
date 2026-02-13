@@ -7,7 +7,8 @@ import {
     getAllPosts,
     toggleLike,
     getPostById,
-    searchPosts
+    searchPosts,
+    getSharedPost
 } from '../controllers/PostController.js';
 import {
     createComment,
@@ -18,6 +19,8 @@ import verifyToken from '../middlewares/Authorization.js';
 
 const router = express.Router();
 
+// Public routes (no authentication required)
+router.get('/shared/:postId', getSharedPost);
 
 router.use(verifyToken);
 
