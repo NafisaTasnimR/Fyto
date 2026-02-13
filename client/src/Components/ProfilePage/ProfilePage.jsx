@@ -35,6 +35,8 @@ export default function ProfilePage({ onEdit }) {
   const [profilePicFile, setProfilePicFile] = useState(null)
   const [profilePicPreview, setProfilePicPreview] = useState(null)
   const [showPasswords, setShowPasswords] = useState({ previous: false, new: false, confirm: false })
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [postToDelete, setPostToDelete] = useState(null)
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -198,19 +200,29 @@ export default function ProfilePage({ onEdit }) {
     setOpenReply({ postId: null, commentId: null })
   }
 
-  const handleDeletePost = async (postId) => {
-    if (!window.confirm('Are you sure you want to delete this post?')) {
-      return
-    }
+  const handleDeletePost = (postId) => {
+    setPostToDelete(postId)
+    setShowDeleteModal(true)
+    setOpenMenuPostId(null)
+  }
 
+  const confirmDeletePost = async () => {
     try {
-      await deletePost(postId)
-      setPosts(posts.filter(post => post._id !== postId))
-      setOpenMenuPostId(null)
+      await deletePost(postToDelete)
+      setPosts(posts.filter(post => post._id !== postToDelete))
+      setShowDeleteModal(false)
+      setPostToDelete(null)
     } catch (error) {
       console.error('Error deleting post:', error)
       alert('Failed to delete post. Please try again.')
+      setShowDeleteModal(false)
+      setPostToDelete(null)
     }
+  }
+
+  const cancelDeletePost = () => {
+    setShowDeleteModal(false)
+    setPostToDelete(null)
   }
 
   const handleDeleteMarketplacePost = async (postId) => {
@@ -1225,6 +1237,43 @@ export default function ProfilePage({ onEdit }) {
                 onClick={handleSavePassword}
               >
                 Save Password
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteModal && (
+        <div className="modal-overlay" onClick={() => cancelDeletePost()}>
+          <div className="delete-confirmation-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Delete Post</h2>
+              <button
+                className="modal-close-btn"
+                onClick={() => cancelDeletePost()}
+                aria-label="Close modal"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <p className="delete-warning">Are you sure you want to delete this post?</p>
+              <p className="delete-subtext">This action cannot be undone.</p>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                className="btn-cancel"
+                onClick={() => cancelDeletePost()}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn-delete"
+                onClick={confirmDeletePost}
+              >
+                Delete
               </button>
             </div>
           </div>
