@@ -136,38 +136,22 @@ export const getPracticeQuiz = async (req, res) => {
 // Check API configuration status
 export const checkQuizAPIStatus = async (req, res) => {
     try {
-        const provider = process.env.QUIZ_PROVIDER || 'gemini';
-        const geminiConfigured = !!process.env.GEMINI_API_KEY;
-        const openaiConfigured = !!process.env.OPENAI_API_KEY;
+        const geminiConfigured = !!process.env.QUIZ_PROVIDER;
 
-        let status = 'not_configured';
-        let activeProvider = null;
-
-        if (provider === 'gemini' && geminiConfigured) {
-            status = 'configured';
-            activeProvider = 'gemini';
-        } else if (provider === 'openai' && openaiConfigured) {
-            status = 'configured';
-            activeProvider = 'openai';
-        } else if (geminiConfigured || openaiConfigured) {
-            status = 'partially_configured';
-        }
+        const status = geminiConfigured ? 'configured' : 'not_configured';
 
         return res.status(200).json({
             success: true,
             data: {
                 status,
-                activeProvider,
+                activeProvider: geminiConfigured ? 'gemini' : null,
                 available: {
-                    gemini: geminiConfigured,
-                    openai: openaiConfigured
+                    gemini: geminiConfigured
                 },
                 fallbackEnabled: true,
-                message: status === 'configured'
-                    ? `Quiz generation is active using ${activeProvider}`
-                    : status === 'partially_configured'
-                        ? 'API keys available but provider not selected correctly'
-                        : 'No API keys configured. Using fallback quizzes. Add GEMINI_API_KEY or OPENAI_API_KEY to .env file.'
+                message: geminiConfigured
+                    ? 'Quiz generation is active using Gemini'
+                    : 'No API key configured. Using fallback quizzes. Add QUIZ_PROVIDER to .env file.'
             }
         });
     } catch (error) {

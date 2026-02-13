@@ -1,34 +1,23 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import OpenAI from "openai";
 
 /**
  * Quiz Generation Service
- * Supports both Gemini and OpenAI APIs for generating plant-related quizzes
+ * Uses Gemini API for generating plant-related quizzes
  * 
  * To use:
  * 1. Add to .env file:
- *    - GEMINI_API_KEY=your_gemini_key (for Gemini)
- *    - OPENAI_API_KEY=your_openai_key (for OpenAI)
- *    - QUIZ_PROVIDER=gemini (or 'openai')
+ *    - QUIZ_PROVIDER=your_gemini_key
  * 
  * 2. Install dependencies:
- *    npm install @google/generative-ai openai
+ *    npm install @google/generative-ai
  */
 
-const QUIZ_PROVIDER = process.env.QUIZ_PROVIDER || 'gemini'; // 'gemini' or 'openai'
-
-// Initialize AI clients
+// Initialize Gemini AI client
 let genAI = null;
-let openai = null;
 
 const initializeClients = () => {
-    if (QUIZ_PROVIDER === 'gemini' && process.env.GEMINI_API_KEY) {
-        genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    }
-    if (QUIZ_PROVIDER === 'openai' && process.env.OPENAI_API_KEY) {
-        openai = new OpenAI({
-            apiKey: process.env.OPENAI_API_KEY
-        });
+    if (process.env.QUIZ_PROVIDER) {
+        genAI = new GoogleGenerativeAI(process.env.QUIZ_PROVIDER);
     }
 };
 
@@ -38,7 +27,7 @@ const generateQuizWithGemini = async (quizType, difficulty) => {
         if (!genAI) initializeClients();
 
         if (!genAI) {
-            throw new Error('Gemini API key not configured. Add GEMINI_API_KEY to .env file.');
+            throw new Error('Gemini API key not configured. Add QUIZ_PROVIDER to .env file.');
         }
 
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
@@ -55,41 +44,6 @@ const generateQuizWithGemini = async (quizType, difficulty) => {
     } catch (error) {
         console.error("Gemini Quiz Generation Error:", error.message);
         throw new Error(`Failed to generate quiz with Gemini: ${error.message}`);
-    }
-};
-
-// Generate quiz using OpenAI
-const generateQuizWithOpenAI = async (quizType, difficulty) => {
-    try {
-        if (!openai) initializeClients();
-
-        if (!openai) {
-            throw new Error('OpenAI API key not configured. Add OPENAI_API_KEY to .env file.');
-        }
-
-        const prompt = createQuizPrompt(quizType, difficulty);
-
-        const response = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
-            messages: [
-                {
-                    role: "system",
-                    content: "You are a plant expert who creates educational quizzes. Always respond with valid JSON only."
-                },
-                {
-                    role: "user",
-                    content: prompt
-                }
-            ],
-            temperature: 0.8,
-            response_format: { type: "json_object" }
-        });
-
-        const text = response.choices[0].message.content;
-        return JSON.parse(text);
-    } catch (error) {
-        console.error("OpenAI Quiz Generation Error:", error.message);
-        throw new Error(`Failed to generate quiz with OpenAI: ${error.message}`);
     }
 };
 
@@ -176,7 +130,7 @@ ONLY return valid JSON, no explanations.
 // Main function to generate daily quiz
 export const generateDailyQuiz = async (quizType = 'image-quiz', difficulty = 'medium') => {
     try {
-        console.log(`🎯 Generating ${quizType} with ${QUIZ_PROVIDER}...`);
+        console.log(`🎯 Generating ${quizType} with Gemini...`);
 
         // Validate inputs
         if (!['image-quiz', 'riddle-quiz'].includes(quizType)) {
@@ -187,19 +141,12 @@ export const generateDailyQuiz = async (quizType = 'image-quiz', difficulty = 'm
             difficulty = 'medium';
         }
 
-        let quiz;
-
-        // Generate quiz based on provider
-        if (QUIZ_PROVIDER === 'openai') {
-            quiz = await generateQuizWithOpenAI(quizType, difficulty);
-        } else {
-            // Default to Gemini
-            quiz = await generateQuizWithGemini(quizType, difficulty);
-        }
+        // Generate quiz using Gemini
+        const quiz = await generateQuizWithGemini(quizType, difficulty);
 
         // Add metadata
         quiz.generatedAt = new Date().toISOString();
-        quiz.provider = QUIZ_PROVIDER;
+        quiz.provider = 'gemini';
 
         console.log(`✅ Quiz generated successfully: ${quiz.quizId}`);
         return quiz;
