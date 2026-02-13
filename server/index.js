@@ -12,6 +12,7 @@ import CommentRoute from "./routes/CommentRoute.js";
 import MarketplaceRoute from "./routes/MarketplaceRoute.js";
 import JournalRoute from "./routes/JournalRoute.js";
 import PlantRoute from "./routes/PlantRoute.js";
+import GamificationRoute from "./routes/GamificationRoute.js";
 
 const app = express();
 connectDB();
@@ -33,6 +34,7 @@ app.use("/api/comments", CommentRoute);
 app.use("/api/marketplace", MarketplaceRoute);
 app.use("/api/journals", JournalRoute);
 app.use("/api/plants", PlantRoute);
+app.use("/api/gamification", GamificationRoute);
 
 const port = process.env.PORT || 5000;
 
