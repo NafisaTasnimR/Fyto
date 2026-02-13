@@ -18,6 +18,26 @@ const UserSchema = new Schema({
         caption: String
     }],
 
+    // Gamification fields
+    scores: {
+        dailyScore: { type: Number, default: 0 },
+        monthlyScore: { type: Number, default: 0 },
+        totalScore: { type: Number, default: 0 }
+    },
+
+    streaks: {
+        currentStreak: { type: Number, default: 0 },
+        longestStreak: { type: Number, default: 0 },
+        lastParticipationDate: { type: Date }
+    },
+
+    monthlyProgress: {
+        month: { type: Number },  // 1-12
+        year: { type: Number },
+        challengesCompleted: { type: Number, default: 0 },
+        lastReset: { type: Date }
+    },
+
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });
