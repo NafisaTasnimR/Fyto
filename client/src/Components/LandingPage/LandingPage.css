@@ -68,10 +68,27 @@
   font-weight: 600;
   padding: 8px 12px;
   border-radius: 6px;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .center-nav .nav-link:hover {
   color: #274b2f;
+}
+
+.center-nav .nav-link.active {
+  color: #2f6b48;
+}
+
+.center-nav .nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -13px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #2f6b48;
 }
 
 /* Plant Dropdown Styles */

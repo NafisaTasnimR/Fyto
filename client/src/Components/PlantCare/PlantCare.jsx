@@ -6,13 +6,26 @@ const PlantCare = () => {
   const [plantName, setPlantName] = useState('');
   const [plantData, setPlantData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [searched, setSearched] = useState(false);
 
   // Simulated API call - replace this with your actual fetch logic later
   const fetchPlantCareInfo = async (name) => {
     setIsLoading(true);
+    setError(null);
+    setSearched(true);
     
     // Simulating network delay
     await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Check if plant exists - for demo, only certain plants have data
+    const availablePlants = ['monstera', 'snake plant', 'pothos', 'fern', 'peace lily'];
+    if (!availablePlants.some(plant => name.toLowerCase().includes(plant))) {
+      setError(`No care information found for "${name}". Try plants like: ${availablePlants.join(', ')}.`);
+      setPlantData(null);
+      setIsLoading(false);
+      return;
+    }
 
     // Mock response following your exact required format
     const mockResponse = {
@@ -62,6 +75,12 @@ const PlantCare = () => {
           </button>
         </form>
       </div>
+
+      {error && (
+        <div className="error-message">
+          <p>{error}</p>
+        </div>
+      )}
 
       {plantData && (
         <div className="results-section">

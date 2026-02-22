@@ -69,6 +69,24 @@
   cursor: not-allowed;
 }
 
+/* Error Message */
+.error-message {
+  margin-bottom: 2rem;
+  padding: 16px;
+  background-color: #fee;
+  border: 2px solid #f87171;
+  border-radius: 8px;
+  text-align: center;
+  animation: slideIn 0.3s ease-in;
+}
+
+.error-message p {
+  margin: 0;
+  color: #dc2626;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
 .results-section {
   animation: fadeIn 0.5s ease-in;
 }
@@ -198,6 +216,11 @@
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 @media (max-width: 600px) {

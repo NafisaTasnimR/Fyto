@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import '../LandingPage/LandingPage.css';
 
 export default function Header() {
   const [showMenu, setShowMenu] = useState(false);
   const [showPlantDropdown, setShowPlantDropdown] = useState(false);
+  const location = useLocation();
+
+  const isPlantActive = location.pathname === '/plant-info' || location.pathname === '/plant-care';
 
   return (
     <>
@@ -26,7 +29,7 @@ export default function Header() {
               onMouseEnter={() => setShowPlantDropdown(true)}
               onMouseLeave={() => setShowPlantDropdown(false)}
             >
-              <span className="nav-link">
+              <span className={`nav-link ${isPlantActive ? 'active' : ''}`}>
                 Plant
                 <img src="/down-arrow.png" alt="dropdown" className="dropdown-arrow" />
               </span>
