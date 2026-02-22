@@ -6,12 +6,81 @@
 }
 
 .plant-info-container {
-  max-width: 1000px;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 2rem;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #333;
 }
 
-/* Header Section */
+/* Search Section */
+.search-section {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: #eaf7e7;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.search-section h1 {
+  margin-top: 0;
+  font-size: 2.5rem;
+  color: #166534;
+  margin-bottom: 8px;
+}
+
+.search-section p {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+/* Search Form */
+.search-form {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 1.5rem;
+}
+
+.plant-input {
+  width: 60%;
+  padding: 12px 16px;
+  font-size: 1rem;
+  border: 2px solid #bbf7d0;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.plant-input:focus {
+  border-color: #22c55e;
+}
+
+.search-button {
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+  background-color: #2f6b48;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.search-button:hover:not(:disabled) {
+  background-color: #245638;
+}
+
+.search-button:disabled {
+  background-color: #7fa896;
+  cursor: not-allowed;
+}
+
+/* Header Section - Deprecated */
 .plant-info-header {
   text-align: center;
   margin-bottom: 40px;
@@ -30,7 +99,7 @@
   margin: 0;
 }
 
-/* Search Form */
+/* Old Search Form Styles - Deprecated */
 .plant-search-form {
   margin-bottom: 40px;
 }

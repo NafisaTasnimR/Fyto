@@ -53,29 +53,23 @@ const PlantInfo = () => {
       <Header />
       
       <div className="plant-info-container">
-        <div className="plant-info-header">
+        <div className="search-section">
           <h1>Plant Information</h1>
           <p>Search for plant details, care tips, and more</p>
-        </div>
-
-        <form className="plant-search-form" onSubmit={handleSearch}>
-          <div className="plant-search-wrapper">
+          
+          <form className="search-form" onSubmit={handleSearch}>
             <input
               type="text"
-              className="plant-search-input"
+              className="plant-input"
               placeholder="Search plant name..."
               value={searchQuery}
               onChange={handleSearchChange}
             />
-            <button type="submit" className="plant-search-btn">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.35-4.35" />
-              </svg>
-              Search
+            <button type="submit" className="search-button" disabled={loading}>
+              {loading ? 'Searching...' : 'Search'}
             </button>
-          </div>
-        </form>
+          </form>
+        </div>
 
         <div className="plant-info-results">
           {loading && (
