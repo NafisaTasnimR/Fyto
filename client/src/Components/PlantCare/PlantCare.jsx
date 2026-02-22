@@ -3,30 +3,18 @@ import Header from '../Shared/Header';
 import './PlantCare.css';
 
 const PlantCare = () => {
-  const [plantName, setPlantName] = useState('');
+  const [uploadedImage, setUploadedImage] = useState(null);
   const [plantData, setPlantData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [searched, setSearched] = useState(false);
 
   // Simulated API call - replace this with your actual fetch logic later
-  const fetchPlantCareInfo = async (name) => {
+  const fetchPlantCareInfo = async () => {
     setIsLoading(true);
     setError(null);
-    setSearched(true);
     
     // Simulating network delay
     await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // Check if plant exists - for demo, only certain plants have data
-    const availablePlants = ['monstera', 'snake plant', 'pothos', 'fern', 'peace lily'];
-    if (!availablePlants.some(plant => name.toLowerCase().includes(plant))) {
-      setError(`No care information found for "${name}". Try plants like: ${availablePlants.join(', ')}.`);
-      setPlantData(null);
-      setIsLoading(false);
-      return;
-    }
-
     // Mock response following your exact required format
     const mockResponse = {
       watering_schedule: "Water once every 1-2 weeks, allowing soil to dry out between waterings.",
@@ -47,10 +35,18 @@ const PlantCare = () => {
     setIsLoading(false);
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (plantName.trim()) {
-      fetchPlantCareInfo(plantName);
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUploadedImage(reader.result);
+        setError(null);
+        setPlantData(null);
+        // Automatically fetch plant care info
+        fetchPlantCareInfo();
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -58,23 +54,48 @@ const PlantCare = () => {
     <div className="plant-care-page">
       <Header />
       <div className="plant-care-container">
+      <h1 className="page-title">Plant Care Guide</h1>
+      
+      {!uploadedImage && (
       <div className="search-section">
-        <h1>Plant Care Guide</h1>
-        <p>Enter a plant name to get a detailed care schedule.</p>
+        <p>Upload a plant image to get detailed care instructions</p>
         
-        <form onSubmit={handleSearch} className="search-form">
-          <input
-            type="text"
-            placeholder="e.g., Monstera Deliciosa, Snake Plant..."
-            value={plantName}
-            onChange={(e) => setPlantName(e.target.value)}
-            className="plant-input"
-          />
-          <button type="submit" className="search-button" disabled={isLoading}>
-            {isLoading ? 'Searching...' : 'Get Care Info'}
-          </button>
-        </form>
+        <div className="upload-area">
+          <label htmlFor="plant-image" className="upload-label">
+            <input
+              id="plant-image"
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="file-input"
+            />
+            <div className="upload-box">
+              <img src="/imageChallenge-icon.png" alt="upload" className="upload-icon" />
+              <p className="upload-text">Click to upload or drag and drop</p>
+              <p className="upload-hint">PNG, JPG, GIF up to 10MB</p>
+            </div>
+          </label>
+        </div>
       </div>
+      )}
+
+      {uploadedImage && (
+        <div className="image-display-section">
+          <div className="uploaded-image-container">
+            <img src={uploadedImage} alt="Uploaded plant" className="uploaded-image" />
+          </div>
+          <label htmlFor="plant-image-change" className="change-image-btn">
+            <input
+              id="plant-image-change"
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="file-input"
+            />
+            Change Image
+          </label>
+        </div>
+      )}
 
       {error && (
         <div className="error-message">
@@ -82,9 +103,9 @@ const PlantCare = () => {
         </div>
       )}
 
-      {plantData && (
+      {plantData && uploadedImage && (
         <div className="results-section">
-          <h2>Care Instructions for: <span className="highlight">{plantName}</span></h2>
+          <h2>Care Instructions</h2>
           
           <div className="info-grid">
             <div className="info-card">
