@@ -4,6 +4,7 @@ import '../LandingPage/LandingPage.css';
 
 export default function Header() {
   const [showMenu, setShowMenu] = useState(false);
+  const [showPlantDropdown, setShowPlantDropdown] = useState(false);
 
   return (
     <>
@@ -19,7 +20,27 @@ export default function Header() {
             <NavLink end to="/store" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Marketplace</NavLink>
             <NavLink end to="/journal" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Journal</NavLink>
             <NavLink end to="/challenges" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Challenges</NavLink>
-            <NavLink end to="/plant-info" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Plant Info</NavLink>
+            
+            <div
+              className="plant-dropdown-container"
+              onMouseEnter={() => setShowPlantDropdown(true)}
+              onMouseLeave={() => setShowPlantDropdown(false)}
+            >
+              <span className="nav-link">
+                Plant
+                <img src="/down-arrow.png" alt="dropdown" className="dropdown-arrow" />
+              </span>
+              {showPlantDropdown && (
+                <div className="plant-dropdown">
+                  <NavLink to="/plant-info" className="plant-option" onClick={() => setShowPlantDropdown(false)}>
+                    Plant Info
+                  </NavLink>
+                  <NavLink to="/plant-care" className="plant-option" onClick={() => setShowPlantDropdown(false)}>
+                    Plant Care
+                  </NavLink>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="menu-section">
