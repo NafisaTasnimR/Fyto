@@ -14,6 +14,7 @@ import ProfilePage from './Components/ProfilePage/ProfilePage';
 import Challenges from './Components/Challenges/Challenges';
 import PlantInfo from './Components/PlantInfo/PlantInfo';
 import './App.css';
+import PlantCare from './Components/PlantCare/PlantCare';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
           <Route path="/social" element={<SocialPage />} />
           <Route path="/challenges" element={<Challenges />} />
           <Route path="/plant-info" element={<PlantInfo />} />
+          <Route path="/plant-care" element={<PlantCare />} />
         </Routes>
       </Router>
     </ConfirmedPostsProvider>
