@@ -24,6 +24,10 @@ const SocialPage = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [sidebarForceShadow, setSidebarForceShadow] = useState(false);
   const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(false);
+  const [openPostMenuId, setOpenPostMenuId] = useState(null);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportingPost, setReportingPost] = useState(null);
+  const [reportReason, setReportReason] = useState('');
 
   React.useEffect(() => {
 
@@ -96,6 +100,17 @@ const SocialPage = () => {
   useEffect(() => {
     fetchPosts();
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (openPostMenuId && !event.target.closest('.post-menu-container')) {
+        setOpenPostMenuId(null);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [openPostMenuId]);
 
   const fetchPosts = async () => {
     try {
@@ -447,6 +462,39 @@ const SocialPage = () => {
     reader.readAsDataURL(file);
   };
 
+  const handleReportClick = (post) => {
+    setReportingPost(post);
+    setShowReportModal(true);
+    setOpenPostMenuId(null);
+  };
+
+  const handleSubmitReport = async () => {
+    if (!reportReason.trim()) {
+      alert('Please provide a reason for reporting');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/posts/${reportingPost.id}/report`,
+        { reason: reportReason },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      alert('Post reported successfully');
+      setShowReportModal(false);
+      setReportingPost(null);
+      setReportReason('');
+    } catch (err) {
+      console.error('Error reporting post:', err);
+      alert('Failed to report post. Please try again.');
+    }
+  };
+
   const Post = ({ post }) => {
     return (
       <div className="post">
@@ -468,6 +516,24 @@ const SocialPage = () => {
               {post.username}
             </h3>
             <span className="timestamp">{post.timestamp}</span>
+          </div>
+          <div className="post-menu-container">
+            <button
+              className="post-menu-btn"
+              onClick={() => setOpenPostMenuId(openPostMenuId === post.id ? null : post.id)}
+            >
+              ⋮
+            </button>
+            {openPostMenuId === post.id && (
+              <div className="post-menu-dropdown">
+                <button
+                  className="post-menu-item"
+                  onClick={() => handleReportClick(post)}
+                >
+                  Report
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -1087,6 +1153,49 @@ const SocialPage = () => {
         </div>
       </div>
 
+
+      {showReportModal && reportingPost && (
+        <div className="modal-overlay" onClick={() => setShowReportModal(false)}>
+          <div className="modal-content report-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Report Post</h2>
+              <button
+                className="close-btn"
+                onClick={() => setShowReportModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="report-modal-body">
+              <p>Why are you reporting this post?</p>
+              <textarea
+                className="report-textarea"
+                placeholder="Please provide a reason for reporting this post..."
+                value={reportReason}
+                onChange={(e) => setReportReason(e.target.value)}
+                rows={5}
+              />
+            </div>
+            <div className="report-modal-actions">
+              <button
+                className="btn-cancel"
+                onClick={() => {
+                  setShowReportModal(false);
+                  setReportReason('');
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn-submit"
+                onClick={handleSubmitReport}
+              >
+                Submit Report
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showImageViewer && viewingImage && (
         <div
