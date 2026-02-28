@@ -5,6 +5,7 @@ import Header from '../Shared/Header';
 import Sidebar from './Sidebar';
 import JournalPage from './JournalPage';
 import CoverSelection from './CoverSelection';
+import JournalsList from './JournalsList';
 import * as journalService from '../../services/journalService';
 
 const defaultPreferences = {
@@ -63,6 +64,7 @@ function Journal() {
   const [showCoverSelection, setShowCoverSelection] = useState(isNewJournal);
   const [selectedCover, setSelectedCover] = useState(null);
   const [currentJournal, setCurrentJournal] = useState(null);
+  const [showJournalsList, setShowJournalsList] = useState(isContinue);
   const [pages, setPages] = useState([]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -71,7 +73,7 @@ function Journal() {
   const [editingTitle, setEditingTitle] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [loadingJournals, setLoadingJournals] = useState(isContinue);
+  const [loadingPages, setLoadingPages] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [lastSavedState, setLastSavedState] = useState(null);
   const [showWarningModal, setShowWarningModal] = useState(false);
@@ -80,110 +82,135 @@ function Journal() {
 
   const currentPage = pages[currentPageIndex];
 
-  // Load existing journals for "Continue" mode
-  useEffect(() => {
-    if (isContinue && !currentJournal) {
-      loadExistingJournals();
-    }
-  }, [isContinue]);
+  const handleJournalSelected = (journal) => {
+    setCurrentJournal(journal);
+    setShowJournalsList(false);
+  };
 
-  const loadExistingJournals = async () => {
-    try {
-      setLoadingJournals(true);
-      const token = localStorage.getItem('token');
-
-      if (!token) {
-        window.location.href = '/login';
-        return;
-      }
-
-      const response = await journalService.getJournals();
-      const journals = response.data.journals || [];
-
-      if (journals.length > 0) {
-        setCurrentJournal(journals[0]);
-      } else {
-        alert('No journals found. Please create a new journal first.');
-        navigate('/journal');
-      }
-      setLoadingJournals(false);
-    } catch (error) {
-      console.error('Error loading journals:', error);
-      setLoadingJournals(false);
-    }
+  const handleBackFromList = () => {
+    navigate('/journal');
   };
 
   const loadJournalPages = useCallback(async () => {
-    if (!currentJournal) return;
+    if (!currentJournal || showJournalsList) return;
 
     try {
+      setLoadingPages(true);
+      console.log('Loading pages for journal:', currentJournal._id);
+      
       const response = await journalService.getJournalPages(currentJournal._id);
+      console.log('Pages response:', response);
+      
       const pagesData = response.data || [];
+      console.log('Pages data:', pagesData);
+
+      if (pagesData.length === 0) {
+        console.warn('No pages found for journal:', currentJournal._id);
+        setPages([]);
+        setCurrentPageIndex(0);
+        setLoadingPages(false);
+        return;
+      }
 
       const transformedPages = await Promise.all(
         pagesData.map(async (page, index) => {
-          const blocksResponse = await journalService.getPageBlocks(page._id);
-          const blocks = blocksResponse.data || [];
+          try {
+            const blocksResponse = await journalService.getPageBlocks(page._id);
+            const blocks = blocksResponse.data || [];
 
-          const textBlocks = blocks.filter(b => b.type === 'text');
-          const imageBlocks = blocks.filter(b => b.type === 'image');
+            const textBlocks = blocks.filter(b => b.type === 'text');
+            const imageBlocks = blocks.filter(b => b.type === 'image');
 
-          const content = textBlocks.map(b => b.text).join('<br>');
-          const wordCount = textBlocks.reduce((count, block) => {
-            const words = (block.text || '').trim().split(/\s+/).filter(w => w.length > 0);
-            return count + words.length;
-          }, 0);
+            const content = textBlocks.map(b => b.text).join('<br>');
+            const wordCount = textBlocks.reduce((count, block) => {
+              const words = (block.text || '').trim().split(/\s+/).filter(w => w.length > 0);
+              return count + words.length;
+            }, 0);
 
-          return {
-            id: page._id,
-            backendId: page._id,
-            elements: imageBlocks.map(b => ({
-              id: b._id,
-              type: 'image',
-              x: b.position.x,
-              y: b.position.y,
-              width: b.image?.width || 200,
-              height: b.image?.height || 200,
-              imageUrl: b.image?.url
-            })),
-            content: content,
-            pageNumber: index + 1,
-            date: new Date(page.createdAt).toLocaleDateString('en-US', {
-              month: 'long',
-              day: 'numeric',
-              year: 'numeric'
-            }),
-            preferences: {
-              ...defaultPreferences,
-              pageColor: page.backgroundColor || selectedCover?.bgColor || '#ffffff',
-              pageWidth: page.pageSize?.width || 800,
-              pageHeight: page.pageSize?.height || 1000
-            },
-            wordCount: wordCount,
-            lastSaved: new Date(page.updatedAt),
-            textBlocks: textBlocks
-          };
+            return {
+              id: page._id,
+              backendId: page._id,
+              elements: imageBlocks.map(b => ({
+                id: b._id,
+                type: 'image',
+                x: b.position.x,
+                y: b.position.y,
+                width: b.image?.width || 200,
+                height: b.image?.height || 200,
+                imageUrl: b.image?.url
+              })),
+              content: content,
+              pageNumber: page.pageNumber || index + 1,
+              date: new Date(page.createdAt).toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+              }),
+              preferences: {
+                ...defaultPreferences,
+                pageColor: page.backgroundColor || '#ffffff',
+                pageWidth: page.pageSize?.width || 800,
+                pageHeight: page.pageSize?.height || 1000
+              },
+              wordCount: wordCount,
+              lastSaved: new Date(page.updatedAt),
+              textBlocks: textBlocks
+            };
+          } catch (blockError) {
+            console.error(`Error loading blocks for page ${page.pageNumber}:`, blockError);
+            // Return page with empty blocks if fetching blocks fails
+            return {
+              id: page._id,
+              backendId: page._id,
+              elements: [],
+              content: '',
+              pageNumber: page.pageNumber || index + 1,
+              date: new Date(page.createdAt).toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+              }),
+              preferences: {
+                ...defaultPreferences,
+                pageColor: page.backgroundColor || '#ffffff',
+                pageWidth: page.pageSize?.width || 800,
+                pageHeight: page.pageSize?.height || 1000
+              },
+              wordCount: 0,
+              lastSaved: new Date(page.updatedAt),
+              textBlocks: []
+            };
+          }
         })
       );
 
-      if (transformedPages.length > 0 && transformedPages[0]) {
+      if (transformedPages.length > 0) {
         setJournalTitle(currentJournal.title);
+        setPages(transformedPages);
+        setCurrentPageIndex(0);
+        setLastSavedState(JSON.stringify(transformedPages));
+        setHasUnsavedChanges(false);
+      } else {
+        setPages([]);
+        setCurrentPageIndex(0);
       }
-
-      setPages(transformedPages.length > 0 ? transformedPages : []);
-      setCurrentPageIndex(0);
-      setLastSavedState(JSON.stringify(transformedPages));
-      setHasUnsavedChanges(false);
+      setLoadingPages(false);
     } catch (error) {
       console.error('Error loading journal pages:', error);
+      setLoadingPages(false);
+      if (error.response?.status === 401) {
+        alert('Your session has expired. Please log in again.');
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      }
     }
-  }, [currentJournal, selectedCover]);
+  }, [currentJournal, showJournalsList]);
 
   useEffect(() => {
-    if (currentJournal) {
+    if (currentJournal && !showJournalsList) {
       loadJournalPages();
     }
-  }, [currentJournal, loadJournalPages]);
+  }, [currentJournal, loadJournalPages, showJournalsList]);
 
   // Track unsaved changes
   useEffect(() => {
@@ -295,6 +322,12 @@ function Journal() {
 
       const firstPage = pages[0];
 
+      // Prepare first page content and elements from the current frontendformat
+      const pageContent = firstPage.content
+        .split('<br>')
+        .filter(text => text.trim())
+        .join('\n');
+
       const journalData = {
         title: journalTitle || 'My Fyto Journal',
         coverImage: {
@@ -308,41 +341,27 @@ function Journal() {
             width: firstPage.preferences.pageWidth,
             height: firstPage.preferences.pageHeight
           },
-          blocks: []
-        }
-      };
-
-      if (firstPage.content) {
-        journalData.firstPage.blocks.push({
-          type: 'text',
-          text: firstPage.content,
-          position: { x: 0, y: 0 },
+          content: pageContent,
           styles: {
             fontFamily: firstPage.preferences.fontFamily,
             fontSize: firstPage.preferences.fontSize,
             color: firstPage.preferences.textColor,
             alignment: firstPage.preferences.textAlign,
             lineHeight: firstPage.preferences.lineHeight
-          }
-        });
-      }
-
-      for (const element of firstPage.elements) {
-        if (element.imageUrl) {
-          journalData.firstPage.blocks.push({
-            type: 'image',
-            position: { x: element.x, y: element.y },
-            image: {
-              url: element.imageUrl,
-              width: element.width,
-              height: element.height
-            }
-          });
+          },
+          elements: firstPage.elements.filter(el => el.imageUrl).map(el => ({
+            imageUrl: el.imageUrl,
+            x: el.x,
+            y: el.y,
+            width: el.width,
+            height: el.height
+          }))
         }
-      }
+      };
 
-      const journalResponse = await journalService.createJournal(journalData);
-      const newJournal = journalResponse.data;
+      console.log('Saving journal with data:', journalData);
+      const journalResponse = await journalService.createJournalWithFirstPage(journalData);
+      const newJournal = journalResponse.data.journal;
 
       console.log('Journal created:', newJournal);
 
@@ -551,6 +570,16 @@ function Journal() {
     );
   }
 
+  // Render journals list for "Continue" mode
+  if (showJournalsList && isContinue) {
+    return (
+      <JournalsList 
+        onSelectJournal={handleJournalSelected}
+        onBack={handleBackFromList}
+      />
+    );
+  }
+
   // Render cover selection
   if (showCoverSelection) {
     return (
@@ -565,11 +594,16 @@ function Journal() {
     );
   }
 
-  // Loading state
-  if (loadingJournals) {
+  // Loading pages state
+  if (loadingPages) {
     return (
       <div className="journal-app-container">
         <Header />
+        <button onClick={handleBackButton} className="back-button-cover">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
         <div style={{
           display: 'flex',
           justifyContent: 'center',
@@ -579,7 +613,12 @@ function Journal() {
           color: '#2f6b48',
           fontFamily: 'Poppins, sans-serif'
         }}>
-          Loading your journals...
+          <div style={{textAlign: 'center'}}>
+            <p>Loading your journal...</p>
+            <div style={{marginTop: '20px', fontSize: '12px', color: '#999'}}>
+              Fetching pages and content
+            </div>
+          </div>
         </div>
       </div>
     );
