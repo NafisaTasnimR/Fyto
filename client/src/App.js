@@ -19,6 +19,8 @@ import PreviewMarketplace from './Components/LandingPage/PreviewMarketplace';
 
 
 import PlantCare from './Components/PlantCare/PlantCare';
+import AdminLogin from './Components/Admin/AdminLogin';
+import Admin from './Components/Admin/Admin';
 
 function App() {
   return (
@@ -42,6 +44,8 @@ function App() {
           <Route path="/preview-marketplace" element={<PreviewMarketplace />} />
           <Route path="/plant-info" element={<PlantInfo />} />
           <Route path="/plant-care" element={<PlantCare />} />
+          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
       </Router>
     </ConfirmedPostsProvider>
