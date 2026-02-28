@@ -1,6 +1,7 @@
 import { identifyPlant } from "../services/PlantNetService.js";
 import { generateCareGuide } from "../services/GeminiService.js";
 import { searchPlants, getPlantById } from "../services/TrefleService.js";
+import { trackChallengeProgress } from '../services/ExtraChallengeService.js';
 
 export const detectPlantAndCare = async (req, res) => {
     try {
@@ -20,6 +21,11 @@ export const detectPlantAndCare = async (req, res) => {
 
         const careInfo = await generateCareGuide(plant.scientificName, location);
         console.log("Care info received:", careInfo ? "Success" : "Not found");
+
+        // Track extra challenge progress
+        if (req.user && req.user._id) {
+            await trackChallengeProgress(req.user._id, 'plant_identify');
+        }
 
         res.json({
             plant,
