@@ -16,6 +16,11 @@ const postSchema = new mongoose.Schema({
         ref: "Users"
     }],
 
+    isPrivate: {
+        type: Boolean,
+        default: false
+    },
+
     createdAt: { type: Date, default: Date.now }
 });
 

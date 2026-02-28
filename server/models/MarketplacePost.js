@@ -61,10 +61,21 @@ const marketplacePostSchema = new mongoose.Schema(
             enum: ["available", "unavailable"],
             default: "available",
             index: true
+        },
+
+        // Expiration date - post will be auto-deleted after this date
+        expiresAt: {
+            type: Date,
+            required: true,
+            index: true
         }
     },
     {
         timestamps: true
     });
+
+// TTL Index - MongoDB will automatically delete documents after expiresAt date
+// The cleanup runs every 60 seconds in MongoDB
+marketplacePostSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 export default mongoose.model("MarketplacePost", marketplacePostSchema);

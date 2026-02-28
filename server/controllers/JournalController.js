@@ -2,11 +2,12 @@ import Journal from "../models/Journal.js";
 import Page from "../models/Page.js";
 import Block from "../models/Block.js";
 import mongoose from "mongoose";
+import { trackChallengeProgress } from '../services/ExtraChallengeService.js';
 
 
 export const createJournal = async (req, res) => {
     try {
-        const { title, coverImage } = req.body;
+        const { title, coverImage, isPublic } = req.body;
         const userId = req.user._id;
 
         if (!title || !coverImage || !coverImage.url) {
@@ -23,10 +24,14 @@ export const createJournal = async (req, res) => {
                 url: coverImage.url,
                 width: coverImage.width || 800,
                 height: coverImage.height || 600
-            }
+            },
+            isPublic: isPublic || false
         });
 
         await journal.save();
+
+        // Track extra challenge progress
+        await trackChallengeProgress(userId, 'journal_create');
 
         return res.status(201).json({
             success: true,
@@ -52,7 +57,7 @@ export const createJournalWithFirstPage = async (req, res) => {
         const { title, coverImage, firstPage } = req.body;
         const userId = req.user._id;
 
-        
+
         const journal = new Journal({
             userId,
             title,
@@ -68,7 +73,7 @@ export const createJournalWithFirstPage = async (req, res) => {
         });
         const savedPage = await page.save({ session });
 
-        
+
         if (firstPage.content && firstPage.content.trim()) {
             const textBlock = new Block({
                 pageId: savedPage._id,
@@ -122,8 +127,20 @@ export const createJournalWithFirstPage = async (req, res) => {
 export const getUserJournals = async (req, res) => {
     try {
         const userId = req.user._id;
+        const { targetUserId } = req.query;
 
-        const journals = await Journal.find({ userId })
+        // Determine which user's journals to fetch
+        const userIdToFetch = targetUserId || userId;
+
+        // Build query based on whether viewing own journals or someone else's
+        let query = { userId: userIdToFetch };
+
+        // If viewing someone else's journals, only show public ones
+        if (targetUserId && targetUserId !== userId.toString()) {
+            query.isPublic = true;
+        }
+
+        const journals = await Journal.find(query)
             .sort({ createdAt: -1 })
             .lean();
 
@@ -148,10 +165,7 @@ export const getJournalById = async (req, res) => {
         const { journalId } = req.params;
         const userId = req.user._id;
 
-        const journal = await Journal.findOne({
-            _id: journalId,
-            userId
-        });
+        const journal = await Journal.findById(journalId);
 
         if (!journal) {
             return res.status(404).json({
@@ -160,7 +174,16 @@ export const getJournalById = async (req, res) => {
             });
         }
 
-       
+        // Check if user has permission to view this journal
+        // Allow if: user is the owner OR the journal is public
+        if (journal.userId.toString() !== userId.toString() && !journal.isPublic) {
+            return res.status(403).json({
+                success: false,
+                message: "This journal is private."
+            });
+        }
+
+
         const pages = await Page.find({ journalId })
             .sort({ pageNumber: 1 })
             .lean();
@@ -239,17 +262,17 @@ export const deleteJournal = async (req, res) => {
             });
         }
 
-        
+
         const pages = await Page.find({ journalId });
         const pageIds = pages.map(page => page._id);
 
-       
+
         await Block.deleteMany({ pageId: { $in: pageIds } });
 
-        
+
         await Page.deleteMany({ journalId });
 
-        
+
         await Journal.deleteOne({ _id: journalId });
 
         return res.status(200).json({
@@ -284,17 +307,17 @@ export const updateWordCount = async (req, res) => {
             });
         }
 
-       
+
         const pages = await Page.find({ journalId });
         const pageIds = pages.map(page => page._id);
 
-      
+
         const blocks = await Block.find({
             pageId: { $in: pageIds },
             type: "text"
         });
 
-       
+
         const totalWordCount = blocks.reduce((count, block) => {
             if (block.text) {
                 const words = block.text.trim().split(/\s+/).filter(word => word.length > 0);
@@ -318,6 +341,80 @@ export const updateWordCount = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: "Failed to update word count",
+            error: error.message
+        });
+    }
+};
+
+
+// Get all public journals
+export const getAllPublicJournals = async (req, res) => {
+    try {
+        const { page = 1, limit = 10 } = req.query;
+        const skip = (Number(page) - 1) * Number(limit);
+
+        const journals = await Journal.find({ isPublic: true })
+            .populate('userId', 'name username profilePic')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(Number(limit))
+            .lean();
+
+        const totalCount = await Journal.countDocuments({ isPublic: true });
+
+        return res.status(200).json({
+            success: true,
+            count: journals.length,
+            data: journals,
+            pagination: {
+                currentPage: Number(page),
+                totalPages: Math.ceil(totalCount / Number(limit)),
+                totalCount,
+                limit: Number(limit)
+            }
+        });
+    } catch (error) {
+        console.error("Error fetching public journals:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch public journals",
+            error: error.message
+        });
+    }
+};
+
+
+// Search public journals by title
+export const searchPublicJournals = async (req, res) => {
+    try {
+        const { query } = req.query;
+
+        if (!query || query.trim() === '') {
+            return res.status(400).json({
+                success: false,
+                message: 'Search query is required.'
+            });
+        }
+
+        const journals = await Journal.find({
+            isPublic: true,
+            title: { $regex: query, $options: 'i' }
+        })
+            .populate('userId', 'name username profilePic')
+            .sort({ createdAt: -1 })
+            .limit(50)
+            .lean();
+
+        return res.status(200).json({
+            success: true,
+            count: journals.length,
+            data: journals
+        });
+    } catch (error) {
+        console.error("Error searching public journals:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to search public journals",
             error: error.message
         });
     }
