@@ -1,5 +1,7 @@
 import Comment from '../models/Comment.js';
 import Post from '../models/Post.js';
+import { createNotification } from './NotificationController.js';
+import { trackChallengeProgress } from '../services/ExtraChallengeService.js';
 
 export const createComment = async (req, res) => {
     try {
@@ -15,6 +17,14 @@ export const createComment = async (req, res) => {
             });
         }
 
+        // Check if user can comment on this post (must be public or user's own post)
+        if (post.isPrivate && post.authorId.toString() !== authorId.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: 'Cannot comment on a private post.'
+            });
+        }
+
         const newComment = new Comment({
             postId,
             authorId,
@@ -24,6 +34,24 @@ export const createComment = async (req, res) => {
 
         const savedComment = await newComment.save();
         await savedComment.populate('authorId', 'name username profilePic');
+
+        // Track extra challenge progress
+        await trackChallengeProgress(authorId, 'comment_create');
+
+        // Create notification for post author
+        try {
+            await createNotification({
+                recipientId: post.authorId,
+                senderId: authorId,
+                type: 'comment',
+                postId,
+                postModel: 'Post',
+                commentId: savedComment._id,
+                message: 'commented on your post.'
+            });
+        } catch (notifError) {
+            console.error('Failed to create comment notification:', notifError);
+        }
 
         return res.status(201).json({
             success: true,
@@ -64,6 +92,21 @@ export const createReply = async (req, res) => {
         const savedReply = await newReply.save();
         await savedReply.populate('authorId', 'name username profilePic');
 
+        // Create notification for the parent comment author
+        try {
+            await createNotification({
+                recipientId: parentComment.authorId,
+                senderId: authorId,
+                type: 'reply',
+                postId: parentComment.postId,
+                postModel: 'Post',
+                commentId: savedReply._id,
+                message: 'replied to your comment.'
+            });
+        } catch (notifError) {
+            console.error('Failed to create reply notification:', notifError);
+        }
+
         return res.status(201).json({
             success: true,
             message: 'Reply created successfully.',
@@ -82,12 +125,21 @@ export const createReply = async (req, res) => {
 export const getCommentsByPost = async (req, res) => {
     try {
         const { postId } = req.params;
+        const userId = req.user._id;
 
         const post = await Post.findById(postId);
         if (!post) {
             return res.status(404).json({
                 success: false,
                 message: 'Post not found.'
+            });
+        }
+
+        // Check if user can view comments on this post (must be public or user's own post)
+        if (post.isPrivate && post.authorId.toString() !== userId.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: 'Cannot view comments on a private post.'
             });
         }
 
