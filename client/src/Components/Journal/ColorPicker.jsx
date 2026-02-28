@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import './ColorPicker.css';
 
 const ColorPicker = ({ color, onChange, onClose }) => {
   const [hue, setHue] = useState(0);
@@ -41,6 +42,7 @@ const ColorPicker = ({ color, onChange, onClose }) => {
         case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
         case g: h = ((b - r) / d + 2) / 6; break;
         case b: h = ((r - g) / d + 4) / 6; break;
+        default: h = 0;
       }
     }
 
@@ -65,8 +67,8 @@ const ColorPicker = ({ color, onChange, onClose }) => {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
-    const newSaturation = Math.round((x / rect.width) * 100);
-    const newLightness = Math.round(100 - (y / rect.height) * 100);
+    const newSaturation = Math.max(0, Math.min(100, Math.round((x / rect.width) * 100)));
+    const newLightness = Math.max(0, Math.min(100, Math.round(100 - (y / rect.height) * 100)));
     
     setSaturation(newSaturation);
     setLightness(newLightness);
@@ -80,7 +82,7 @@ const ColorPicker = ({ color, onChange, onClose }) => {
     if (!hueRef.current) return;
     const rect = hueRef.current.getBoundingClientRect();
     const y = e.clientY - rect.top;
-    const newHue = Math.round((y / rect.height) * 360);
+    const newHue = Math.max(0, Math.min(360, Math.round((y / rect.height) * 360)));
     
     setHue(newHue);
     const newColor = hslToHex(newHue, saturation, lightness);
@@ -108,29 +110,37 @@ const ColorPicker = ({ color, onChange, onClose }) => {
   ];
 
   return (
-    <div className="color-picker-panel">
-      <div className="color-picker-header">
-        <span>Select Color</span>
-        <button onClick={onClose} className="close-picker-btn">×</button>
+    <div className="journal-color-picker-panel-m">
+      <div className="journal-color-picker-header-m">
+        <span className="journal-color-picker-title-m">Select Color</span>
+        <button onClick={onClose} className="journal-color-picker-close-btn-m" title="Close">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
       
-      <div className="color-picker-main">
+      <div className="journal-color-picker-main-m">
         <div 
           ref={gradientRef}
-          className="color-gradient" 
-          onClick={handleGradientClick}
+          className="journal-color-gradient-m" 
+          onMouseDown={handleGradientClick}
           style={{
-            background: `linear-gradient(to bottom, 
-              hsl(${hue}, 100%, 100%) 0%, 
-              hsl(${hue}, 100%, 50%) 50%, 
-              hsl(${hue}, 100%, 0%) 100%),
+            background: `
+              linear-gradient(to bottom, 
+                hsl(${hue}, 100%, 100%) 0%, 
+                hsl(${hue}, 100%, 50%) 50%, 
+                hsl(${hue}, 100%, 0%) 100%
+              ),
               linear-gradient(to right, 
-              hsl(${hue}, 0%, 50%) 0%, 
-              hsl(${hue}, 100%, 50%) 100%)`
+                hsl(${hue}, 0%, 50%) 0%, 
+                hsl(${hue}, 100%, 50%) 100%
+              )`
           }}
         >
           <div 
-            className="color-picker-cursor"
+            className="journal-color-picker-cursor-m"
             style={{
               left: `${saturation}%`,
               top: `${100 - lightness}%`
@@ -140,47 +150,51 @@ const ColorPicker = ({ color, onChange, onClose }) => {
         
         <div 
           ref={hueRef}
-          className="hue-slider" 
-          onClick={handleHueClick}
+          className="journal-hue-slider-m" 
+          onMouseDown={handleHueClick}
         >
           <div 
-            className="hue-cursor"
+            className="journal-hue-cursor-m"
             style={{ top: `${(hue / 360) * 100}%` }}
           />
         </div>
-        
-        <div className="brightness-slider">
-          <div className="brightness-gradient" style={{ background: `linear-gradient(to bottom, #000 0%, transparent 100%)` }} />
-        </div>
       </div>
 
-      <div className="hex-input-container">
+      <div className="journal-color-current-preview-m">
+        <div 
+          className="journal-color-preview-swatch-m"
+          style={{ backgroundColor: hslToHex(hue, saturation, lightness) }}
+        ></div>
         <input 
           type="text" 
           value={hexInput}
           onChange={handleHexChange}
-          className="hex-input"
+          className="journal-hex-input-m"
           placeholder="#000000"
+          maxLength={7}
         />
       </div>
 
-      <div className="preset-colors">
-        {presetColors.map(presetColor => (
-          <button
-            key={presetColor}
-            onClick={() => {
-              const hsl = hexToHsl(presetColor);
-              setHue(hsl.h);
-              setSaturation(hsl.s);
-              setLightness(hsl.l);
-              setHexInput(presetColor);
-              onChange(presetColor);
-            }}
-            className={`preset-color-swatch ${color === presetColor ? 'active' : ''}`}
-            style={{ backgroundColor: presetColor }}
-            title={presetColor}
-          />
-        ))}
+      <div className="journal-preset-colors-m">
+        <div className="journal-preset-colors-label-m">Preset Colors</div>
+        <div className="journal-preset-colors-grid-m">
+          {presetColors.map(presetColor => (
+            <button
+              key={presetColor}
+              onClick={() => {
+                const hsl = hexToHsl(presetColor);
+                setHue(hsl.h);
+                setSaturation(hsl.s);
+                setLightness(hsl.l);
+                setHexInput(presetColor);
+                onChange(presetColor);
+              }}
+              className={`journal-preset-color-swatch-m ${color.toUpperCase() === presetColor.toUpperCase() ? 'active' : ''}`}
+              style={{ backgroundColor: presetColor }}
+              title={presetColor}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

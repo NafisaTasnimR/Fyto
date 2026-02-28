@@ -1,0 +1,383 @@
+.preview-social-page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding-top: 70px;
+}
+
+/* Reuse landing page header styles */
+.preview-header.fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 0;
+}
+
+.preview-header.fixed-header .header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+}
+
+.preview-header .logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #2f6b48;
+  cursor: pointer;
+}
+
+.preview-header .site-logo {
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+  display: inline-block;
+}
+
+.preview-header .logo span {
+  font-family: 'Allegro', cursive;
+  color: #2f6b48;
+  font-weight: 700;
+  line-height: 1;
+  font-size: 1.4rem;
+}
+
+.preview-page-title-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+.preview-page-title-container h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #262626;
+  margin: 0;
+}
+
+.preview-header-right {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  align-items: center;
+}
+
+.preview-login-btn {
+  background: none;
+  border: 1px solid #2f6b48;
+  color: #2f6b48;
+  padding: 10px 25px;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.preview-login-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.preview-signup-btn {
+  background-color: #2f6b48;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.preview-signup-btn:hover {
+  background-color: #3d8d40;
+}
+
+/* Small back button like journal.jsx */
+.back-button-preview {
+  position: fixed;
+  top: 90px;
+  left: 20px;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  color: #2f6b48;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-size: 24px;
+  font-weight: 300;
+  padding: 0;
+  line-height: 1;
+  border-radius: 50%;
+}
+
+.back-button-preview::after {
+  content: 'Back';
+  position: absolute;
+  left: 60px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #2f6b48;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.back-button-preview:hover::after {
+  opacity: 1;
+}
+
+.back-button-preview:hover {
+  background: #f9fafb;
+  border-color: #2f6b48;
+  box-shadow: 0 2px 8px rgba(47, 107, 72, 0.1);
+}
+
+.back-button-preview svg {
+  flex-shrink: 0;
+}
+
+.preview-signup-btn-cta {
+  background-color: #2f6b48;
+  color: white;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.preview-signup-btn-cta:hover {
+  background-color: #3d8d40;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(47, 107, 72, 0.2);
+}
+
+.preview-signup-btn-cta:active {
+  transform: translateY(0);
+}
+
+.preview-page-subtitle {
+  text-align: center;
+  margin-bottom: 24px;
+  padding: 0 20px;
+}
+
+.preview-page-subtitle p {
+  font-size: 14px;
+  color: #8e8e8e;
+  margin: 0;
+}
+
+.preview-social-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 60px 20px 40px 20px;
+}
+
+.preview-loading,
+.preview-error,
+.preview-empty {
+  text-align: center;
+  padding: 40px 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  color: #8e8e8e;
+  font-size: 16px;
+}
+
+.preview-error {
+  background-color: #fff5f5;
+  color: #c33;
+  border: 1px solid #f5a;
+}
+
+.preview-posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.preview-post-card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+.preview-post-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.preview-post-header {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  align-items: flex-start;
+}
+
+.preview-post-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.preview-post-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.preview-post-meta h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+  margin: 0 0 4px 0;
+}
+
+.preview-post-time {
+  font-size: 12px;
+  color: #8e8e8e;
+}
+
+.preview-post-content {
+  margin-bottom: 12px;
+}
+
+.preview-post-content p {
+  font-size: 14px;
+  color: #262626;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+  word-break: break-word;
+}
+
+.preview-post-image {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.preview-post-footer {
+  display: flex;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #efefef;
+  font-size: 12px;
+  color: #8e8e8e;
+}
+
+.preview-post-stat {
+  display: flex;
+  align-items: center;
+}
+
+.preview-signup-cta {
+  background-color: #fff;
+  border: 2px solid #2f6b48;
+  border-radius: 12px;
+  padding: 32px 24px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.preview-signup-cta h3 {
+  font-size: 20px;
+  color: #262626;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.preview-signup-cta p {
+  font-size: 14px;
+  color: #8e8e8e;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.preview-signup-btn {
+  background-color: #2f6b48;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.preview-signup-btn:hover {
+  background-color: #3d8d40;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(47, 107, 72, 0.2);
+}
+
+.preview-signup-btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .preview-social-container {
+    max-width: 100%;
+  }
+
+  .preview-header {
+    padding: 0 16px;
+    height: 65px;
+  }
+
+  .preview-header-center h1 {
+    font-size: 20px;
+  }
+
+  .preview-post-image {
+    height: 250px;
+  }
+
+  .preview-signup-cta {
+    padding: 24px 16px;
+  }
+
+  .preview-signup-cta h3 {
+    font-size: 18px;
+  }
+
+  .preview-header-left,
+  .preview-header-right,
+  .preview-header-center {
+    flex: 1;
+  }
+}

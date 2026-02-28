@@ -13,7 +13,6 @@ function Toolbar({
 }) {
   const [hasTextSelected, setHasTextSelected] = React.useState(false);
 
-  
   React.useEffect(() => {
     const checkSelection = () => {
       const selection = window.getSelection();
@@ -54,7 +53,6 @@ function Toolbar({
   ];
   const paddingSizes = [0, 20, 40, 60, 80, 100];
 
-  
   const applyTextFormat = (command, value = null) => {
     document.execCommand(command, false, value);
     if (contentRef && contentRef.current) {
@@ -62,13 +60,11 @@ function Toolbar({
     }
   };
 
-  
   const handleTextColorChange = (color) => {
     const selection = window.getSelection();
     const hasSelection = selection && selection.toString().trim().length > 0;
     
     if (hasSelection && contentRef && contentRef.current && contentRef.current.contains(selection.anchorNode)) {
-      
       const range = selection.getRangeAt(0);
       const selectedText = range.extractContents();
       const span = document.createElement('span');
@@ -76,12 +72,10 @@ function Toolbar({
       span.appendChild(selectedText);
       range.insertNode(span);
       
-      
       if (contentRef.current) {
         const event = new Event('input', { bubbles: true });
         contentRef.current.dispatchEvent(event);
         contentRef.current.focus();
-        
         
         const newRange = document.createRange();
         newRange.setStartAfter(span);
@@ -90,29 +84,28 @@ function Toolbar({
         selection.addRange(newRange);
       }
     } else {
-      
       updatePreferences({ textColor: color });
     }
   };
 
   return (
-    <div className="page-toolbar">
-      <div className="toolbar-left">
-        <div className="toolbar-item">
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cpath d='M16 2v4M8 2v4M3 10h18'/%3E%3C/svg%3E" alt="Date" className="toolbar-icon" />
-          <span className="toolbar-date">{currentPage.date}</span>
+    <div className="journal-page-toolbar-m">
+      <div className="journal-toolbar-left-m">
+        <div className="journal-toolbar-item-m">
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cpath d='M16 2v4M8 2v4M3 10h18'/%3E%3C/svg%3E" alt="Date" className="journal-toolbar-icon-m" />
+          <span className="journal-toolbar-date-m">{currentPage.date}</span>
         </div>
-        <div className="toolbar-item">
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 2v6h6M16 13H8M16 17H8M10 9H8'/%3E%3C/svg%3E" alt="Words" className="toolbar-icon" />
-          <span>{currentPage.wordCount} words</span>
+        <div className="journal-toolbar-item-m">
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 2v6h6M16 13H8M16 17H8M10 9H8'/%3E%3C/svg%3E" alt="Words" className="journal-toolbar-icon-m" />
+          <span className="journal-toolbar-word-count-m">{currentPage.wordCount} words</span>
         </div>
       </div>
 
-      <div className="toolbar-right">
-        
+      <div className="journal-toolbar-right-m">
+        {/* Text Formatting Buttons */}
         <button 
           onClick={() => applyTextFormat('bold')}
-          className="toolbar-icon-btn"
+          className="journal-toolbar-icon-btn-m"
           title="Bold (Ctrl+B)"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -121,10 +114,9 @@ function Toolbar({
           </svg>
         </button>
 
-       
         <button 
           onClick={() => applyTextFormat('italic')}
-          className="toolbar-icon-btn"
+          className="journal-toolbar-icon-btn-m"
           title="Italic (Ctrl+I)"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -134,10 +126,9 @@ function Toolbar({
           </svg>
         </button>
 
-        
         <button 
           onClick={() => applyTextFormat('underline')}
-          className="toolbar-icon-btn"
+          className="journal-toolbar-icon-btn-m"
           title="Underline (Ctrl+U)"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -146,10 +137,9 @@ function Toolbar({
           </svg>
         </button>
 
-       
         <button 
           onClick={() => applyTextFormat('strikeThrough')}
-          className="toolbar-icon-btn"
+          className="journal-toolbar-icon-btn-m"
           title="Strikethrough"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -159,20 +149,28 @@ function Toolbar({
           </svg>
         </button>
 
-        <div style={{ width: '1px', height: '24px', background: '#e5e7eb', margin: '0 0.5rem' }}></div>
+        <div className="journal-toolbar-divider-m"></div>
 
-        
-        <div className="toolbar-dropdown">
+        {/* Font Family Dropdown */}
+        <div className="journal-toolbar-dropdown-m">
           <button 
-            className="toolbar-icon-btn"
+            className="journal-toolbar-icon-btn-m"
             onClick={() => toggleDropdown('font')}
             title="Font Family"
           >
-            <img src="/font-style.png" alt="Font" className="toolbar-icon" />
+            <img src="/font-style.png" alt="Font" className="journal-toolbar-icon-m" />
           </button>
           {activeDropdown === 'font' && (
-            <div className="dropdown-panel">
-              <div className="dropdown-header">Select Font Family</div>
+            <div className="journal-dropdown-panel-m">
+              <div className="journal-dropdown-header-with-close-m">
+                <span className="journal-dropdown-header-text-m">Font Family</span>
+                <button onClick={() => toggleDropdown(null)} className="journal-dropdown-close-btn-m" title="Close">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
               {fontOptions.map(font => (
                 <button
                   key={font}
@@ -180,7 +178,7 @@ function Toolbar({
                     updatePreferences({ fontFamily: font });
                     toggleDropdown(null);
                   }}
-                  className={`dropdown-option ${currentPage.preferences.fontFamily === font ? 'active' : ''}`}
+                  className={`journal-dropdown-option-m ${currentPage.preferences.fontFamily === font ? 'active' : ''}`}
                   style={{ fontFamily: font }}
                 >
                   {font.split(',')[0].replace(/"/g, '')}
@@ -190,19 +188,27 @@ function Toolbar({
           )}
         </div>
 
-     
-        <div className="toolbar-dropdown">
+        {/* Font Size Dropdown */}
+        <div className="journal-toolbar-dropdown-m">
           <button 
-            className="toolbar-icon-btn"
+            className="journal-toolbar-icon-btn-m"
             onClick={() => toggleDropdown('size')}
             title="Font Size"
           >
-            <img src="/font-size.png" alt="Size" className="toolbar-icon" />
+            <img src="/font-size.png" alt="Size" className="journal-toolbar-icon-m" />
           </button>
           {activeDropdown === 'size' && (
-            <div className="dropdown-panel">
-              <div className="dropdown-header">Font Size</div>
-              <div className="size-grid">
+            <div className="journal-dropdown-panel-m">
+              <div className="journal-dropdown-header-with-close-m">
+                <span className="journal-dropdown-header-text-m">Font Size</span>
+                <button onClick={() => toggleDropdown(null)} className="journal-dropdown-close-btn-m" title="Close">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+              <div className="journal-size-grid-m">
                 {fontSizes.map(size => (
                   <button
                     key={size}
@@ -210,7 +216,7 @@ function Toolbar({
                       updatePreferences({ fontSize: size });
                       toggleDropdown(null);
                     }}
-                    className={`size-option ${currentPage.preferences.fontSize === size ? 'active' : ''}`}
+                    className={`journal-size-option-m ${currentPage.preferences.fontSize === size ? 'active' : ''}`}
                   >
                     {size}
                   </button>
@@ -220,10 +226,10 @@ function Toolbar({
           )}
         </div>
 
-        
-        <div className="toolbar-dropdown">
+        {/* Text Color Picker */}
+        <div className="journal-toolbar-dropdown-m">
           <button 
-            className="toolbar-icon-btn"
+            className="journal-toolbar-icon-btn-m"
             onClick={() => toggleDropdown('textColor')}
             title={hasTextSelected ? "Color selected text" : "Change default text color"}
             style={{ 
@@ -232,7 +238,7 @@ function Toolbar({
               borderColor: hasTextSelected ? '#3498db' : ''
             }}
           >
-            <img src="/text-color.png" alt="Text Color" className="toolbar-icon" />
+            <img src="/text-color.png" alt="Text Color" className="journal-toolbar-icon-m" />
             <div style={{
               position: 'absolute',
               bottom: '2px',
@@ -247,19 +253,7 @@ function Toolbar({
           {activeDropdown === 'textColor' && (
             <div>
               {hasTextSelected && (
-                <div style={{
-                  position: 'absolute',
-                  top: '-30px',
-                  right: '0',
-                  background: '#3498db',
-                  color: 'white',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
-                  fontSize: '12px',
-                  whiteSpace: 'nowrap',
-                  fontWeight: '500',
-                  zIndex: 300
-                }}>
+                <div className="journal-text-color-indicator-m">
                   Coloring selected text
                 </div>
               )}
@@ -272,14 +266,14 @@ function Toolbar({
           )}
         </div>
 
-        
-        <div className="toolbar-dropdown">
+        {/* Page Color Picker */}
+        <div className="journal-toolbar-dropdown-m">
           <button 
-            className="toolbar-icon-btn"
+            className="journal-toolbar-icon-btn-m"
             onClick={() => toggleDropdown('pageColor')}
-            title="Page Color"
+            title="Page Background Color"
           >
-            <img src="/paper.png" alt="Page Color" className="toolbar-icon" />
+            <img src="/paper.png" alt="Page Color" className="journal-toolbar-icon-m" />
           </button>
           {activeDropdown === 'pageColor' && (
             <ColorPicker
@@ -290,39 +284,48 @@ function Toolbar({
           )}
         </div>
 
-        
-        <div className="toolbar-dropdown">
+        {/* Formatting Dropdown */}
+        <div className="journal-toolbar-dropdown-m">
           <button 
-            className="toolbar-icon-btn"
+            className="journal-toolbar-icon-btn-m"
             onClick={() => toggleDropdown('formatting')}
             title="Text Formatting"
           >
-            <img src="/text-format.png" alt="Format" className="toolbar-icon" />
+            <img src="/text-format.png" alt="Format" className="journal-toolbar-icon-m" />
           </button>
           {activeDropdown === 'formatting' && (
-            <div className="dropdown-panel">
-              <div className="dropdown-section">
-                <div className="dropdown-header">Line Height</div>
-                <div className="format-options">
+            <div className="journal-dropdown-panel-m">
+              <div className="journal-dropdown-header-with-close-m">
+                <span className="journal-dropdown-header-text-m">Text Formatting</span>
+                <button onClick={() => toggleDropdown(null)} className="journal-dropdown-close-btn-m" title="Close">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+              <div className="journal-dropdown-section-m">
+                <div className="journal-dropdown-subheader-m">Line Height</div>
+                <div className="journal-format-options-m">
                   {lineHeights.map(height => (
                     <button
                       key={height}
                       onClick={() => updatePreferences({ lineHeight: height })}
-                      className={`format-option ${currentPage.preferences.lineHeight === height ? 'active' : ''}`}
+                      className={`journal-format-option-m ${currentPage.preferences.lineHeight === height ? 'active' : ''}`}
                     >
                       {height}
                     </button>
                   ))}
                 </div>
               </div>
-              <div className="dropdown-section">
-                <div className="dropdown-header">Text Align</div>
-                <div className="format-options">
+              <div className="journal-dropdown-section-m">
+                <div className="journal-dropdown-subheader-m">Text Align</div>
+                <div className="journal-format-options-m">
                   {textAlignOptions.map(align => (
                     <button
                       key={align}
                       onClick={() => updatePreferences({ textAlign: align })}
-                      className={`format-option ${currentPage.preferences.textAlign === align ? 'active' : ''}`}
+                      className={`journal-format-option-m ${currentPage.preferences.textAlign === align ? 'active' : ''}`}
                     >
                       {align.charAt(0).toUpperCase() + align.slice(1)}
                     </button>
@@ -333,42 +336,51 @@ function Toolbar({
           )}
         </div>
 
-        
-        <div className="toolbar-dropdown">
+        {/* Layout Dropdown */}
+        <div className="journal-toolbar-dropdown-m">
           <button 
-            className="toolbar-icon-btn"
+            className="journal-toolbar-icon-btn-m"
             onClick={() => toggleDropdown('layout')}
             title="Page Layout"
           >
-            <img src="/paper-size.png" alt="Layout" className="toolbar-icon" />
+            <img src="/paper-size.png" alt="Layout" className="journal-toolbar-icon-m" />
           </button>
           {activeDropdown === 'layout' && (
-            <div className="dropdown-panel">
-              <div className="dropdown-section">
-                <div className="dropdown-header">Page Size</div>
+            <div className="journal-dropdown-panel-m">
+              <div className="journal-dropdown-header-with-close-m">
+                <span className="journal-dropdown-header-text-m">Page Layout</span>
+                <button onClick={() => toggleDropdown(null)} className="journal-dropdown-close-btn-m" title="Close">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+              <div className="journal-dropdown-section-m">
+                <div className="journal-dropdown-subheader-m">Page Size</div>
                 {pageSizes.map(size => (
                   <button
                     key={size.label}
                     onClick={() => {
                       updatePreferences({ pageWidth: size.width, pageHeight: size.height });
                     }}
-                    className={`dropdown-option ${
+                    className={`journal-dropdown-option-m ${
                       currentPage.preferences.pageWidth === size.width && 
                       currentPage.preferences.pageHeight === size.height ? 'active' : ''
                     }`}
                   >
-                    {size.label} ({size.width}x{size.height})
+                    {size.label} ({size.width}×{size.height})
                   </button>
                 ))}
               </div>
-              <div className="dropdown-section">
-                <div className="dropdown-header">Padding</div>
-                <div className="format-options">
+              <div className="journal-dropdown-section-m">
+                <div className="journal-dropdown-subheader-m">Padding</div>
+                <div className="journal-format-options-m">
                   {paddingSizes.map(padding => (
                     <button
                       key={padding}
                       onClick={() => updatePreferences({ padding })}
-                      className={`format-option ${currentPage.preferences.padding === padding ? 'active' : ''}`}
+                      className={`journal-format-option-m ${currentPage.preferences.padding === padding ? 'active' : ''}`}
                     >
                       {padding}px
                     </button>
@@ -379,23 +391,23 @@ function Toolbar({
           )}
         </div>
 
-       
+        {/* Add Photo Button */}
         <button 
           onClick={addElement} 
-          className="toolbar-icon-btn"
+          className="journal-toolbar-icon-btn-m"
           title="Add Photo"
         >
-          <img src="/image.png" alt="Add Photo" className="toolbar-icon" />
+          <img src="/image.png" alt="Add Photo" className="journal-toolbar-icon-m" />
         </button>
 
-        
+        {/* Delete Page Button */}
         {pagesLength > 1 && (
           <button 
             onClick={deletePage} 
-            className="toolbar-icon-btn delete-btn"
+            className="journal-toolbar-icon-btn-m journal-delete-btn-m"
             title="Delete Page"
           >
-            <img src="/cancel.png" alt="Delete" className="toolbar-icon" />
+            <img src="/cancel.png" alt="Delete" className="journal-toolbar-icon-m" />
           </button>
         )}
       </div>

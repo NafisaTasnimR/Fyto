@@ -1,0 +1,192 @@
+/* Color Picker Panel - Fixed and Professional */
+.journal-color-picker-panel-m {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  padding: 1rem;
+  z-index: 300;
+  min-width: 280px;
+  border: 1px solid #e5e7eb;
+}
+
+.journal-color-picker-header-m {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.journal-color-picker-title-m {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  font-family: 'Poppins', sans-serif;
+}
+
+.journal-color-picker-close-btn-m {
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.journal-color-picker-close-btn-m:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.journal-color-picker-main-m {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.journal-color-gradient-m {
+  width: 200px;
+  height: 150px;
+  border-radius: 8px;
+  position: relative;
+  cursor: crosshair;
+  border: 1px solid #e5e7eb;
+  background-blend-mode: multiply;
+}
+
+.journal-color-picker-cursor-m {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 2px solid white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.journal-hue-slider-m {
+  width: 24px;
+  height: 150px;
+  border-radius: 8px;
+  position: relative;
+  cursor: pointer;
+  background: linear-gradient(to bottom,
+    hsl(0, 100%, 50%) 0%,
+    hsl(30, 100%, 50%) 8.33%,
+    hsl(60, 100%, 50%) 16.67%,
+    hsl(90, 100%, 50%) 25%,
+    hsl(120, 100%, 50%) 33.33%,
+    hsl(150, 100%, 50%) 41.67%,
+    hsl(180, 100%, 50%) 50%,
+    hsl(210, 100%, 50%) 58.33%,
+    hsl(240, 100%, 50%) 66.67%,
+    hsl(270, 100%, 50%) 75%,
+    hsl(300, 100%, 50%) 83.33%,
+    hsl(330, 100%, 50%) 91.67%,
+    hsl(360, 100%, 50%) 100%
+  );
+  border: 1px solid #e5e7eb;
+}
+
+.journal-hue-cursor-m {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 4px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 2px;
+  pointer-events: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.journal-color-current-preview-m {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.journal-color-preview-swatch-m {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  border: 2px solid #e5e7eb;
+  flex-shrink: 0;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.journal-hex-input-m {
+  flex: 1;
+  padding: 0.625rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.journal-hex-input-m:focus {
+  border-color: #2f6b48;
+  box-shadow: 0 0 0 3px rgba(47, 107, 72, 0.1);
+}
+
+.journal-preset-colors-m {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.journal-preset-colors-label-m {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.journal-preset-colors-grid-m {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
+}
+
+.journal-preset-color-swatch-m {
+  width: 100%;
+  aspect-ratio: 1;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+  background: none;
+}
+
+.journal-preset-color-swatch-m:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1;
+}
+
+.journal-preset-color-swatch-m.active {
+  border-color: #2f6b48;
+  border-width: 3px;
+  box-shadow: 0 0 0 2px rgba(47, 107, 72, 0.2);
+}

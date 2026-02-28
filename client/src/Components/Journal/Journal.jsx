@@ -5,6 +5,7 @@ import Header from '../Shared/Header';
 import Sidebar from './Sidebar';
 import JournalPage from './JournalPage';
 import CoverSelection from './CoverSelection';
+import JournalsList from './JournalsList';
 import * as journalService from '../../services/journalService';
 
 const defaultPreferences = {
@@ -15,8 +16,43 @@ const defaultPreferences = {
   lineHeight: 1.6,
   textAlign: 'left',
   pageWidth: 800,
-  pageHeight: 600,
+  pageHeight: 1000,
   padding: 40
+};
+
+// Warning Modal Component
+const UnsavedWarningModal = ({ onCancel, onLeave }) => {
+  return (
+    <div className="journal-unsaved-warning-modal-overlay-m">
+      <div className="journal-unsaved-warning-modal-m">
+        <div className="journal-unsaved-warning-icon-container-m">
+          <img 
+            src="/journal-leave-warning.png" 
+            alt="Warning" 
+            className="journal-unsaved-warning-icon-m"
+          />
+        </div>
+        <h2 className="journal-unsaved-warning-title-m">Unsaved Changes</h2>
+        <p className="journal-unsaved-warning-message-m">
+          You have unsaved changes on this page. Are you sure you want to leave? All your changes will be lost.
+        </p>
+        <div className="journal-unsaved-warning-actions-m">
+          <button 
+            onClick={onCancel} 
+            className="journal-unsaved-warning-btn-m journal-unsaved-warning-btn-cancel-m"
+          >
+            Stay
+          </button>
+          <button 
+            onClick={onLeave} 
+            className="journal-unsaved-warning-btn-m journal-unsaved-warning-btn-leave-m"
+          >
+            Leave Anyway
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 function Journal() {
@@ -28,6 +64,7 @@ function Journal() {
   const [showCoverSelection, setShowCoverSelection] = useState(isNewJournal);
   const [selectedCover, setSelectedCover] = useState(null);
   const [currentJournal, setCurrentJournal] = useState(null);
+  const [showJournalsList, setShowJournalsList] = useState(isContinue);
   const [pages, setPages] = useState([]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -36,114 +73,146 @@ function Journal() {
   const [editingTitle, setEditingTitle] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [loadingJournals, setLoadingJournals] = useState(isContinue);
+  const [loadingPages, setLoadingPages] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [lastSavedState, setLastSavedState] = useState(null);
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState(null);
+  const [journalTitle, setJournalTitle] = useState('My Fyto Journal');
 
   const currentPage = pages[currentPageIndex];
 
-  
-  useEffect(() => {
-    if (isContinue && !currentJournal) {
-      loadExistingJournals();
-    }
-  }, [isContinue]);
+  const handleJournalSelected = (journal) => {
+    setCurrentJournal(journal);
+    setShowJournalsList(false);
+  };
 
-  const loadExistingJournals = async () => {
-    try {
-      setLoadingJournals(true);
-      const token = localStorage.getItem('token');
-
-      if (!token) {
-        window.location.href = '/login';
-        return;
-      }
-
-      const response = await journalService.getJournals();
-      const journals = response.data.journals || [];
-
-      if (journals.length > 0) {
-        setCurrentJournal(journals[0]);
-      } else {
-        alert('No journals found. Please create a new journal first.');
-        navigate('/journal');
-      }
-      setLoadingJournals(false);
-    } catch (error) {
-      console.error('Error loading journals:', error);
-      setLoadingJournals(false);
-    }
+  const handleBackFromList = () => {
+    navigate('/journal');
   };
 
   const loadJournalPages = useCallback(async () => {
-    if (!currentJournal) return;
+    if (!currentJournal || showJournalsList) return;
 
     try {
+      setLoadingPages(true);
+      console.log('Loading pages for journal:', currentJournal._id);
+      
       const response = await journalService.getJournalPages(currentJournal._id);
+      console.log('Pages response:', response);
+      
       const pagesData = response.data || [];
+      console.log('Pages data:', pagesData);
+
+      if (pagesData.length === 0) {
+        console.warn('No pages found for journal:', currentJournal._id);
+        setPages([]);
+        setCurrentPageIndex(0);
+        setLoadingPages(false);
+        return;
+      }
 
       const transformedPages = await Promise.all(
-        pagesData.map(async (page) => {
-          const blocksResponse = await journalService.getPageBlocks(page._id);
-          const blocks = blocksResponse.data || [];
+        pagesData.map(async (page, index) => {
+          try {
+            const blocksResponse = await journalService.getPageBlocks(page._id);
+            const blocks = blocksResponse.data || [];
 
-          const textBlocks = blocks.filter(b => b.type === 'text');
-          const imageBlocks = blocks.filter(b => b.type === 'image');
+            const textBlocks = blocks.filter(b => b.type === 'text');
+            const imageBlocks = blocks.filter(b => b.type === 'image');
 
-          const content = textBlocks.map(b => b.text).join('<br>');
-          const wordCount = textBlocks.reduce((count, block) => {
-            const words = (block.text || '').trim().split(/\s+/).filter(w => w.length > 0);
-            return count + words.length;
-          }, 0);
+            const content = textBlocks.map(b => b.text).join('<br>');
+            const wordCount = textBlocks.reduce((count, block) => {
+              const words = (block.text || '').trim().split(/\s+/).filter(w => w.length > 0);
+              return count + words.length;
+            }, 0);
 
-          return {
-            id: page._id,
-            backendId: page._id,
-            elements: imageBlocks.map(b => ({
-              id: b._id,
-              type: 'image',
-              x: b.position.x,
-              y: b.position.y,
-              width: b.image?.width || 200,
-              height: b.image?.height || 200,
-              imageUrl: b.image?.url
-            })),
-            content: content,
-            title: currentJournal.title,
-            date: new Date(page.createdAt).toLocaleDateString('en-US', {
-              month: 'long',
-              day: 'numeric',
-              year: 'numeric'
-            }),
-            preferences: {
-              ...defaultPreferences,
-              pageColor: page.backgroundColor || selectedCover?.bgColor || '#ffffff',
-              pageWidth: page.pageSize?.width || 800,
-              pageHeight: page.pageSize?.height || 1000
-            },
-            wordCount: wordCount,
-            lastSaved: new Date(page.updatedAt),
-            textBlocks: textBlocks
-          };
+            return {
+              id: page._id,
+              backendId: page._id,
+              elements: imageBlocks.map(b => ({
+                id: b._id,
+                type: 'image',
+                x: b.position.x,
+                y: b.position.y,
+                width: b.image?.width || 200,
+                height: b.image?.height || 200,
+                imageUrl: b.image?.url
+              })),
+              content: content,
+              pageNumber: page.pageNumber || index + 1,
+              date: new Date(page.createdAt).toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+              }),
+              preferences: {
+                ...defaultPreferences,
+                pageColor: page.backgroundColor || '#ffffff',
+                pageWidth: page.pageSize?.width || 800,
+                pageHeight: page.pageSize?.height || 1000
+              },
+              wordCount: wordCount,
+              lastSaved: new Date(page.updatedAt),
+              textBlocks: textBlocks
+            };
+          } catch (blockError) {
+            console.error(`Error loading blocks for page ${page.pageNumber}:`, blockError);
+            // Return page with empty blocks if fetching blocks fails
+            return {
+              id: page._id,
+              backendId: page._id,
+              elements: [],
+              content: '',
+              pageNumber: page.pageNumber || index + 1,
+              date: new Date(page.createdAt).toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+              }),
+              preferences: {
+                ...defaultPreferences,
+                pageColor: page.backgroundColor || '#ffffff',
+                pageWidth: page.pageSize?.width || 800,
+                pageHeight: page.pageSize?.height || 1000
+              },
+              wordCount: 0,
+              lastSaved: new Date(page.updatedAt),
+              textBlocks: []
+            };
+          }
         })
       );
 
-      setPages(transformedPages.length > 0 ? transformedPages : []);
-      setCurrentPageIndex(0);
-      setLastSavedState(JSON.stringify(transformedPages));
-      setHasUnsavedChanges(false);
+      if (transformedPages.length > 0) {
+        setJournalTitle(currentJournal.title);
+        setPages(transformedPages);
+        setCurrentPageIndex(0);
+        setLastSavedState(JSON.stringify(transformedPages));
+        setHasUnsavedChanges(false);
+      } else {
+        setPages([]);
+        setCurrentPageIndex(0);
+      }
+      setLoadingPages(false);
     } catch (error) {
       console.error('Error loading journal pages:', error);
+      setLoadingPages(false);
+      if (error.response?.status === 401) {
+        alert('Your session has expired. Please log in again.');
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      }
     }
-  }, [currentJournal, selectedCover]);
+  }, [currentJournal, showJournalsList]);
 
   useEffect(() => {
-    if (currentJournal) {
+    if (currentJournal && !showJournalsList) {
       loadJournalPages();
     }
-  }, [currentJournal, loadJournalPages]);
+  }, [currentJournal, loadJournalPages, showJournalsList]);
 
-  
+  // Track unsaved changes
   useEffect(() => {
     if (pages.length > 0 && lastSavedState) {
       const currentState = JSON.stringify(pages);
@@ -151,7 +220,7 @@ function Journal() {
     }
   }, [pages, lastSavedState]);
 
-  
+  // Browser back/refresh warning
   useEffect(() => {
     const handleBeforeUnload = (e) => {
       if (hasUnsavedChanges) {
@@ -172,7 +241,7 @@ function Journal() {
       backendId: null,
       elements: [],
       content: '',
-      title: 'My Fyto Journal',
+      pageNumber: 1,
       date: new Date().toLocaleDateString('en-US', {
         month: 'long',
         day: 'numeric',
@@ -196,29 +265,43 @@ function Journal() {
 
   const handleBackButton = () => {
     if (hasUnsavedChanges) {
-      const confirmLeave = window.confirm(
-        'You have unsaved changes. Are you sure you want to leave? Your changes will be lost.'
-      );
-      if (!confirmLeave) return;
-    }
-
-    if (showCoverSelection) {
-      navigate('/journal');
-    } else if (isNewJournal) {
-      setShowCoverSelection(true);
+      setPendingNavigation(() => () => {
+        if (showCoverSelection) {
+          navigate('/journal');
+        } else if (isNewJournal) {
+          setShowCoverSelection(true);
+        } else {
+          navigate('/journal');
+        }
+      });
+      setShowWarningModal(true);
     } else {
-      navigate('/journal');
+      if (showCoverSelection) {
+        navigate('/journal');
+      } else if (isNewJournal) {
+        setShowCoverSelection(true);
+      } else {
+        navigate('/journal');
+      }
     }
   };
 
   const handlePageChange = (newIndex) => {
-    if (hasUnsavedChanges) {
-      const confirmChange = window.confirm(
-        'You have unsaved changes on this page. Are you sure you want to switch pages? Your changes will be lost.'
-      );
-      if (!confirmChange) return;
-    }
     setCurrentPageIndex(newIndex);
+  };
+
+  const confirmLeave = () => {
+    setShowWarningModal(false);
+    setHasUnsavedChanges(false);
+    if (pendingNavigation) {
+      pendingNavigation();
+      setPendingNavigation(null);
+    }
+  };
+
+  const cancelLeave = () => {
+    setShowWarningModal(false);
+    setPendingNavigation(null);
   };
 
   const saveJournal = async () => {
@@ -239,8 +322,14 @@ function Journal() {
 
       const firstPage = pages[0];
 
+      // Prepare first page content and elements from the current frontendformat
+      const pageContent = firstPage.content
+        .split('<br>')
+        .filter(text => text.trim())
+        .join('\n');
+
       const journalData = {
-        title: firstPage.title || 'My Fyto Journal',
+        title: journalTitle || 'My Fyto Journal',
         coverImage: {
           url: selectedCover.imageUrl || 'https://via.placeholder.com/800x600',
           width: 800,
@@ -252,30 +341,47 @@ function Journal() {
             width: firstPage.preferences.pageWidth,
             height: firstPage.preferences.pageHeight
           },
-          content: firstPage.content,
-          elements: firstPage.elements,
+          content: pageContent,
           styles: {
             fontFamily: firstPage.preferences.fontFamily,
             fontSize: firstPage.preferences.fontSize,
             color: firstPage.preferences.textColor,
             alignment: firstPage.preferences.textAlign,
             lineHeight: firstPage.preferences.lineHeight
-          }
+          },
+          elements: firstPage.elements.filter(el => el.imageUrl).map(el => ({
+            imageUrl: el.imageUrl,
+            x: el.x,
+            y: el.y,
+            width: el.width,
+            height: el.height
+          }))
         }
       };
 
-      const response = await journalService.createJournalWithFirstPage(journalData);
-      const { journal: newJournal, page: savedFirstPage } = response.data;
+      console.log('Saving journal with data:', journalData);
+      const journalResponse = await journalService.createJournalWithFirstPage(journalData);
+      const newJournal = journalResponse.data.journal;
 
-      setCurrentJournal(newJournal);
+      console.log('Journal created:', newJournal);
+
+      // Defensive check for journal
+      if (!newJournal || !newJournal._id) {
+        throw new Error('Invalid journal response from server');
+      }
 
       const updatedPages = [...pages];
-      updatedPages[0].backendId = savedFirstPage._id;
+      
+      // The backend doesn't return pages array on creation, so we'll set it after fetching
+      // For now, just mark first page as having a journal
+      updatedPages[0] = {
+        ...updatedPages[0],
+        lastSaved: new Date()
+      };
 
-      if (pages.length > 1) {
-        for (let i = 1; i < pages.length; i++) {
-          const page = pages[i];
-
+      for (let i = 1; i < pages.length; i++) {
+        const page = pages[i];
+        try {
           const pageData = {
             backgroundColor: page.preferences.pageColor,
             pageSize: {
@@ -286,9 +392,14 @@ function Journal() {
 
           const pageResponse = await journalService.createPage(newJournal._id, pageData);
           const savedPage = pageResponse.data;
-          updatedPages[i].backendId = savedPage._id;
 
-          if (page.content && page.content.trim()) {
+          updatedPages[i] = {
+            ...page,
+            backendId: savedPage._id,
+            lastSaved: new Date()
+          };
+
+          if (page.content) {
             await journalService.createBlock(savedPage._id, {
               type: 'text',
               text: page.content,
@@ -316,25 +427,57 @@ function Journal() {
               });
             }
           }
+        } catch (pageError) {
+          console.error(`Error saving page ${i + 1}:`, pageError);
+          throw new Error(`Failed to save page ${i + 1}: ${pageError.message}`);
         }
       }
 
-      await journalService.updateWordCount(newJournal._id);
+      // Update word count (non-critical operation)
+      try {
+        await journalService.updateWordCount(newJournal._id);
+      } catch (wcError) {
+        console.warn('Word count update failed, but journal was saved:', wcError);
+      }
+
+      // Fetch the journal pages to get backend IDs
+      try {
+        const pagesResponse = await journalService.getJournalPages(newJournal._id);
+        const fetchedPages = pagesResponse.data || [];
+        
+        // Update pages with backend IDs
+        fetchedPages.forEach((fetchedPage, index) => {
+          if (updatedPages[index]) {
+            updatedPages[index] = {
+              ...updatedPages[index],
+              backendId: fetchedPage._id
+            };
+          }
+        });
+      } catch (fetchError) {
+        console.warn('Could not fetch page IDs, but journal was saved:', fetchError);
+      }
 
       setPages(updatedPages);
       setLastSavedState(JSON.stringify(updatedPages));
       setHasUnsavedChanges(false);
+      setCurrentJournal(newJournal);
 
       alert('Journal saved successfully!');
     } catch (error) {
       console.error('Error saving journal:', error);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
 
       if (error.response?.status === 401 || error.response?.data?.message?.includes('token')) {
         alert('Your session has expired. Please log in again.');
         localStorage.removeItem('token');
         window.location.href = '/login';
       } else {
-        alert('Failed to save journal. Please try again.');
+        alert(`Failed to save journal. Error: ${error.message || 'Unknown error'}. Check console for details.`);
       }
     } finally {
       setSaving(false);
@@ -343,11 +486,12 @@ function Journal() {
 
   const updatePage = (updates) => {
     const updatedPages = pages.map((page, idx) =>
-      idx === currentPageIndex ? { ...page, ...updates, lastSaved: new Date() } : page
+      idx === currentPageIndex ? { ...page, ...updates } : page
     );
     setPages(updatedPages);
   };
 
+  // Each page has independent preferences
   const updatePreferences = (newPrefs) => {
     updatePage({
       preferences: { ...currentPage.preferences, ...newPrefs }
@@ -355,24 +499,23 @@ function Journal() {
   };
 
   const addNewPage = () => {
+    const pageNumber = pages.length + 1;
     
-    const entryNumber = pages.length + 1;
-    const newTitle = entryNumber === 1 ? 'My Fyto Journal' : `My Fyto Journal ${entryNumber}`;
-
     const newPage = {
       id: Date.now(),
       backendId: null,
       elements: [],
       content: '',
-      title: newTitle,
+      pageNumber: pageNumber,
       date: new Date().toLocaleDateString('en-US', {
         month: 'long',
         day: 'numeric',
         year: 'numeric'
       }),
+      // Each page gets its own independent preferences
       preferences: { 
         ...defaultPreferences,
-        pageColor: selectedCover?.bgColor || currentPage?.preferences.pageColor || '#ffffff'
+        pageColor: '#ffffff'
       },
       wordCount: 0,
       lastSaved: null,
@@ -417,7 +560,27 @@ function Journal() {
     setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
   };
 
-  
+  // Render warning modal
+  if (showWarningModal) {
+    return (
+      <UnsavedWarningModal 
+        onCancel={cancelLeave}
+        onLeave={confirmLeave}
+      />
+    );
+  }
+
+  // Render journals list for "Continue" mode
+  if (showJournalsList && isContinue) {
+    return (
+      <JournalsList 
+        onSelectJournal={handleJournalSelected}
+        onBack={handleBackFromList}
+      />
+    );
+  }
+
+  // Render cover selection
   if (showCoverSelection) {
     return (
       <>
@@ -431,11 +594,16 @@ function Journal() {
     );
   }
 
-  
-  if (loadingJournals) {
+  // Loading pages state
+  if (loadingPages) {
     return (
       <div className="journal-app-container">
         <Header />
+        <button onClick={handleBackButton} className="back-button-cover">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
         <div style={{
           display: 'flex',
           justifyContent: 'center',
@@ -445,13 +613,18 @@ function Journal() {
           color: '#2f6b48',
           fontFamily: 'Poppins, sans-serif'
         }}>
-          Loading your journals...
+          <div style={{textAlign: 'center'}}>
+            <p>Loading your journal...</p>
+            <div style={{marginTop: '20px', fontSize: '12px', color: '#999'}}>
+              Fetching pages and content
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
-  
+  // No pages state
   if (!currentPage) {
     return (
       <div className="journal-app-container">
@@ -536,6 +709,8 @@ function Journal() {
             saving={saving}
             currentJournal={currentJournal}
             hasUnsavedChanges={hasUnsavedChanges}
+            journalTitle={journalTitle}
+            setJournalTitle={setJournalTitle}
           />
         </main>
       </div>

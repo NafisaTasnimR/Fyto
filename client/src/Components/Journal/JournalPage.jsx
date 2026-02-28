@@ -40,7 +40,10 @@ function JournalPage({
   activeDropdown,
   toggleDropdown,
   saving,
-  currentJournal
+  currentJournal,
+  hasUnsavedChanges,
+  journalTitle,
+  setJournalTitle
 }) {
   const canvasRef = useRef(null);
   const contentRef = useRef(null);
@@ -55,7 +58,6 @@ function JournalPage({
     });
   };
 
-  
   React.useEffect(() => {
     if (contentRef.current && contentRef.current.innerHTML !== currentPage.content) {
       const selection = window.getSelection();
@@ -65,7 +67,6 @@ function JournalPage({
 
       contentRef.current.innerHTML = currentPage.content || '';
 
-      
       if (startContainer && contentRef.current.contains(startContainer)) {
         try {
           const newRange = document.createRange();
@@ -74,7 +75,7 @@ function JournalPage({
           selection.removeAllRanges();
           selection.addRange(newRange);
         } catch (e) {
-         
+          // Silently handle cursor restoration errors
         }
       }
     }
@@ -85,7 +86,6 @@ function JournalPage({
       elements: currentPage.elements.filter(el => el.id !== elementId)
     });
 
-    
     try {
       await journalService.deleteBlock(elementId);
     } catch (error) {
@@ -100,7 +100,6 @@ function JournalPage({
       )
     });
 
-    
     if (updates.x !== undefined || updates.y !== undefined) {
       try {
         await journalService.updateBlockPosition(elementId, {
@@ -193,7 +192,6 @@ function JournalPage({
     const file = event.target.files[0];
     if (!file) return;
 
-   
     const validation = validateImageFile(file);
     if (!validation.valid) {
       alert(validation.error);
@@ -201,13 +199,9 @@ function JournalPage({
     }
 
     try {
-    
       const compressedImage = await compressImage(file, 800, 800, 0.85);
-
-      
       updateElement(elementId, { imageUrl: compressedImage });
 
-      
       if (currentPage?.backendId) {
         const element = currentPage.elements.find(el => el.id === elementId);
         if (element) {
@@ -226,14 +220,25 @@ function JournalPage({
     }
   };
 
-  const getTimeSinceLastSave = () => {
-    if (!currentPage.lastSaved) return 'Not saved yet';
-    const now = new Date();
-    const diff = Math.floor((now - currentPage.lastSaved) / 1000 / 60);
-    if (diff < 1) return 'Saved just now';
-    if (diff < 60) return `Saved ${diff} minute${diff > 1 ? 's' : ''} ago`;
-    const hours = Math.floor(diff / 60);
-    return `Saved ${hours} hour${hours > 1 ? 's' : ''} ago`;
+  const getSaveStatus = () => {
+    if (saving) {
+      return <span className="save-status">Saving...</span>;
+    }
+    
+    if (hasUnsavedChanges) {
+      return <span className="save-status unsaved">Not saved</span>;
+    }
+    
+    if (currentPage.lastSaved) {
+      const now = new Date();
+      const diff = Math.floor((now - currentPage.lastSaved) / 1000 / 60);
+      if (diff < 1) return <span className="save-status saved">Saved just now</span>;
+      if (diff < 60) return <span className="save-status saved">Saved {diff} minute{diff > 1 ? 's' : ''} ago</span>;
+      const hours = Math.floor(diff / 60);
+      return <span className="save-status saved">Saved {hours} hour{hours > 1 ? 's' : ''} ago</span>;
+    }
+    
+    return <span className="save-status unsaved">Not saved</span>;
   };
 
   return (
@@ -254,21 +259,20 @@ function JournalPage({
             {editingTitle ? (
               <input
                 type="text"
-                value={currentPage.title}
-                onChange={(e) => updatePage({ title: e.target.value })}
+                value={journalTitle}
+                onChange={(e) => setJournalTitle(e.target.value)}
                 onBlur={() => setEditingTitle(false)}
                 onKeyPress={(e) => e.key === 'Enter' && setEditingTitle(false)}
                 className="title-input"
                 autoFocus
+                placeholder="Journal Title"
               />
             ) : (
               <h2 className="page-title" onClick={() => setEditingTitle(true)}>
-                {currentPage.title}
+                {journalTitle}
               </h2>
             )}
-            <div className="save-status">
-              {saving ? 'Saving...' : getTimeSinceLastSave()}
-            </div>
+            {getSaveStatus()}
           </div>
         </div>
 
@@ -360,14 +364,14 @@ function JournalPage({
       {pagesLength > 1 && (
         <div className="page-navigation">
           <button
-            onClick={() => setCurrentPageIndex(prev => prev - 1)}
+            onClick={() => setCurrentPageIndex(currentPageIndex - 1)}
             disabled={currentPageIndex === 0}
             className="nav-btn"
           >
             <ChevronLeftIcon /> Previous
           </button>
           <button
-            onClick={() => setCurrentPageIndex(prev => prev + 1)}
+            onClick={() => setCurrentPageIndex(currentPageIndex + 1)}
             disabled={currentPageIndex === pagesLength - 1}
             className="nav-btn"
           >
