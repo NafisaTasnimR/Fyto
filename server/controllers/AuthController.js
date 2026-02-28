@@ -1,6 +1,7 @@
 import UserModel from "../models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { trackChallengeProgress } from '../services/ExtraChallengeService.js';
 
 const signup = async (req, res) => {
     try {
@@ -13,7 +14,8 @@ const signup = async (req, res) => {
             name,
             email,
             username,
-            passwordHash: await bcrypt.hash(password, 10)
+            passwordHash: await bcrypt.hash(password, 10),
+            profilePic: 'https://via.placeholder.com/150/4CAF50/ffffff?text=User'
         });
         await userModel.save();
         res.status(201).json({ message: "User created successfully", success: true });
@@ -36,17 +38,27 @@ const login = async (req, res) => {
             return res.status(400).json({ message: "Invalid email or password", success: false });
         }
         const token = jwt.sign(
-            { email: user.email, _id: user._id },
+            { email: user.email, _id: user._id, isAdmin: user.isAdmin },
             process.env.JWT_SECRET,
             { expiresIn: "24h" }
         )
+
+        // Track consecutive login for extra challenges
+        await trackChallengeProgress(user._id, 'consecutive_login');
+
         res.status(200).json(
             {
                 message: "Login successful",
                 success: true,
                 token,
                 data: {
-                    email: user.email
+                    _id: user._id,
+                    email: user.email,
+                    name: user.name,
+                    username: user.username,
+                    profilePic: user.profilePic,
+                    bio: user.bio,
+                    isAdmin: user.isAdmin
                 }
             }
         )
