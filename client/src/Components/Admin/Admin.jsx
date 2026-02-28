@@ -26,7 +26,7 @@ const MOCK_SOCIAL_REPORTS = [
       _id: 'p1',
       authorId: { username: 'PlantLover99', profilePicture: '' },
       content: 'Check out my new rare succulent collection! 🌵🪴',
-      images: ['/preview1.jpg'],
+      images: ['/g1.jpg'],
       createdAt: '2026-02-25T10:15:00Z',
     },
   },
@@ -80,7 +80,7 @@ const MOCK_MARKETPLACE_REPORTS = [
       description: 'Fast‑growing ground cover – spreads quickly!',
       postType: 'sell',
       price: 15,
-      photos: ['/preview2.jpg'],
+      photos: ['/g2.jpg'],
       createdAt: '2026-02-24T12:00:00Z',
     },
   },
@@ -100,7 +100,7 @@ const MOCK_MARKETPLACE_REPORTS = [
       description: 'Rare variegated Monstera at a steal!',
       postType: 'sell',
       price: 5,
-      photos: [],
+      photos: ['/g3.jpg'],
       createdAt: '2026-02-27T08:30:00Z',
     },
   },
@@ -221,7 +221,7 @@ const Admin = () => {
       <aside className="admin-sidebar">
         <div className="admin-sidebar-top">
           <div className="admin-logo">
-            <span className="admin-logo-icon">🌿</span>
+            <img src="/2.png" alt="Fyto" className="admin-logo-icon" />
             <span className="admin-logo-text">Fyto Admin</span>
           </div>
 
