@@ -1,5 +1,7 @@
 import User from '../models/User.js';
 import ChallengeParticipation from '../models/ChallengeParticipation.js';
+import { trackChallengeProgress } from '../services/ExtraChallengeService.js';
+import { trackChallengeProgress } from '../services/ExtraChallengeService.js';
 
 // Helper function to check and update streak
 const updateStreak = async (user) => {
@@ -124,6 +126,11 @@ export const participateInDailyChallenge = async (req, res) => {
         });
 
         await participation.save();
+
+        // Track extra challenge progress - only if correct answer
+        if (isCorrect) {
+            await trackChallengeProgress(userId, 'daily_challenge_complete');
+        }
 
         return res.status(201).json({
             success: true,
