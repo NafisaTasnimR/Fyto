@@ -68,6 +68,9 @@
   font-weight: 600;
   padding: 8px 12px;
   border-radius: 6px;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .center-nav .nav-link:hover {
@@ -114,6 +117,71 @@
   height: 3px;
   background-color: #2f6b48;
   border-radius: 2px;
+.center-nav .nav-link.active {
+  color: #2f6b48;
+}
+
+.center-nav .nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -13px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #2f6b48;
+}
+
+/* Plant Dropdown Styles */
+.plant-dropdown-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.plant-dropdown-container > .nav-link {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dropdown-arrow {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.plant-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  margin-top: 0;
+  min-width: 150px;
+  z-index: 1001;
+  overflow: hidden;
+}
+
+.plant-option {
+  display: block;
+  padding: 12px 16px;
+  color: #4b5563;
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 1px solid #f0f0f0;
+  transition: all 0.2s;
+}
+
+.plant-option:last-child {
+  border-bottom: none;
+}
+
+.plant-option:hover {
+  background: #f0f7ef;
+  color: #274b2f;
+  padding-left: 20px;
 }
 
 /* Mirrored styles for unique button classes on LandingPage to avoid clashes */

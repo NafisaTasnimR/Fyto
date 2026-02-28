@@ -12,11 +12,13 @@ import JournalLanding from './Components/Journal/JournalLanding';
 import Journal from './Components/Journal/Journal';
 import ProfilePage from './Components/ProfilePage/ProfilePage';
 import Challenges from './Components/Challenges/Challenges';
+import PlantInfo from './Components/PlantInfo/PlantInfo';
 import './App.css';
 import PreviewSocialPage from './Components/LandingPage/PreviewSocialPage';
 import PreviewMarketplace from './Components/LandingPage/PreviewMarketplace';
 
 
+import PlantCare from './Components/PlantCare/PlantCare';
 
 function App() {
   return (
@@ -38,6 +40,8 @@ function App() {
           <Route path="/challenges" element={<Challenges />} />
           <Route path="/preview-social" element={<PreviewSocialPage />} />
           <Route path="/preview-marketplace" element={<PreviewMarketplace />} />
+          <Route path="/plant-info" element={<PlantInfo />} />
+          <Route path="/plant-care" element={<PlantCare />} />
         </Routes>
       </Router>
     </ConfirmedPostsProvider>
