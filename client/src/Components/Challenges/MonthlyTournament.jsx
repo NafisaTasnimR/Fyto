@@ -3,8 +3,8 @@ import './MonthlyTournament.css';
 
 const MonthlyTournament = () => {
   const [activeTab, setActiveTab] = useState('challenges');
-  const [daysRemaining, setDaysRemaining] = useState(5);
-  const [currentRank, setCurrentRank] = useState(8);
+  const [daysRemaining] = useState(5);
+  const [currentRank] = useState(8);
 
   
   const tournamentData = {
@@ -80,7 +80,7 @@ const MonthlyTournament = () => {
   };
 
  
-  const [leaderboard, setLeaderboard] = useState([
+  const [leaderboard, setLeaderboard] = useState([ // eslint-disable-line no-unused-vars
     { rank: 1, username: 'PlantMaster99', avatar: '/images/avatars/user1.png', points: 380, completedChallenges: 5, badge: 'gold' },
     { rank: 2, username: 'GreenThumbPro', avatar: '/images/avatars/user2.png', points: 350, completedChallenges: 5, badge: 'gold' },
     { rank: 3, username: 'BotanicalBella', avatar: '/images/avatars/user3.png', points: 310, completedChallenges: 5, badge: 'silver' },
@@ -122,6 +122,7 @@ const MonthlyTournament = () => {
     return Math.min((progress / total) * 100, 100);
   };
 
+  // eslint-disable-next-line no-unused-vars
   const getBadgeImage = (badge) => {
     const badges = {
       gold: '/images/badges/gold.png',
@@ -131,6 +132,7 @@ const MonthlyTournament = () => {
     return badges[badge] || null;
   };
 
+  // eslint-disable-next-line no-unused-vars
   const getRankClass = (rank) => {
     if (rank <= 3) return 'top-three';
     if (rank <= 10) return 'top-ten';

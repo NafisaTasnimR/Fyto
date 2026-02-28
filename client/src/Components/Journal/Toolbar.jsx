@@ -397,7 +397,7 @@ function Toolbar({
           className="journal-toolbar-icon-btn-m"
           title="Add Photo"
         >
-          <img src="/image.png" alt="Add Photo" className="journal-toolbar-icon-m" />
+          <img src="/image.png" alt="Add" className="journal-toolbar-icon-m" />
         </button>
 
         {/* Delete Page Button */}

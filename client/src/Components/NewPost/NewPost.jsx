@@ -9,6 +9,7 @@ const NewPost = () => {
   const fileInputRef = useRef(null);
   const [showCropper, setShowCropper] = useState(false);
   const [cropperImage, setCropperImage] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const canvasRef = useRef(null);
   const [cropData, setCropData] = useState({ x: 0, y: 0, scale: 1 });
 

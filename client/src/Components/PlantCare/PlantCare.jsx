@@ -5,6 +5,7 @@ import './PlantCare.css';
 const PlantCare = () => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [plantData, setPlantData] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 

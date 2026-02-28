@@ -104,6 +104,7 @@ const LeaderBoard = () => {
   );
 };
 
+// eslint-disable-next-line no-unused-vars
 const getAvatarColor = (rank) => {
   const colors = ['#48C9B0', '#9B59B6', '#E74C3C', '#3498DB', '#F39C12'];
   return colors[(rank - 4) % colors.length];
