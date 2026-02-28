@@ -1,8 +1,10 @@
 import Post from '../models/Post.js';
+import { createNotification } from './NotificationController.js';
+import { trackChallengeProgress } from '../services/ExtraChallengeService.js';
 
 export const createPost = async (req, res) => {
     try {
-        const { content, images } = req.body;
+        const { content, images, isPrivate } = req.body;
         const authorId = req.user._id;
 
         if (!content && (!images || images.length === 0)) {
@@ -16,12 +18,16 @@ export const createPost = async (req, res) => {
             authorId,
             content,
             images: images || [],
-            likes: []
+            likes: [],
+            isPrivate: isPrivate || false
         });
 
         const savedPost = await newPost.save();
 
         await savedPost.populate('authorId', 'name username profilePic');
+
+        // Track extra challenge progress
+        await trackChallengeProgress(authorId, 'post_create');
 
         return res.status(201).json({
             success: true,
@@ -43,6 +49,7 @@ export const deletePost = async (req, res) => {
     try {
         const { postId } = req.params;
         const userId = req.user._id;
+        const isAdmin = req.user.isAdmin;
 
         const post = await Post.findById(postId);
 
@@ -53,7 +60,8 @@ export const deletePost = async (req, res) => {
             });
         }
 
-        if (post.authorId.toString() !== userId.toString()) {
+        // Allow deletion if user is the author OR if user is an admin
+        if (post.authorId.toString() !== userId.toString() && !isAdmin) {
             return res.status(403).json({
                 success: false,
                 message: 'You are not authorized to delete this post.'
@@ -78,7 +86,7 @@ export const deletePost = async (req, res) => {
 export const updatePost = async (req, res) => {
     try {
         const { postId } = req.params;
-        const { content, images } = req.body;
+        const { content, images, isPrivate } = req.body;
         const userId = req.user._id;
 
         const post = await Post.findById(postId);
@@ -99,6 +107,7 @@ export const updatePost = async (req, res) => {
 
         if (content !== undefined) post.content = content;
         if (images !== undefined) post.images = images;
+        if (typeof isPrivate === 'boolean') post.isPrivate = isPrivate;
 
         const updatedPost = await post.save();
 
@@ -122,16 +131,27 @@ export const updatePost = async (req, res) => {
 export const getUserPosts = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { type } = req.query;
+        const { type, targetUserId } = req.query;
 
         let posts;
+        const userIdToFetch = targetUserId || userId;
 
         if (type === 'liked') {
-            posts = await Post.find({ likes: userId })
+            // When fetching liked posts, respect privacy if viewing another user's likes
+            const filter = { likes: userIdToFetch };
+            if (targetUserId && targetUserId !== userId.toString()) {
+                filter.isPrivate = false;
+            }
+            posts = await Post.find(filter)
                 .populate('authorId', 'name username profilePic')
                 .sort({ createdAt: -1 });
         } else {
-            posts = await Post.find({ authorId: userId })
+            // When fetching user's own posts, show all. When viewing others, show only public
+            const filter = { authorId: userIdToFetch };
+            if (targetUserId && targetUserId !== userId.toString()) {
+                filter.isPrivate = false;
+            }
+            posts = await Post.find(filter)
                 .populate('authorId', 'name username profilePic')
                 .sort({ createdAt: -1 });
         }
@@ -162,15 +182,27 @@ export const getUserPosts = async (req, res) => {
 export const getAllPosts = async (req, res) => {
     try {
         const { page = 1, limit = 10 } = req.query;
+        const userId = req.user._id;
 
-        const posts = await Post.find()
+        // Only show public posts or user's own posts
+        const posts = await Post.find({
+            $or: [
+                { isPrivate: false },
+                { authorId: userId }
+            ]
+        })
             .populate('authorId', 'name username profilePic')
             .sort({ createdAt: -1 })
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .exec();
 
-        const count = await Post.countDocuments();
+        const count = await Post.countDocuments({
+            $or: [
+                { isPrivate: false },
+                { authorId: userId }
+            ]
+        });
 
         if (count === 0 || posts.length === 0) {
             return res.status(200).json({
@@ -214,12 +246,42 @@ export const toggleLike = async (req, res) => {
             });
         }
 
+        // Check if user can like this post (must be public or user's own post)
+        if (post.isPrivate && post.authorId.toString() !== userId.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: 'Cannot like a private post.'
+            });
+        }
+
         const likeIndex = post.likes.indexOf(userId);
 
         if (likeIndex > -1) {
             post.likes.splice(likeIndex, 1);
         } else {
             post.likes.push(userId);
+
+            // Track extra challenge progress - like given
+            await trackChallengeProgress(userId, 'like_give');
+
+            // Track extra challenge progress - like received (for post author)
+            if (post.authorId.toString() !== userId.toString()) {
+                await trackChallengeProgress(post.authorId, 'like_receive');
+            }
+
+            // Create notification for post author when someone likes their post
+            try {
+                await createNotification({
+                    recipientId: post.authorId,
+                    senderId: userId,
+                    type: 'like',
+                    postId: post._id,
+                    postModel: 'Post',
+                    message: 'liked your post.'
+                });
+            } catch (notifError) {
+                console.error('Failed to create like notification:', notifError);
+            }
         }
 
         await post.save();
@@ -243,6 +305,7 @@ export const toggleLike = async (req, res) => {
 export const getPostById = async (req, res) => {
     try {
         const { postId } = req.params;
+        const userId = req.user._id;
 
         const post = await Post.findById(postId)
             .populate('authorId', 'name username profilePic');
@@ -251,6 +314,14 @@ export const getPostById = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: 'Post not found.'
+            });
+        }
+
+        // Check if user has permission to view this post
+        if (post.isPrivate && post.authorId._id.toString() !== userId.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: 'This post is private.'
             });
         }
 
@@ -271,6 +342,7 @@ export const getPostById = async (req, res) => {
 export const searchPosts = async (req, res) => {
     try {
         const { query } = req.query;
+        const userId = req.user._id;
 
         if (!query || query.trim() === '') {
             return res.status(400).json({
@@ -279,9 +351,13 @@ export const searchPosts = async (req, res) => {
             });
         }
 
-
+        // Only search in public posts or user's own posts
         const posts = await Post.find({
-            content: { $regex: query, $options: 'i' }
+            content: { $regex: query, $options: 'i' },
+            $or: [
+                { isPrivate: false },
+                { authorId: userId }
+            ]
         })
             .populate('authorId', 'name username profilePic')
             .sort({ createdAt: -1 })
@@ -313,6 +389,14 @@ export const getSharedPost = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: 'Post not found.'
+            });
+        }
+
+        // Shared posts can only be viewed if they are public
+        if (post.isPrivate) {
+            return res.status(403).json({
+                success: false,
+                message: 'This post is private and cannot be shared.'
             });
         }
 

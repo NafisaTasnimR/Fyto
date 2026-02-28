@@ -6,7 +6,9 @@ import {
     getJournalById,
     updateJournal,
     deleteJournal,
-    updateWordCount
+    updateWordCount,
+    getAllPublicJournals,
+    searchPublicJournals
 } from "../controllers/JournalController.js";
 import {
     createPage,
@@ -49,6 +51,9 @@ const router = express.Router();
 router.use(verifyToken);
 
 
+// Public journals (authenticated users can view)
+router.get("/public", getAllPublicJournals);
+router.get("/public/search", searchPublicJournals);
 
 router.post("/with-first-page", validateCreateJournal, createJournalWithFirstPage);
 
