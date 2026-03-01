@@ -17,6 +17,7 @@ export default function ProfilePage({ onEdit }) {
   const [user, setUser] = useState(null)
   const [challengePositions, setChallengePositions] = useState(null)
   const [leaderboardTab, setLeaderboardTab] = useState('daily')
+  const [totalPoints, setTotalPoints] = useState(0)
   const [openMenuPostId, setOpenMenuPostId] = useState(null)
   const [showImageViewer, setShowImageViewer] = useState(false)
   const [viewingImage, setViewingImage] = useState(null)
@@ -65,7 +66,20 @@ export default function ProfilePage({ onEdit }) {
       }
     }
 
+    const fetchPoints = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/gamification/stats`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        setTotalPoints(res.data?.data?.scores?.totalScore || 0)
+      } catch (error) {
+        console.error('Error fetching points:', error)
+      }
+    }
+
     fetchUserData()
+    fetchPoints()
   }, [])
 
   useEffect(() => {
@@ -81,19 +95,27 @@ export default function ProfilePage({ onEdit }) {
           const marketplaceData = await getUserMarketplacePosts()
           setMarketplacePosts(marketplaceData.posts)
         } else if (activeTab === 'leaderboard') {
-          // Mock data for frontend design - replace with API call later
+          const token = localStorage.getItem('token')
+          const headers = { Authorization: `Bearer ${token}` }
+
+          const [statsRes, dailyRes, overallRes] = await Promise.all([
+            axios.get(`${process.env.REACT_APP_API_URL}/api/gamification/stats`, { headers }),
+            axios.get(`${process.env.REACT_APP_API_URL}/api/gamification/leaderboard?type=daily`, { headers }),
+            axios.get(`${process.env.REACT_APP_API_URL}/api/gamification/leaderboard?type=total`, { headers }),
+          ])
+
+          const stats = statsRes.data?.data || {}
+          const dailyLb = dailyRes.data?.data || {}
+          const overallLb = overallRes.data?.data || {}
+
           setChallengePositions({
             daily: {
-              streakCount: 7,
-              position: 5
-            },
-            monthly: {
-              totalPoints: 450,
-              position: 12
+              streakCount: stats.streaks?.currentStreak || 0,
+              position: dailyLb.currentUser?.rank || '-'
             },
             overall: {
-              totalPoints: 2340,
-              position: 45
+              totalPoints: stats.scores?.totalScore || 0,
+              position: overallLb.currentUser?.rank || '-'
             }
           })
           setLeaderboardTab('daily')
@@ -357,7 +379,7 @@ export default function ProfilePage({ onEdit }) {
                     {/* Post Header */}
                     <div className="post-header">
                       <img
-                        src={post.authorId?.profilePic || '/boy.png'}
+                        src={post.authorId?.profilePic || '/dp.png'}
                         alt={post.authorId?.name || 'User'}
                         className="avatar"
                       />
@@ -568,7 +590,7 @@ export default function ProfilePage({ onEdit }) {
         return (
           <div className="tab-panel">
             <h2 className="journal-heading">Leader board</h2>
-            {challengePositions && (challengePositions.daily || challengePositions.monthly || challengePositions.overall) ? (
+            {challengePositions && (challengePositions.daily || challengePositions.overall) ? (
               <div className="leaderboard-section">
                 <div className="leaderboard-tabs1">
                   <button
@@ -576,12 +598,6 @@ export default function ProfilePage({ onEdit }) {
                     onClick={() => setLeaderboardTab('daily')}
                   >
                     Daily
-                  </button>
-                  <button
-                    className={`leaderboard-tab ${leaderboardTab === 'monthly' ? 'active' : ''}`}
-                    onClick={() => setLeaderboardTab('monthly')}
-                  >
-                    Monthly
                   </button>
                   <button
                     className={`leaderboard-tab ${leaderboardTab === 'overall' ? 'active' : ''}`}
@@ -603,22 +619,6 @@ export default function ProfilePage({ onEdit }) {
                       <div className="stat-item">
                         <p className="stat-label">Your Position</p>
                         <p className="stat-value">#{challengePositions.daily.position}</p>
-                        <p className="stat-unit">in leaderboard</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {leaderboardTab === 'monthly' && challengePositions.monthly && (
-                    <div className="leaderboard-stats">
-                      <div className="stat-item">
-                        <p className="stat-label">Total Points</p>
-                        <p className="stat-value">{challengePositions.monthly.totalPoints}</p>
-                        <p className="stat-unit">points</p>
-                      </div>
-                      <div className="stat-divider"></div>
-                      <div className="stat-item">
-                        <p className="stat-label">Your Position</p>
-                        <p className="stat-value">#{challengePositions.monthly.position}</p>
                         <p className="stat-unit">in leaderboard</p>
                       </div>
                     </div>
@@ -697,7 +697,7 @@ export default function ProfilePage({ onEdit }) {
     try {
       const token = localStorage.getItem('token')
       const response = await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/users/update`,
+        `${process.env.REACT_APP_API_URL}/api/users/me`,
         {
           username: editFormData.username,
         },
@@ -742,7 +742,7 @@ export default function ProfilePage({ onEdit }) {
 
       const token = localStorage.getItem('token')
       const response = await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/users/update`,
+        `${process.env.REACT_APP_API_URL}/api/users/me`,
         {
           previousPassword: passwordFormData.previousPassword,
           newPassword: passwordFormData.newPassword,
@@ -784,17 +784,23 @@ export default function ProfilePage({ onEdit }) {
         return
       }
 
-      const formData = new FormData()
-      formData.append('profilePic', profilePicFile)
+      // Convert file to base64 data URL
+      const toBase64 = (file) => new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onload = () => resolve(reader.result)
+        reader.onerror = (error) => reject(error)
+      })
+
+      const base64Image = await toBase64(profilePicFile)
 
       const token = localStorage.getItem('token')
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/users/upload-profile-pic`,
-        formData,
+      const response = await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/users/me`,
+        { profilePic: base64Image },
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
           },
         }
       )
@@ -802,7 +808,7 @@ export default function ProfilePage({ onEdit }) {
       if (response.data.success) {
         setUser((prev) => ({
           ...prev,
-          profilePic: response.data.profilePicUrl,
+          profilePic: response.data.data?.profilePic || base64Image,
         }))
         setShowProfilePicModal(false)
         setProfilePicFile(null)
@@ -821,6 +827,35 @@ export default function ProfilePage({ onEdit }) {
     setProfilePicPreview(null)
   }
 
+  const handleRemoveProfilePic = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/users/me`,
+        { profilePic: '' },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+
+      if (response.data.success) {
+        setUser((prev) => ({
+          ...prev,
+          profilePic: '',
+        }))
+        setShowProfilePicModal(false)
+        setProfilePicFile(null)
+        setProfilePicPreview(null)
+        alert('Profile picture removed.')
+      }
+    } catch (error) {
+      console.error('Error removing profile picture:', error)
+      alert('Error removing profile picture: ' + (error.response?.data?.message || error.message))
+    }
+  }
+
   return (
     <div className="profile-page">
       <Header />
@@ -829,7 +864,7 @@ export default function ProfilePage({ onEdit }) {
         <div className="content-inner">
           <div className="profile-top">
             <div className="profile-photo" aria-hidden="false">
-              <img src={user?.profilePic || "/boy.png"} alt="Profile" />
+              <img src={user?.profilePic || "/dp.png"} alt="Profile" />
               <button
                 className="camera-btn"
                 onClick={() => setShowProfilePicModal(true)}
@@ -854,7 +889,7 @@ export default function ProfilePage({ onEdit }) {
                   <img src="/reward.png" alt="Reward" className="points-icon1" />
                   <div className="points-info">
       
-                    <p className="points-value1">{user?.points || 0}</p>
+                    <p className="points-value1">{totalPoints}</p>
                   </div>
                 </div>
                 <button
@@ -948,7 +983,7 @@ export default function ProfilePage({ onEdit }) {
             <div className="view-post-content">
               <div className="post-header">
                 <img
-                  src={viewingPost.authorId?.profilePic || '/boy.png'}
+                  src={viewingPost.authorId?.profilePic || '/dp.png'}
                   alt={viewingPost.authorId?.name || 'User'}
                   className="post-avatar"
                 />
@@ -1034,7 +1069,7 @@ export default function ProfilePage({ onEdit }) {
                 activeCommentsPost.comments.map((c) => (
                   <div key={c.id} className="comment-item">
                     <div className="comment-header">
-                      <img src={c.userAvatar || '/boy.png'} alt={c.username} className="comment-avatar" />
+                      <img src={c.userAvatar || '/dp.png'} alt={c.username} className="comment-avatar" />
                       <strong>{c.username}</strong>
                     </div>
                     <div className="comment-text">{c.text}</div>
@@ -1338,21 +1373,32 @@ export default function ProfilePage({ onEdit }) {
               <div className="profile-pic-upload-container">
                 <div className="profile-pic-preview">
                   <img
-                    src={profilePicPreview || user?.profilePic || "/boy.png"}
+                    src={profilePicPreview || user?.profilePic || "/dp.png"}
                     alt="Profile Preview"
                     className="preview-image"
                   />
                 </div>
 
-                <label className="file-input-label">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleProfilePicChange}
-                    className="file-input"
-                  />
-                  <span className="file-input-btn">Choose Photo</span>
-                </label>
+                <div className="pic-btn-row">
+                  <label className="file-input-label">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProfilePicChange}
+                      className="file-input"
+                    />
+                    <span className="file-input-btn">Choose Photo</span>
+                  </label>
+
+                  {user?.profilePic && (
+                    <button
+                      className="btn-remove-pic"
+                      onClick={handleRemoveProfilePic}
+                    >
+                      Remove Photo
+                    </button>
+                  )}
+                </div>
 
                 {profilePicFile && (
                   <p className="file-name">
@@ -1374,7 +1420,7 @@ export default function ProfilePage({ onEdit }) {
                 onClick={handleSaveProfilePic}
                 disabled={!profilePicFile}
               >
-                Save Picture
+                Save 
               </button>
             </div>
           </div>
