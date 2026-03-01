@@ -1,7 +1,6 @@
 import React from 'react';
 import Header from '../Shared/Header';
 import DailyChallenge from './DailyChallenge';
-import MonthlyTournament from './MonthlyTournament';
 import ExtraChallenges from './ExtraChallenges';
 import './Challenges.css';
 
@@ -21,12 +20,6 @@ const Challenges = () => {
             Daily
           </button>
           <button 
-            className={`challenge-tab ${activeTab === 'monthly' ? 'active' : ''}`}
-            onClick={() => setActiveTab('monthly')}
-          >
-            Monthly
-          </button>
-          <button 
             className={`challenge-tab ${activeTab === 'extra' ? 'active' : ''}`}
             onClick={() => setActiveTab('extra')}
           >
@@ -36,7 +29,6 @@ const Challenges = () => {
 
         <div className="challenge-content-area">
           {activeTab === 'daily' && <DailyChallenge />}
-          {activeTab === 'monthly' && <MonthlyTournament />}
           {activeTab === 'extra' && <ExtraChallenges />}
         </div>
       </div>

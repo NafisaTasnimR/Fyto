@@ -1,39 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './ExtraChallenges.css';
 
+const API = process.env.REACT_APP_API_URL;
+
 const ExtraChallenges = () => {
-  const [completedChallenges] = useState([]);
+  const [challenges, setChallenges] = useState([]);
+  const [stats, setStats] = useState({ totalCompleted: 0, totalPoints: 0, currentBatch: 1 });
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const headers = { Authorization: `Bearer ${token}` };
 
-  const challenges = [
-    { id: 'mp1', title: 'Green Thumb Trader', description: 'Buy 10 plants from marketplace', points: 20, progress: 3, total: 10, status: 'in-progress' },
-    { id: 'mp2', title: 'Plant Parent Provider', description: 'Sell 5 plants on marketplace', points: 25, progress: 0, total: 5, status: 'available' },
-    { id: 'mp3', title: 'Generous Gardener', description: 'Donate 3 plants to community members', points: 30, progress: 1, total: 3, status: 'in-progress' },
-    { id: 'mp4', title: 'Exchange Expert', description: 'Complete 5 plant exchanges', points: 25, progress: 2, total: 5, status: 'in-progress' },
-    { id: 'mp5', title: 'Rare Collector', description: 'Purchase a rare or exotic plant species', points: 40, progress: 0, total: 1, status: 'available' },
-    { id: 'mp6', title: 'Market Maven', description: 'List 10 different plant varieties for sale', points: 30, progress: 4, total: 10, status: 'in-progress' },
-    { id: 'mp7', title: 'Supporting Sustainability', description: 'Buy 5 locally-sourced plants', points: 25, progress: 0, total: 5, status: 'available' },
-    { id: 'mp8', title: 'Deal Hunter', description: 'Purchase plants from 10 different sellers', points: 35, progress: 5, total: 10, status: 'in-progress' },
-    { id: 'mp9', title: 'Diversity Champion', description: 'Own plants from 5 different plant families', points: 30, progress: 3, total: 5, status: 'in-progress' },
-    { id: 'mp10', title: 'Marketplace Veteran', description: 'Complete 50 total marketplace transactions', points: 50, progress: 12, total: 50, status: 'in-progress' }
-  ];
+        const [challengesRes, statsRes] = await Promise.all([
+          axios.get(`${API}/api/extra-challenges`, { headers }),
+          axios.get(`${API}/api/extra-challenges/stats`, { headers })
+        ]);
 
-
-
-
-
-  const calculateProgress = (progress, total) => {
-    return Math.min((progress / total) * 100, 100);
-  };
-
-  const getStatusBadge = (status) => {
-    const badges = {
-      'available': { text: 'Available', class: 'status-available' },
-      'in-progress': { text: 'In Progress', class: 'status-progress' },
-      'completed': { text: 'Completed', class: 'status-completed' }
+        if (challengesRes.data.success) {
+          setChallenges(challengesRes.data.data.challenges || []);
+        }
+        if (statsRes.data.success) {
+          setStats(statsRes.data.data);
+        }
+      } catch (err) {
+        console.error('Error loading extra challenges:', err);
+      } finally {
+        setLoading(false);
+      }
     };
-    return badges[status] || badges['available'];
+    fetchData();
+  }, []);
+
+  const calculateProgress = (current, total) => {
+    return Math.min((current / total) * 100, 100);
   };
+
+  const getStatusBadge = (challenge) => {
+    if (challenge.isCompleted) return { text: 'Completed', class: 'status-completed' };
+    if (challenge.currentProgress > 0) return { text: 'In Progress', class: 'status-progress' };
+    return { text: 'Available', class: 'status-available' };
+  };
+
+  const inProgressCount = challenges.filter(c => !c.isCompleted && c.currentProgress > 0).length;
+
+  const challengeImages = ['mp1', 'mp4', 'mp3', 'mp9', 'mp8'];
 
   return (
     <div className="extra-challenges-container">
@@ -45,23 +59,21 @@ const ExtraChallenges = () => {
           <div className="stat-card">
             <img src="/champion.png" alt="trophy" className="stat-icon" />
             <div className="stat-info">
-              <span className="stat-value">{completedChallenges.length}</span>
+              <span className="stat-value">{loading ? '...' : stats.totalCompleted}</span>
               <span className="stat-label">Completed</span>
             </div>
           </div>
           <div className="stat-card">
             <img src="/hourglass.png" alt="hourglass" className="stat-icon" />
             <div className="stat-info">
-              <span className="stat-value">
-                {challenges.filter(c => c.status === 'in-progress').length}
-              </span>
+              <span className="stat-value">{loading ? '...' : inProgressCount}</span>
               <span className="stat-label">In Progress</span>
             </div>
           </div>
           <div className="stat-card">
             <img src="/star.png" alt="star" className="stat-icon" />
             <div className="stat-info">
-              <span className="stat-value">247</span>
+              <span className="stat-value">{loading ? '...' : stats.totalPoints}</span>
               <span className="stat-label">Total Points</span>
             </div>
           </div>
@@ -69,14 +81,18 @@ const ExtraChallenges = () => {
       </div>
 
       <div className="challenges-list">
-        {challenges.map(challenge => {
-          const isCompleted = challenge.progress >= challenge.total;
-          const progressPercent = calculateProgress(challenge.progress, challenge.total);
-          const statusBadge = getStatusBadge(isCompleted ? 'completed' : challenge.status);
+        {loading ? (
+          <p style={{ textAlign: 'center', color: '#888', padding: '2rem' }}>Loading challenges...</p>
+        ) : challenges.length === 0 ? (
+          <p style={{ textAlign: 'center', color: '#888', padding: '2rem' }}>No challenges available yet.</p>
+        ) : challenges.map((challenge, index) => {
+          const progressPercent = calculateProgress(challenge.currentProgress, challenge.targetCount);
+          const statusBadge = getStatusBadge(challenge);
+          const imgName = challengeImages[index % challengeImages.length];
 
           return (
-            <div key={challenge.id} className={`challenge-list-item ${isCompleted ? 'completed' : ''}`}>
-              <img src={`/${challenge.id}.png`} alt={challenge.title} className="challenge-sticker" />
+            <div key={challenge.id} className={`challenge-list-item ${challenge.isCompleted ? 'completed' : ''}`}>
+              <img src={`/${imgName}.png`} alt={challenge.title} className="challenge-sticker" />
               <div className="challenge-list-content">
                 <div className="challenge-info">
                   <h3 className="challenge-title">{challenge.title}</h3>
@@ -84,7 +100,7 @@ const ExtraChallenges = () => {
                   <div className="progress-section">
                     <div className="progress-info">
                       <span className="progress-text">
-                        {challenge.progress} / {challenge.total}
+                        {challenge.currentProgress} / {challenge.targetCount}
                       </span>
                       <span className="progress-percent">
                         {Math.round(progressPercent)}%

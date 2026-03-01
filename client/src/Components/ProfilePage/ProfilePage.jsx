@@ -887,7 +887,7 @@ export default function ProfilePage({ onEdit }) {
               </div>
               <div className="profile-actions">
                 <div className="profile-points-section">
-                  <img src="/reward.png" alt="Reward" className="points-icon1" />
+                  <img src="star.png" alt="Reward" className="points-icon1" />
                   <div className="points-info">
       
                     <p className="points-value1">{totalPoints}</p>

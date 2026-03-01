@@ -1,88 +1,72 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './DailyChallenge.css';
 
-const DailyChallenge = ({ selectedDate }) => {
-  const [challenge, setChallenge] = useState(null);
+const API = process.env.REACT_APP_API_URL;
+
+const DailyChallenge = () => {
+  const [quiz, setQuiz] = useState(null);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [alreadyParticipated, setAlreadyParticipated] = useState(false);
+  const [participationHistory, setParticipationHistory] = useState(null);
+  const [streakData, setStreakData] = useState({ currentStreak: 0, completedDates: [] });
+  const [error, setError] = useState(null);
 
-  
-  const [streakData] = useState({
-    currentStreak: 4, 
-    completedDates: ['2026-01-24', '2026-01-25', '2026-01-26', '2026-01-27', '2026-01-01', '2026-01-03', '2026-01-15'] // Can have random completed dates
-  });
 
- 
-  const calculateStreak = (completedDates) => {
-    const today = new Date('2026-01-27'); 
-    let streak = 0;
-    let checkDate = new Date(today);
-    
-    while (true) {
-      const dateStr = checkDate.toISOString().split('T')[0];
-      if (completedDates.includes(dateStr)) {
-        streak++;
-        checkDate.setDate(checkDate.getDate() - 1); 
-      } else {
-        break; 
+  useEffect(() => {
+    const fetchAll = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('token');
+        const headers = { Authorization: `Bearer ${token}` };
+
+        // Fetch today's quiz
+        const quizRes = await axios.get(`${API}/api/gamification/quiz/daily`, { headers });
+        if (quizRes.data.success) {
+          setQuiz(quizRes.data.quiz);
+          setAlreadyParticipated(quizRes.data.alreadyParticipated);
+          if (quizRes.data.alreadyParticipated && quizRes.data.participationData) {
+            const pd = quizRes.data.participationData;
+            setParticipationHistory({
+              isCorrect: pd.wasCorrect,
+              pointsEarned: pd.pointsEarned,
+              participatedAt: pd.participatedAt
+            });
+          }
+        }
+
+        // Fetch gamification stats for streak
+        const statsRes = await axios.get(`${API}/api/gamification/stats`, { headers });
+        if (statsRes.data.success) {
+          const streaks = statsRes.data.data.streaks;
+          setStreakData(prev => ({ ...prev, currentStreak: streaks.currentStreak || 0 }));
+        }
+
+        // Fetch daily participation history for calendar
+        const histRes = await axios.get(
+          `${API}/api/gamification/history?challengeType=daily&limit=100`,
+          { headers }
+        );
+        if (histRes.data.success) {
+          const participations = histRes.data.data.participations || [];
+          const dates = participations.map(p =>
+            new Date(p.participatedAt).toISOString().split('T')[0]
+          );
+          setStreakData(prev => ({ ...prev, completedDates: dates }));
+        }
+      } catch (err) {
+        console.error('Error loading daily challenge:', err);
+        setError('Failed to load today\'s challenge. Please try again.');
+      } finally {
+        setLoading(false);
       }
-    }
-    
-    return streak;
-  };
-
- 
-  const challenges = {
-    '2026-01-01': {
-      type: 'riddle',
-      question: 'I sleep by day and bloom by night, my flowers are white and fragrant bright. What am I?',
-      options: [
-        'Night Blooming Jasmine',
-        'Morning Glory',
-        'Moonflower',
-        'Evening Primrose'
-      ],
-      correctAnswer: 0,
-      points: 10,
-      image: null
-    },
-    '2026-01-02': {
-      type: 'image',
-      question: 'What plant species does this flower belong to?',
-      options: [
-        'Pothos',
-        'Monstera Deliciosa',
-        'Philodendron',
-        'Anthurium'
-      ],
-      correctAnswer: 1,
-      points: 10,
-      image: '/hibiscus.jpg'
-    },
-    '2026-01-27': {
-      type: 'image',
-      question: 'What plant species does this flower belong to?',
-      options: [
-        'Hibiscus',
-        'Rose',
-        'Plumeria',
-        'Bougainvillea'
-      ],
-      correctAnswer: 0,
-      points: 10,
-      image: '/hibiscus.jpg'
-    }
-  };
-
-  const [viewingDate, setViewingDate] = useState(selectedDate || '2026-01-27');
-
-  const handleDateClick = (dateStr) => {
-    setViewingDate(dateStr);
-    setIsSubmitted(false);
-    setSelectedOption(null);
-    setResult(null);
-  };
+    };
+    fetchAll();
+  }, []);
 
   const handleCloseModal = () => {
     setIsSubmitted(false);
@@ -90,51 +74,85 @@ const DailyChallenge = ({ selectedDate }) => {
     setResult(null);
   };
 
-  useEffect(() => {
-    const dateKey = viewingDate;
-    const todayChallenge = challenges[dateKey] || challenges['2026-01-27'];
-    setChallenge(todayChallenge);
-    setIsSubmitted(false);
-    setSelectedOption(null);
-    setResult(null);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [viewingDate]);
-
-  const handleSubmit = () => {
-    if (selectedOption === null) return;
-
-    const isCorrect = selectedOption === challenge.correctAnswer;
-
-    setIsSubmitted(true);
-    setResult({
-      isCorrect,
-      correctAnswer: challenge.options[challenge.correctAnswer],
-      pointsEarned: isCorrect ? challenge.points : 0
-    });
+  const determineIsCorrect = (selectedOptionText) => {
+    if (!quiz) return false;
+    if (quiz.type === 'image-quiz' && quiz.plantName) {
+      // Compare selected option text against plantName (ignore parenthetical notes)
+      const basePlantName = quiz.plantName.split('(')[0].trim().toLowerCase();
+      const optionText = selectedOptionText.toLowerCase();
+      return optionText.includes(basePlantName) || basePlantName.includes(optionText);
+    }
+    // For riddle-quiz we cannot determine correctness without correctAnswer
+    return false;
   };
 
-  
-  const StreakCalendar = ({ onDateClick }) => {
-    // eslint-disable-next-line no-unused-vars
-    const currentDate = new Date(2026, 0); 
-    const daysInMonth = new Date(2026, 1, 0).getDate();
-    const firstDay = new Date(2026, 0, 1).getDay();
-    
-    const actualStreak = calculateStreak(streakData.completedDates);
+  const handleSubmit = async () => {
+    if (selectedOption === null || submitting || alreadyParticipated) return;
+    try {
+      setSubmitting(true);
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+      const selectedOptionText = quiz.options[selectedOption];
+      const isCorrect = determineIsCorrect(selectedOptionText);
 
-    const handleDateClick = (day) => {
-      const dateStr = `2026-01-${day.toString().padStart(2, '0')}`;
-      if (onDateClick) {
-        onDateClick(dateStr);
+      const res = await axios.post(
+        `${API}/api/gamification/daily`,
+        {
+          challengeId: quiz.quizId,
+          challengeSubType: quiz.type || 'riddle-quiz',
+          isCorrect,
+          metadata: { selectedAnswer: selectedOptionText }
+        },
+        { headers }
+      );
+
+      if (res.data.success) {
+        const data = res.data.data;
+        setIsSubmitted(true);
+        setAlreadyParticipated(true);
+        setResult({
+          isCorrect: data.pointsEarned > 0,
+          pointsEarned: data.pointsEarned,
+          serverMessage: res.data.message
+        });
+        setStreakData(prev => ({
+          ...prev,
+          currentStreak: data.currentStreak,
+          completedDates: [
+            ...prev.completedDates,
+            new Date().toISOString().split('T')[0]
+          ]
+        }));
       }
-    };
+    } catch (err) {
+      if (err.response?.status === 400 && err.response?.data?.message?.includes('already participated')) {
+        setAlreadyParticipated(true);
+      } else {
+        console.error('Submit error:', err);
+        setError('Failed to submit answer. Please try again.');
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+
+
+
+
+  const StreakCalendar = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDay = new Date(year, month, 1).getDay();
 
     return (
       <div className="streak-calendar">
         <div className="streak-header">
           <span className="streak-label">STREAK</span>
           <div className="streak-count-container">
-            <span className="streak-count">{actualStreak} days</span>
+            <span className="streak-count">{streakData.currentStreak} days</span>
             <img src="/streak-icon.png" alt="Streak" className="streak-icon" />
           </div>
         </div>
@@ -153,14 +171,13 @@ const DailyChallenge = ({ selectedDate }) => {
             
             {[...Array(daysInMonth)].map((_, i) => {
               const day = i + 1;
-              const dateStr = `2026-01-${day.toString().padStart(2, '0')}`;
+              const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
               const isCompleted = streakData.completedDates.includes(dateStr);
               
               return (
                 <div 
                   key={day} 
-                  className={`day-mini ${isCompleted ? 'completed' : ''} ${isCompleted ? 'clickable' : ''}`}
-                  onClick={() => isCompleted && handleDateClick(day)}
+                  className={`day-mini ${isCompleted ? 'completed' : ''}`}
                 >
                   {isCompleted ? '✓' : day}
                 </div>
@@ -172,8 +189,21 @@ const DailyChallenge = ({ selectedDate }) => {
     );
   };
 
-  if (!challenge) {
-    return <div className="daily-challenge-container">Loading challenge...</div>;
+  const quizType = quiz?.type || 'riddle-quiz';
+  const isRiddle = quizType === 'riddle-quiz';
+  const questionText = isRiddle ? (quiz?.riddle || quiz?.question) : quiz?.question;
+  const imageUrl = !isRiddle ? (quiz?.imageUrl || quiz?.image) : null;
+
+  if (loading) {
+    return <div className="daily-challenge-container">Loading today's challenge...</div>;
+  }
+
+  if (error) {
+    return <div className="daily-challenge-container" style={{ color: '#e74c3c', padding: '2rem' }}>{error}</div>;
+  }
+
+  if (!quiz) {
+    return <div className="daily-challenge-container">No challenge available today.</div>;
   }
 
   return (
@@ -182,19 +212,19 @@ const DailyChallenge = ({ selectedDate }) => {
         
         <div className="challenge-main">
           <div className="challenge-type-badge">
-            <span className={`type-pill ${challenge.type}`}>
+            <span className={`type-pill ${quizType}`}>
               <img 
-                src={challenge.type === 'riddle' ? '/riddle.png' : '/imageChallenge-icon.png'} 
-                alt={challenge.type}
+                src={isRiddle ? '/riddle.png' : '/imageChallenge-icon.png'} 
+                alt={quizType}
                 className="challenge-type-icon"
               />
-              {challenge.type === 'riddle' ? 'Riddle Challenge' : 'Image Challenge'}
+              {isRiddle ? 'Riddle Challenge' : 'Image Challenge'}
             </span>
           </div>
 
-          {challenge.type === 'image' && challenge.image && (
+          {!isRiddle && imageUrl && (
             <div className="challenge-image-container">
-              <img src={challenge.image} alt="Plant identification challenge" />
+              <img src={imageUrl} alt="Plant identification challenge" />
               <div className="image-label">Plant identification challenge</div>
             </div>
           )}
@@ -202,7 +232,7 @@ const DailyChallenge = ({ selectedDate }) => {
           <div className="question-section">
             <div className="question-box-container">
               <div className="question-box">
-                <p className="question-text">{challenge.question}</p>
+                <p className="question-text">{questionText}</p>
               </div>
               <img 
                 src="/thinking.png" 
@@ -212,13 +242,30 @@ const DailyChallenge = ({ selectedDate }) => {
             </div>
           </div>
 
-          {!isSubmitted ? (
+          {alreadyParticipated && !isSubmitted && (
+            <div className="already-participated-banner">
+              <img src="/feedback.png" alt="done" className="already-participated-icon" />
+              <div className="already-participated-text">
+                <h3>You've already completed today's challenge!</h3>
+                {participationHistory && (
+                  <p>
+                    {participationHistory.isCorrect
+                      ? `Great job! You earned ${participationHistory.pointsEarned} points.`
+                      : 'Better luck tomorrow!'}
+                  </p>
+                )}
+                <p className="already-participated-sub">Come back tomorrow for a new challenge.</p>
+              </div>
+            </div>
+          )}
+
+          {!alreadyParticipated && !isSubmitted ? (
             <>
               <div className="answer-section">
                 <label className="answer-label">Your Answer:</label>
                 
                 <div className="options-list">
-                  {challenge.options.map((option, index) => (
+                  {(quiz.options || []).map((option, index) => (
                     <button
                       key={index}
                       className={`option-button ${selectedOption === index ? 'selected' : ''}`}
@@ -237,16 +284,15 @@ const DailyChallenge = ({ selectedDate }) => {
                 <button 
                   onClick={handleSubmit} 
                   className="submit-button-capsule"
-                  disabled={selectedOption === null}
+                  disabled={selectedOption === null || submitting}
                 >
-                  Submit Answer
+                  {submitting ? 'Submitting...' : 'Submit Answer'}
                 </button>
               </div>
             </>
           ) : null}
 
-          
-          {isSubmitted && (
+          {isSubmitted && result && (
             <div className="result-modal-overlay">
               <div className="result-modal">
                 <button 
@@ -268,26 +314,24 @@ const DailyChallenge = ({ selectedDate }) => {
                 </h3>
                 
                 <p className="result-modal-message">
-                  {result.isCorrect 
+                  {result.serverMessage || (result.isCorrect 
                     ? `Great job! You've earned ${result.pointsEarned} points!`
-                    : `The correct answer is: ${result.correctAnswer}`
-                  }
+                    : `Keep trying! Your streak continues.`
+                  )}
                 </p>
                 
-                {result.isCorrect && (
+                {result.isCorrect && result.pointsEarned > 0 && (
                   <div className="result-modal-points">
                     +{result.pointsEarned} points
                   </div>
                 )}
-
-               
               </div>
             </div>
           )}
         </div>
 
         <div className="challenge-sidebar">
-          <StreakCalendar onDateClick={handleDateClick} />
+          <StreakCalendar />
         </div>
       </div>
     </div>
