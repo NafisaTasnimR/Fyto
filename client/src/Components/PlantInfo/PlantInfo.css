@@ -6,7 +6,7 @@
 }
 
 .plant-info-container {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 2rem;
   font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -163,88 +163,93 @@
   min-height: 300px;
 }
 
-/* Results List */
-.plant-results-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+/* Results Grid */
+.plant-results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 24px;
   width: 100%;
 }
 
-/* Result Row */
-.plant-result-row {
-  display: flex;
-  align-items: center;
-  gap: 20px;
+/* Plant Card */
+.plant-card {
   background: #fff;
-  border-radius: 14px;
-  padding: 14px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: box-shadow 0.2s;
-}
-
-.plant-result-row:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-}
-
-/* Row image */
-.plant-result-img-wrapper {
-  width: 90px;
-  height: 90px;
-  border-radius: 12px;
-  background: #e9f5ec;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 16px;
   overflow: hidden;
-  flex-shrink: 0;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
 }
 
-.plant-result-img {
+.plant-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+}
+
+/* Card image */
+.plant-card-img-wrapper {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  background: #e9f5ec;
+  overflow: hidden;
+}
+
+.plant-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
 }
 
-.plant-result-no-img {
+.plant-card:hover .plant-card-img {
+  transform: scale(1.05);
+}
+
+.plant-card-no-img {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36px;
+  width: 100%;
+  height: 100%;
+  font-size: 56px;
   color: #a3d4ae;
+  background: linear-gradient(135deg, #e9f5ec 0%, #d4edda 100%);
 }
 
-/* Row info */
-.plant-result-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.plant-card-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.92);
+  color: #2f6b48;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.plant-result-common {
-  font-size: 17px;
+/* Card body */
+.plant-card-body {
+  padding: 16px 18px 20px;
+}
+
+.plant-card-name {
+  font-size: 18px;
   font-weight: 700;
   color: #1a1a1a;
-  margin: 0;
+  margin: 0 0 4px;
+  line-height: 1.3;
 }
 
-.plant-result-scientific {
+.plant-card-scientific {
   font-size: 13px;
   font-style: italic;
   color: #888;
   margin: 0;
-}
-
-.plant-result-type {
-  display: inline-block;
-  padding: 3px 12px;
-  border-radius: 14px;
-  font-size: 12px;
-  font-weight: 600;
-  background: #e8f5e9;
-  color: #2f6b48;
-  margin-top: 6px;
-  width: fit-content;
+  line-height: 1.4;
 }
 
 /* Messages */
@@ -401,14 +406,13 @@
     width: 100%;
   }
 
-  .plant-result-row {
-    gap: 14px;
-    padding: 12px;
+  .plant-results-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
   }
 
-  .plant-result-img-wrapper {
-    width: 70px;
-    height: 70px;
+  .plant-card-img-wrapper {
+    height: 180px;
   }
 
   .plant-info-card {

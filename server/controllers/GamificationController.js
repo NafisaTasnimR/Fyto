@@ -1,7 +1,6 @@
 import User from '../models/User.js';
 import ChallengeParticipation from '../models/ChallengeParticipation.js';
 import { trackChallengeProgress } from '../services/ExtraChallengeService.js';
-import { trackChallengeProgress } from '../services/ExtraChallengeService.js';
 
 // Helper function to check and update streak
 const updateStreak = async (user) => {

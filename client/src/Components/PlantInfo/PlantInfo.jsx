@@ -1,52 +1,14 @@
 import React, { useState } from 'react';
 import Header from '../Shared/Header';
+import { searchPlants } from '../../services/plantService';
 import './PlantInfo.css';
-
-const MOCK_PLANTS = [
-  {
-    scientificName: 'Rosa chinensis',
-    commonName: 'China Rose',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Rosa_chinensis_-_Brera_Botanical_Garden_-_DSC09820.JPG/800px-Rosa_chinensis_-_Brera_Botanical_Garden_-_DSC09820.JPG',
-    plantType: 'Bush/Shrub',
-  },
-  {
-    scientificName: 'Monstera deliciosa',
-    commonName: 'Swiss Cheese Plant',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Monstera_deliciosa2.jpg/800px-Monstera_deliciosa2.jpg',
-    plantType: 'Climber',
-  },
-  {
-    scientificName: 'Aloe vera',
-    commonName: 'Aloe Vera',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Aloe_vera_flower_inridge.jpg/800px-Aloe_vera_flower_inridge.jpg',
-    plantType: 'Succulent',
-  },
-  {
-    scientificName: 'Ficus lyrata',
-    commonName: 'Fiddle Leaf Fig',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Ficus_lyrata_-_Palmengarten.jpg/800px-Ficus_lyrata_-_Palmengarten.jpg',
-    plantType: 'Tree',
-  },
-  {
-    scientificName: 'Lavandula angustifolia',
-    commonName: 'English Lavender',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Single_lavender_flower02.jpg/800px-Single_lavender_flower02.jpg',
-    plantType: 'Herb/Shrub',
-  },
-  {
-    scientificName: 'Epipremnum aureum',
-    commonName: 'Golden Pothos',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Epipremnum_aureum_31082012.jpg/800px-Epipremnum_aureum_31082012.jpg',
-    plantType: 'Vine',
-  },
-];
 
 const PlantInfo = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState(MOCK_PLANTS);
+  const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [searched, setSearched] = useState(true);
+  const [searched, setSearched] = useState(false);
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
@@ -65,33 +27,16 @@ const PlantInfo = () => {
     setSearched(true);
     setSearchResults([]);
 
-    // TODO: Replace mock filter with real API call
-    // try {
-    //   const token = localStorage.getItem('token');
-    //   const response = await axios.get(
-    //     `${process.env.REACT_APP_API_URL}/api/plants/search`,
-    //     {
-    //       params: { name: searchQuery },
-    //       headers: { Authorization: `Bearer ${token}` },
-    //     }
-    //   );
-    //   const plants = response.data.plants || response.data || [];
-    //   setSearchResults(Array.isArray(plants) ? plants : [plants]);
-    // } catch (err) {
-    //   console.error('Error searching plant:', err);
-    //   setError('Failed to search for plant. Please try again.');
-    // }
-
-    // Mock: filter the dummy data by query
-    const query = searchQuery.toLowerCase();
-    const filtered = MOCK_PLANTS.filter(
-      (p) =>
-        p.commonName.toLowerCase().includes(query) ||
-        p.scientificName.toLowerCase().includes(query) ||
-        p.plantType.toLowerCase().includes(query)
-    );
-    setSearchResults(filtered);
-    setLoading(false);
+    try {
+      const result = await searchPlants(searchQuery);
+      const plants = result.data || [];
+      setSearchResults(Array.isArray(plants) ? plants : [plants]);
+    } catch (err) {
+      console.error('Error searching plant:', err);
+      setError('Failed to search for plant. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -139,34 +84,31 @@ const PlantInfo = () => {
           )}
 
           {searchResults.length > 0 && (
-            <div className="plant-results-list">
+            <div className="plant-results-grid">
               {searchResults.map((plant, index) => (
-                <div className="plant-result-row" key={plant._id || index}>
-                  <div className="plant-result-img-wrapper">
+                <div className="plant-card" key={plant._id || plant.id || index}>
+                  <div className="plant-card-img-wrapper">
                     {plant.imageUrl ? (
                       <img
                         src={plant.imageUrl}
                         alt={plant.commonName || plant.scientificName}
-                        className="plant-result-img"
+                        className="plant-card-img"
                       />
                     ) : (
-                      <div className="plant-result-no-img">
+                      <div className="plant-card-no-img">
                         <span>🌱</span>
                       </div>
                     )}
+                    {plant.plantType && (
+                      <span className="plant-card-badge">{plant.plantType}</span>
+                    )}
                   </div>
-
-                  <div className="plant-result-info">
+                  <div className="plant-card-body">
                     {plant.commonName && (
-                      <h3 className="plant-result-common">{plant.commonName}</h3>
+                      <h3 className="plant-card-name">{plant.commonName}</h3>
                     )}
                     {plant.scientificName && (
-                      <p className="plant-result-scientific">
-                        {plant.scientificName}
-                      </p>
-                    )}
-                    {plant.plantType && (
-                      <span className="plant-result-type">{plant.plantType}</span>
+                      <p className="plant-card-scientific">{plant.scientificName}</p>
                     )}
                   </div>
                 </div>
