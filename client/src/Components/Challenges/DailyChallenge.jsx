@@ -8,7 +8,7 @@ const DailyChallenge = ({ selectedDate }) => {
   const [result, setResult] = useState(null);
 
   
-  const [streakData, setStreakData] = useState({
+  const [streakData] = useState({
     currentStreak: 4, 
     completedDates: ['2026-01-24', '2026-01-25', '2026-01-26', '2026-01-27', '2026-01-01', '2026-01-03', '2026-01-15'] // Can have random completed dates
   });
@@ -97,6 +97,7 @@ const DailyChallenge = ({ selectedDate }) => {
     setIsSubmitted(false);
     setSelectedOption(null);
     setResult(null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewingDate]);
 
   const handleSubmit = () => {
@@ -114,6 +115,7 @@ const DailyChallenge = ({ selectedDate }) => {
 
   
   const StreakCalendar = ({ onDateClick }) => {
+    // eslint-disable-next-line no-unused-vars
     const currentDate = new Date(2026, 0); 
     const daysInMonth = new Date(2026, 1, 0).getDate();
     const firstDay = new Date(2026, 0, 1).getDay();

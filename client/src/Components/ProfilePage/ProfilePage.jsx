@@ -4,7 +4,7 @@ import axios from 'axios'
 import Header from '../Shared/Header'
 import './ProfilePage.css'
 import '../SocialPage/SocialPage.css'
-import { getUserPosts, deletePost, updatePost } from '../../services/postService'
+import { getUserPosts, deletePost } from '../../services/postService' // eslint-disable-line no-unused-vars
 import { getUserMarketplacePosts } from '../../services/marketplaceService'
 import { getUserJournals } from '../../services/journalService'
 import { getCurrentUser } from '../../services/authService'

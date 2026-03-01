@@ -2,12 +2,51 @@ import React, { useState } from 'react';
 import Header from '../Shared/Header';
 import './PlantInfo.css';
 
+const MOCK_PLANTS = [
+  {
+    scientificName: 'Rosa chinensis',
+    commonName: 'China Rose',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Rosa_chinensis_-_Brera_Botanical_Garden_-_DSC09820.JPG/800px-Rosa_chinensis_-_Brera_Botanical_Garden_-_DSC09820.JPG',
+    plantType: 'Bush/Shrub',
+  },
+  {
+    scientificName: 'Monstera deliciosa',
+    commonName: 'Swiss Cheese Plant',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Monstera_deliciosa2.jpg/800px-Monstera_deliciosa2.jpg',
+    plantType: 'Climber',
+  },
+  {
+    scientificName: 'Aloe vera',
+    commonName: 'Aloe Vera',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Aloe_vera_flower_inridge.jpg/800px-Aloe_vera_flower_inridge.jpg',
+    plantType: 'Succulent',
+  },
+  {
+    scientificName: 'Ficus lyrata',
+    commonName: 'Fiddle Leaf Fig',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Ficus_lyrata_-_Palmengarten.jpg/800px-Ficus_lyrata_-_Palmengarten.jpg',
+    plantType: 'Tree',
+  },
+  {
+    scientificName: 'Lavandula angustifolia',
+    commonName: 'English Lavender',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Single_lavender_flower02.jpg/800px-Single_lavender_flower02.jpg',
+    plantType: 'Herb/Shrub',
+  },
+  {
+    scientificName: 'Epipremnum aureum',
+    commonName: 'Golden Pothos',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Epipremnum_aureum_31082012.jpg/800px-Epipremnum_aureum_31082012.jpg',
+    plantType: 'Vine',
+  },
+];
+
 const PlantInfo = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [plantData, setPlantData] = useState(null);
+  const [searchResults, setSearchResults] = useState(MOCK_PLANTS);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [searched, setSearched] = useState(false);
+  const [searched, setSearched] = useState(true);
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
@@ -15,7 +54,7 @@ const PlantInfo = () => {
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    
+
     if (!searchQuery.trim()) {
       setError('Please enter a plant name');
       return;
@@ -24,39 +63,47 @@ const PlantInfo = () => {
     setLoading(true);
     setError(null);
     setSearched(true);
-    setPlantData(null);
+    setSearchResults([]);
 
-    try {
-      // API call will be made here by the user
-      // const response = await axios.get(
-      //   `${process.env.REACT_APP_API_URL}/api/plants/search`,
-      //   {
-      //     params: { name: searchQuery },
-      //     headers: {
-      //       Authorization: `Bearer ${localStorage.getItem('token')}`,
-      //     },
-      //   }
-      // );
-      // setPlantData(response.data.plant);
+    // TODO: Replace mock filter with real API call
+    // try {
+    //   const token = localStorage.getItem('token');
+    //   const response = await axios.get(
+    //     `${process.env.REACT_APP_API_URL}/api/plants/search`,
+    //     {
+    //       params: { name: searchQuery },
+    //       headers: { Authorization: `Bearer ${token}` },
+    //     }
+    //   );
+    //   const plants = response.data.plants || response.data || [];
+    //   setSearchResults(Array.isArray(plants) ? plants : [plants]);
+    // } catch (err) {
+    //   console.error('Error searching plant:', err);
+    //   setError('Failed to search for plant. Please try again.');
+    // }
 
-      // For now, leave loading state and let user integrate API
-    } catch (err) {
-      console.error('Error searching plant:', err);
-      setError('Failed to search for plant. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    // Mock: filter the dummy data by query
+    const query = searchQuery.toLowerCase();
+    const filtered = MOCK_PLANTS.filter(
+      (p) =>
+        p.commonName.toLowerCase().includes(query) ||
+        p.scientificName.toLowerCase().includes(query) ||
+        p.plantType.toLowerCase().includes(query)
+    );
+    setSearchResults(filtered);
+    setLoading(false);
   };
 
   return (
     <div className="plant-info-page">
       <Header />
-      
+
       <div className="plant-info-container">
+        {/* Search */}
         <div className="search-section">
           <h1>Plant Information</h1>
           <p>Search for plant details, care tips, and more</p>
-          
+
           <form className="search-form" onSubmit={handleSearch}>
             <input
               type="text"
@@ -71,6 +118,7 @@ const PlantInfo = () => {
           </form>
         </div>
 
+        {/* Results */}
         <div className="plant-info-results">
           {loading && (
             <div className="plant-info-message loading">
@@ -84,99 +132,49 @@ const PlantInfo = () => {
             </div>
           )}
 
-          {searched && !loading && !plantData && !error && (
+          {searched && !loading && searchResults.length === 0 && !error && (
             <div className="plant-info-message no-results">
               <p>No plant found. Try a different search.</p>
             </div>
           )}
 
-          {plantData && (
-            <div className="plant-info-card">
-              <div className="plant-info-image-section">
-                {plantData.image && (
-                  <img 
-                    src={plantData.image} 
-                    alt={plantData.name}
-                    className="plant-info-image"
-                  />
-                )}
-              </div>
+          {searchResults.length > 0 && (
+            <div className="plant-results-list">
+              {searchResults.map((plant, index) => (
+                <div className="plant-result-row" key={plant._id || index}>
+                  <div className="plant-result-img-wrapper">
+                    {plant.imageUrl ? (
+                      <img
+                        src={plant.imageUrl}
+                        alt={plant.commonName || plant.scientificName}
+                        className="plant-result-img"
+                      />
+                    ) : (
+                      <div className="plant-result-no-img">
+                        <span>🌱</span>
+                      </div>
+                    )}
+                  </div>
 
-              <div className="plant-info-details-section">
-                <div className="plant-info-header-content">
-                  <h2 className="plant-info-name">{plantData.name}</h2>
-                  {plantData.scientificName && (
-                    <p className="plant-info-scientific">{plantData.scientificName}</p>
-                  )}
+                  <div className="plant-result-info">
+                    {plant.commonName && (
+                      <h3 className="plant-result-common">{plant.commonName}</h3>
+                    )}
+                    {plant.scientificName && (
+                      <p className="plant-result-scientific">
+                        {plant.scientificName}
+                      </p>
+                    )}
+                    {plant.plantType && (
+                      <span className="plant-result-type">{plant.plantType}</span>
+                    )}
+                  </div>
                 </div>
-
-                {plantData.description && (
-                  <div className="plant-info-section">
-                    <h3>Description</h3>
-                    <p>{plantData.description}</p>
-                  </div>
-                )}
-
-                {plantData.careInstructions && (
-                  <div className="plant-info-section">
-                    <h3>Care Instructions</h3>
-                    <p>{plantData.careInstructions}</p>
-                  </div>
-                )}
-
-                {plantData.wateringNeeds && (
-                  <div className="plant-info-section">
-                    <h3>Watering Needs</h3>
-                    <p>{plantData.wateringNeeds}</p>
-                  </div>
-                )}
-
-                {plantData.sunlightRequirements && (
-                  <div className="plant-info-section">
-                    <h3>Sunlight Requirements</h3>
-                    <p>{plantData.sunlightRequirements}</p>
-                  </div>
-                )}
-
-                {plantData.soilType && (
-                  <div className="plant-info-section">
-                    <h3>Soil Type</h3>
-                    <p>{plantData.soilType}</p>
-                  </div>
-                )}
-
-                {plantData.temperature && (
-                  <div className="plant-info-section">
-                    <h3>Temperature</h3>
-                    <p>{plantData.temperature}</p>
-                  </div>
-                )}
-
-                {plantData.hardiness && (
-                  <div className="plant-info-section">
-                    <h3>Hardiness</h3>
-                    <p>{plantData.hardiness}</p>
-                  </div>
-                )}
-
-                {plantData.commonPests && (
-                  <div className="plant-info-section">
-                    <h3>Common Pests</h3>
-                    <p>{plantData.commonPests}</p>
-                  </div>
-                )}
-
-                {plantData.benefits && (
-                  <div className="plant-info-section">
-                    <h3>Benefits</h3>
-                    <p>{plantData.benefits}</p>
-                  </div>
-                )}
-              </div>
+              ))}
             </div>
           )}
 
-          {!searched && !plantData && (
+          {!searched && searchResults.length === 0 && (
             <div className="plant-info-message empty">
               <p>Search for a plant to see its information</p>
             </div>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './ExtraChallenges.css';
 
 const ExtraChallenges = () => {
-  const [completedChallenges, setCompletedChallenges] = useState([]);
+  const [completedChallenges] = useState([]);
 
 
   const challenges = [

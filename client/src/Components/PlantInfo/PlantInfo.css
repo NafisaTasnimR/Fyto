@@ -161,9 +161,90 @@
 /* Results Section */
 .plant-info-results {
   min-height: 300px;
+}
+
+/* Results List */
+.plant-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+/* Result Row */
+.plant-result-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s;
+}
+
+.plant-result-row:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Row image */
+.plant-result-img-wrapper {
+  width: 90px;
+  height: 90px;
+  border-radius: 12px;
+  background: #e9f5ec;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.plant-result-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.plant-result-no-img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  color: #a3d4ae;
+}
+
+/* Row info */
+.plant-result-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.plant-result-common {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.plant-result-scientific {
+  font-size: 13px;
+  font-style: italic;
+  color: #888;
+  margin: 0;
+}
+
+.plant-result-type {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #e8f5e9;
+  color: #2f6b48;
+  margin-top: 6px;
+  width: fit-content;
 }
 
 /* Messages */
@@ -318,6 +399,16 @@
 
   .plant-search-btn {
     width: 100%;
+  }
+
+  .plant-result-row {
+    gap: 14px;
+    padding: 12px;
+  }
+
+  .plant-result-img-wrapper {
+    width: 70px;
+    height: 70px;
   }
 
   .plant-info-card {

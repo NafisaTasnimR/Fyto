@@ -27,6 +27,7 @@ const Store = () => {
 
   useEffect(() => {
     fetchMarketplacePosts();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   const fetchMarketplacePosts = async () => {

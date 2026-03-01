@@ -117,6 +117,8 @@
   height: 3px;
   background-color: #2f6b48;
   border-radius: 2px;
+}
+
 .center-nav .nav-link.active {
   color: #2f6b48;
 }
