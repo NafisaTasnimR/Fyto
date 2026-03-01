@@ -1,39 +1,34 @@
 import React, { useState } from 'react';
 import Header from '../Shared/Header';
+import { identifyPlant } from '../../services/plantService';
 import './PlantCare.css';
 
 const PlantCare = () => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [plantData, setPlantData] = useState(null);
-  // eslint-disable-next-line no-unused-vars
+  const [plantInfo, setPlantInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Simulated API call - replace this with your actual fetch logic later
-  const fetchPlantCareInfo = async () => {
+  const fetchPlantCareInfo = async (imageFile) => {
     setIsLoading(true);
     setError(null);
-    
-    // Simulating network delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    // Mock response following your exact required format
-    const mockResponse = {
-      watering_schedule: "Water once every 1-2 weeks, allowing soil to dry out between waterings.",
-      sunlight_requirement: "Bright, indirect light. Avoid direct harsh sunlight.",
-      soil_type: "Well-draining potting mix with perlite and peat moss.",
-      fertilizer_schedule: "Apply a balanced liquid fertilizer once a month during spring and summer.",
-      pruning_guide: "Trim yellowing or dead leaves at the base of the stem to promote new growth.",
-      repotting_frequency: "Repot every 1-2 years when roots start growing out of the drainage holes.",
-      care_timeline: [
-        "Week 1: Allow the plant to acclimate to its new spot. Do not repot immediately. Check soil moisture.",
-        "Week 2: Begin regular watering schedule. Wipe leaves with a damp cloth to remove dust.",
-        "Month 1: Apply first dose of diluted fertilizer if it is growing season.",
-        "Month 3: Check for root binding and assess if the plant needs a slightly larger pot."
-      ]
-    };
 
-    setPlantData(mockResponse);
-    setIsLoading(false);
+    try {
+      const response = await identifyPlant(imageFile);
+      setPlantInfo(response.plant || null);
+
+      if (typeof response.care === 'string') {
+        setError(response.care);
+      } else {
+        setPlantData(response.care);
+      }
+    } catch (err) {
+      console.error('Error identifying plant:', err);
+      setError(err.response?.data?.message || 'Failed to identify plant. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleImageUpload = (e) => {
@@ -44,8 +39,8 @@ const PlantCare = () => {
         setUploadedImage(reader.result);
         setError(null);
         setPlantData(null);
-        // Automatically fetch plant care info
-        fetchPlantCareInfo();
+        setPlantInfo(null);
+        fetchPlantCareInfo(file);
       };
       reader.readAsDataURL(file);
     }
@@ -85,6 +80,17 @@ const PlantCare = () => {
           <div className="uploaded-image-container">
             <img src={uploadedImage} alt="Uploaded plant" className="uploaded-image" />
           </div>
+          {plantInfo && (
+            <div className="identified-plant-info">
+              <h2>{plantInfo.plantName || plantInfo.scientificName}</h2>
+              {plantInfo.scientificName && plantInfo.plantName && (
+                <p className="scientific-name">{plantInfo.scientificName}</p>
+              )}
+              {plantInfo.confidence != null && (
+                <p className="confidence">Confidence: {(plantInfo.confidence * 100).toFixed(1)}%</p>
+              )}
+            </div>
+          )}
           <label htmlFor="plant-image-change" className="change-image-btn">
             <input
               id="plant-image-change"
@@ -95,6 +101,12 @@ const PlantCare = () => {
             />
             Change Image
           </label>
+        </div>
+      )}
+
+      {isLoading && (
+        <div className="loading-message">
+          <p>Identifying plant and generating care guide...</p>
         </div>
       )}
 
