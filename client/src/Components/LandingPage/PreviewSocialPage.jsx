@@ -113,7 +113,7 @@ const PreviewSocialPage = () => {
               <div key={post._id} className="preview-post-card">
                 <div className="preview-post-header">
                   <img
-                    src={post.authorId?.profilePic || '/boy.png'}
+                    src={post.authorId?.profilePic || '/dp.png'}
                     alt={post.authorId?.username}
                     className="preview-post-avatar"
                   />

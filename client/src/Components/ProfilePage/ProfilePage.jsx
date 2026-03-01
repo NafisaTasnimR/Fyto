@@ -8,6 +8,7 @@ import { getUserPosts, deletePost } from '../../services/postService' // eslint-
 import { getUserMarketplacePosts } from '../../services/marketplaceService'
 import { getUserJournals } from '../../services/journalService'
 import { getCurrentUser } from '../../services/authService'
+import { getProfilePic } from '../../utils/imageUtils'
 
 export default function ProfilePage({ onEdit }) {
   const [activeTab, setActiveTab] = useState('journals')
@@ -379,7 +380,7 @@ export default function ProfilePage({ onEdit }) {
                     {/* Post Header */}
                     <div className="post-header">
                       <img
-                        src={post.authorId?.profilePic || '/dp.png'}
+                        src={getProfilePic(post.authorId?.profilePic)}
                         alt={post.authorId?.name || 'User'}
                         className="avatar"
                       />
@@ -864,7 +865,7 @@ export default function ProfilePage({ onEdit }) {
         <div className="content-inner">
           <div className="profile-top">
             <div className="profile-photo" aria-hidden="false">
-              <img src={user?.profilePic || "/dp.png"} alt="Profile" />
+              <img src={getProfilePic(user?.profilePic)} alt="Profile" />
               <button
                 className="camera-btn"
                 onClick={() => setShowProfilePicModal(true)}
@@ -983,7 +984,7 @@ export default function ProfilePage({ onEdit }) {
             <div className="view-post-content">
               <div className="post-header">
                 <img
-                  src={viewingPost.authorId?.profilePic || '/dp.png'}
+                  src={getProfilePic(viewingPost.authorId?.profilePic)}
                   alt={viewingPost.authorId?.name || 'User'}
                   className="post-avatar"
                 />
@@ -1069,7 +1070,7 @@ export default function ProfilePage({ onEdit }) {
                 activeCommentsPost.comments.map((c) => (
                   <div key={c.id} className="comment-item">
                     <div className="comment-header">
-                      <img src={c.userAvatar || '/dp.png'} alt={c.username} className="comment-avatar" />
+                      <img src={getProfilePic(c.userAvatar)} alt={c.username} className="comment-avatar" />
                       <strong>{c.username}</strong>
                     </div>
                     <div className="comment-text">{c.text}</div>
@@ -1373,7 +1374,7 @@ export default function ProfilePage({ onEdit }) {
               <div className="profile-pic-upload-container">
                 <div className="profile-pic-preview">
                   <img
-                    src={profilePicPreview || user?.profilePic || "/dp.png"}
+                    src={profilePicPreview || getProfilePic(user?.profilePic)}
                     alt="Profile Preview"
                     className="preview-image"
                   />

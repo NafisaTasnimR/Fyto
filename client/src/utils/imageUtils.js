@@ -3,6 +3,17 @@
  */
 
 /**
+ * Returns the user's profile picture or the default dp.png.
+ * Falls back to /dp.png when the value is empty or is the server placeholder.
+ * @param {string} pic - profilePic value from the server
+ * @returns {string}
+ */
+export const getProfilePic = (pic) => {
+    if (!pic || pic.includes('via.placeholder.com')) return '/dp.png';
+    return pic;
+};
+
+/**
  * Convert file to base64 string
  * @param {File} file - The image file to convert
  * @returns {Promise<string>} - Base64 encoded string
