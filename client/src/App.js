@@ -46,8 +46,8 @@ function App() {
           <Route path="/preview-marketplace" element={<PreviewMarketplace />} />
           <Route path="/plant-info" element={<PlantInfo />} />
           <Route path="/plant-care" element={<PlantCare />} />
-          <Route path="/admin-login" element={<AdminLogin />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin-dashboard" element={<Admin />} />
         </Routes>
       </Router>
     </ConfirmedPostsProvider>
