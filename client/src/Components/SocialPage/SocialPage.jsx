@@ -13,6 +13,7 @@ const SocialPage = () => {
   const [showCreatePostModal, setShowCreatePostModal] = useState(false);
   const [showCommentsModal, setShowCommentsModal] = useState(false);
   const [activeCommentsPost, setActiveCommentsPost] = useState(null);
+  const [highlightedReplyId, setHighlightedReplyId] = useState(null);
   const [showViewPostModal, setShowViewPostModal] = useState(false);
   const [viewingPost, setViewingPost] = useState(null);
   const [showImageViewer, setShowImageViewer] = useState(false);
@@ -129,11 +130,34 @@ const SocialPage = () => {
             timestamp: formatTimestamp(post.createdAt),
             liked: post.likes?.includes(currentUserId) || false,
             comments: [],
+            commentsCount: null,
           };
         });
         setPosts(formattedPosts);
         setPostsError(null);
         console.log('Successfully loaded', formattedPosts.length, 'posts');
+
+        // Fetch comment counts for all posts in parallel
+        const commentData = await Promise.all(
+          formattedPosts.map(async (post) => {
+            try {
+              const res = await axios.get(
+                `${process.env.REACT_APP_API_URL}/api/posts/${post.id}/comments`,
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+              if (res.data.success) {
+                const comments = res.data.comments || [];
+                const totalCount = comments.reduce((sum, c) => sum + 1 + (c.replies?.length || 0), 0);
+                return { id: post.id, comments, commentsCount: totalCount };
+              }
+            } catch {}
+            return { id: post.id, comments: [], commentsCount: 0 };
+          })
+        );
+        setPosts(prev => prev.map(p => {
+          const data = commentData.find(d => d.id === p.id);
+          return data ? { ...p, comments: data.comments, commentsCount: data.commentsCount } : p;
+        }));
       } else {
         console.error('API returned success: false', response.data);
         setPostsError(response.data.message || 'Failed to load posts');
@@ -173,6 +197,95 @@ const SocialPage = () => {
       setUnreadCount(0);
     } catch (err) {
       console.error('Error marking notifications as read:', err);
+    }
+  };
+
+  const handleNotificationClick = async (notif) => {
+    if (!notif.postId) return;
+
+    try {
+      // Mark this notification as read
+      const token = localStorage.getItem('token');
+      await axios.patch(
+        `${process.env.REACT_APP_API_URL}/api/notifications/${notif._id}/read`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      ).catch(() => {}); // ignore if endpoint doesn't exist
+      setNotifications(prev => prev.map(n => n._id === notif._id ? { ...n, isRead: true } : n));
+
+      // Fetch the post
+      const postRes = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/posts/${notif.postId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (!postRes.data.success) return;
+
+      const post = postRes.data.post;
+
+      // Close notifications panel
+      setShowNotifications(false);
+
+      if (notif.type === 'comment' || notif.type === 'reply') {
+        // Open comments modal with the post's comments loaded
+        const comments = await fetchComments(post._id);
+
+        // For reply notifications, move the parent comment (the one replied to) to the top
+        let sortedComments = comments;
+        let replyToHighlight = null;
+        if (notif.type === 'reply' && notif.commentId) {
+          const replyIdStr = notif.commentId.toString();
+          const parentIdx = comments.findIndex(c =>
+            c.replies?.some(r => r._id?.toString() === replyIdStr)
+          );
+          if (parentIdx > 0) {
+            sortedComments = [comments[parentIdx], ...comments.filter((_, i) => i !== parentIdx)];
+          }
+          replyToHighlight = replyIdStr;
+        }
+
+        const formattedPost = {
+          id: post._id,
+          _id: post._id,
+          username: post.authorId?.username || 'Unknown User',
+          userAvatar: getProfilePic(post.authorId?.profilePic),
+          authorUserId: post.authorId?._id || null,
+          postImage: post.images && post.images.length > 0 ? post.images[0] : null,
+          likes: post.likes?.length || 0,
+          caption: post.content || '',
+          timestamp: formatTimestamp(post.createdAt),
+          comments: sortedComments,
+        };
+        setHighlightedReplyId(replyToHighlight);
+        setActiveCommentsPost(formattedPost);
+        setShowCommentsModal(true);
+        setModalCommentInput('');
+      } else {
+        // For likes — open the post view modal
+        const token2 = localStorage.getItem('token');
+        let currentUserId = null;
+        try {
+          const tokenParts = token2.split('.');
+          const payload = JSON.parse(atob(tokenParts[1]));
+          currentUserId = payload._id;
+        } catch (e) {}
+
+        const formattedPost = {
+          id: post._id,
+          username: post.authorId?.username || 'Unknown User',
+          userAvatar: getProfilePic(post.authorId?.profilePic),
+          authorUserId: post.authorId?._id || null,
+          postImage: post.images && post.images.length > 0 ? post.images[0] : null,
+          likes: post.likes?.length || 0,
+          caption: post.content || '',
+          timestamp: formatTimestamp(post.createdAt),
+          liked: currentUserId ? (post.likes?.includes(currentUserId) || false) : false,
+          comments: [],
+        };
+        setViewingPost(formattedPost);
+        setShowViewPostModal(true);
+      }
+    } catch (err) {
+      console.error('Error handling notification click:', err);
     }
   };
 
@@ -261,6 +374,8 @@ const SocialPage = () => {
 
   const [replyInputs, setReplyInputs] = useState({});
   const [openReply, setOpenReply] = useState({ postId: null, commentId: null });
+  const [commentInputs, setCommentInputs] = useState({});
+  const [modalCommentInput, setModalCommentInput] = useState('');
 
   const handleUserClick = (userId) => {
     if (userId) {
@@ -344,34 +459,102 @@ const SocialPage = () => {
     setReplyInputs({ ...replyInputs, [`${postId}-${commentId}`]: value });
   };
 
-  const submitReply = (postId, commentId) => {
+  const fetchComments = async (postId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/posts/${postId}/comments`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (response.data.success) return response.data.comments;
+    } catch (err) {
+      console.error('Error fetching comments:', err);
+    }
+    return [];
+  };
+
+  const submitComment = async (postId, content) => {
+    if (!content.trim()) return;
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/posts/${postId}/comments`,
+        { content: content.trim() },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (response.data.success) {
+        const newComment = { ...response.data.comment, replies: [] };
+        setPosts((prev) => prev.map((p) =>
+          p.id === postId ? { ...p, comments: [newComment, ...(p.comments || [])], commentsCount: (p.commentsCount ?? 0) + 1 } : p
+        ));
+        setActiveCommentsPost((prev) =>
+          prev && prev.id === postId
+            ? { ...prev, comments: [newComment, ...(prev.comments || [])], commentsCount: (prev.commentsCount ?? 0) + 1 }
+            : prev
+        );
+      }
+    } catch (err) {
+      console.error('Error submitting comment:', err);
+    }
+  };
+
+  const openCommentsModal = async (post) => {
+    const comments = await fetchComments(post.id);
+    const totalCount = comments.reduce((sum, c) => sum + 1 + (c.replies?.length || 0), 0);
+    setPosts((prev) => prev.map((p) =>
+      p.id === post.id ? { ...p, comments, commentsCount: totalCount } : p
+    ));
+    setActiveCommentsPost({ ...post, comments, commentsCount: totalCount });
+    setShowCommentsModal(true);
+    setModalCommentInput('');
+  };
+
+  const submitReply = async (postId, commentId) => {
     const key = `${postId}-${commentId}`;
     const text = (replyInputs[key] || '').trim();
     if (!text) return;
-
-    setPosts((prevPosts) => {
-      const newPosts = prevPosts.map((post) => {
-        if (post.id !== postId) return post;
-        return {
-          ...post,
-          comments: post.comments.map((c) =>
-            c.id === commentId
-              ? { ...c, replies: [...(c.replies || []), { id: Date.now(), username: 'You', text }] }
-              : c
-          ),
-        };
-      });
-
-      if (activeCommentsPost && activeCommentsPost.id === postId) {
-        const updated = newPosts.find((p) => p.id === postId);
-        setActiveCommentsPost(updated);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/comments/${commentId}/replies`,
+        { content: text },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (response.data.success) {
+        const newReply = response.data.comment;
+        setPosts((prevPosts) => {
+          const newPosts = prevPosts.map((post) => {
+            if (post.id !== postId) return post;
+            return {
+              ...post,
+              commentsCount: (post.commentsCount ?? 0) + 1,
+              comments: post.comments.map((c) =>
+                c._id === commentId
+                  ? { ...c, replies: [...(c.replies || []), newReply] }
+                  : c
+              ),
+            };
+          });
+          return newPosts;
+        });
+        setActiveCommentsPost((prev) => {
+          if (!prev || prev.id !== postId) return prev;
+          return {
+            ...prev,
+            commentsCount: (prev.commentsCount ?? 0) + 1,
+            comments: prev.comments.map((c) =>
+              c._id === commentId
+                ? { ...c, replies: [...(c.replies || []), newReply] }
+                : c
+            ),
+          };
+        });
+        setReplyInputs({ ...replyInputs, [key]: '' });
+        setOpenReply({ postId: null, commentId: null });
       }
-
-      return newPosts;
-    });
-
-    setReplyInputs({ ...replyInputs, [key]: '' });
-    setOpenReply({ postId: null, commentId: null });
+    } catch (err) {
+      console.error('Error submitting reply:', err);
+    }
   };
 
   const handleCreatePost = async (e) => {
@@ -586,12 +769,12 @@ const SocialPage = () => {
           </button>
           <button
             className="action-btn comment-btn"
-            onClick={() => {
-              setActiveCommentsPost(post);
-              setShowCommentsModal(true);
-            }}
+            onClick={() => openCommentsModal(post)}
           >
             <img src="/cmnt.png" alt="comment" className="action-icon" />
+            {post.commentsCount !== null && post.commentsCount > 0 && (
+              <span className="action-count">{post.commentsCount}</span>
+            )}
           </button>
           <button 
             className="action-btn share-btn"
@@ -611,13 +794,13 @@ const SocialPage = () => {
         <div className="comments-section">
           {post.comments.length > 0 ? (
             <>
-              {post.comments.map((comment) => (
-                <div key={comment.id} className="comment">
+              {post.comments.slice(0, 2).map((comment) => (
+                <div key={comment._id} className="comment">
                   <div className="comment-main">
-                    <strong>{comment.username}</strong> {comment.text}
+                    <strong>{comment.authorId?.name || comment.authorId?.username || 'User'}</strong> {comment.content}
                     <button
                       className="reply-btn"
-                      onClick={() => toggleReply(post.id, comment.id)}
+                      onClick={() => toggleReply(post.id, comment._id)}
                       title="Reply"
                     >
                       Reply
@@ -627,25 +810,25 @@ const SocialPage = () => {
                   {comment.replies && comment.replies.length > 0 && (
                     <div className="comment-replies">
                       {comment.replies.map((r) => (
-                        <div key={r.id} className="comment-reply">
-                          <strong>{r.username}</strong> {r.text}
+                        <div key={r._id} className="comment-reply">
+                          <strong>{r.authorId?.name || r.authorId?.username || 'User'}</strong> {r.content}
                         </div>
                       ))}
                     </div>
                   )}
 
-                  {openReply.postId === post.id && openReply.commentId === comment.id && (
+                  {openReply.postId === post.id && openReply.commentId === comment._id && (
                     <div className="reply-composer">
                       <input
                         type="text"
-                        placeholder={`Reply to ${comment.username}...`}
-                        value={replyInputs[`${post.id}-${comment.id}`] || ''}
-                        onChange={(e) => handleReplyChange(post.id, comment.id, e.target.value)}
+                        placeholder={`Reply to ${comment.authorId?.name || 'user'}...`}
+                        value={replyInputs[`${post.id}-${comment._id}`] || ''}
+                        onChange={(e) => handleReplyChange(post.id, comment._id, e.target.value)}
                         className="reply-input"
                       />
                       <button
                         className="reply-send"
-                        onClick={() => submitReply(post.id, comment.id)}
+                        onClick={() => submitReply(post.id, comment._id)}
                       >
                         Send
                       </button>
@@ -656,17 +839,14 @@ const SocialPage = () => {
               {post.comments.length > 2 && (
                 <button
                   className="view-more-comments"
-                  onClick={() => {
-                    setActiveCommentsPost(post);
-                    setShowCommentsModal(true);
-                  }}
+                  onClick={() => openCommentsModal(post)}
                 >
                   View all {post.comments.length} comments
                 </button>
               )}
             </>
           ) : (
-            <p className="no-comments">No comments yet. Be the first to comment!</p>
+            post.commentsCount === 0 && <p className="no-comments">No comments yet. Be the first to comment!</p>
           )}
         </div>
 
@@ -675,8 +855,22 @@ const SocialPage = () => {
             type="text"
             placeholder="Add a comment..."
             className="comment-input"
+            value={commentInputs[post.id] || ''}
+            onChange={(e) => setCommentInputs({ ...commentInputs, [post.id]: e.target.value })}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                submitComment(post.id, commentInputs[post.id] || '');
+                setCommentInputs({ ...commentInputs, [post.id]: '' });
+              }
+            }}
           />
-          <button className="post-comment-btn">Post</button>
+          <button
+            className="post-comment-btn"
+            onClick={() => {
+              submitComment(post.id, commentInputs[post.id] || '');
+              setCommentInputs({ ...commentInputs, [post.id]: '' });
+            }}
+          >Post</button>
         </div>
       </div>
     );
@@ -855,13 +1049,13 @@ const SocialPage = () => {
       )}
 
       {showCommentsModal && activeCommentsPost && (
-        <div className="modal-overlay" onClick={() => { setShowCommentsModal(false); setActiveCommentsPost(null); }}>
+        <div className="modal-overlay" onClick={() => { setShowCommentsModal(false); setActiveCommentsPost(null); setHighlightedReplyId(null); }}>
           <div className="modal-content comments-style" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>{activeCommentsPost.username}'s Post</h2>
               <button
                 className="close-btn"
-                onClick={() => { setShowCommentsModal(false); setActiveCommentsPost(null); }}
+                onClick={() => { setShowCommentsModal(false); setActiveCommentsPost(null); setHighlightedReplyId(null); }}
                 title="Close comments"
               >
                 ✕
@@ -871,16 +1065,16 @@ const SocialPage = () => {
             <div className="comments-list">
               {activeCommentsPost.comments && activeCommentsPost.comments.length > 0 ? (
                 activeCommentsPost.comments.map((c) => (
-                  <div key={c.id} className="comment-item">
-                    <img src="/girl.png" alt={c.username} className="comment-avatar" />
+                  <div key={c._id} className="comment-item">
+                    <img src={getProfilePic(c.authorId?.profilePic)} alt={c.authorId?.name || 'User'} className="comment-avatar" />
                     <div className="comment-body">
-                      <strong>{c.username}</strong>
-                      <p>{c.text}</p>
+                      <strong>{c.authorId?.name || c.authorId?.username || 'User'}</strong>
+                      <p>{c.content}</p>
 
                       <div className="modal-comment-actions">
                         <button
                           className="reply-btn"
-                          onClick={() => toggleReply(activeCommentsPost.id, c.id)}
+                          onClick={() => toggleReply(activeCommentsPost.id, c._id)}
                         >
                           Reply
                         </button>
@@ -889,25 +1083,28 @@ const SocialPage = () => {
                       {c.replies && c.replies.length > 0 && (
                         <div className="comment-replies modal-replies">
                           {c.replies.map((r) => (
-                            <div key={r.id} className="comment-reply">
-                              <strong>{r.username}</strong> {r.text}
+                            <div
+                              key={r._id}
+                              className={`comment-reply${r._id?.toString() === highlightedReplyId ? ' highlighted-reply' : ''}`}
+                            >
+                              <strong>{r.authorId?.name || r.authorId?.username || 'User'}</strong> {r.content}
                             </div>
                           ))}
                         </div>
                       )}
 
-                      {openReply.postId === activeCommentsPost.id && openReply.commentId === c.id && (
+                      {openReply.postId === activeCommentsPost.id && openReply.commentId === c._id && (
                         <div className="reply-composer modal-reply-composer">
                           <input
                             type="text"
-                            placeholder={`Reply to ${c.username}...`}
-                            value={replyInputs[`${activeCommentsPost.id}-${c.id}`] || ''}
-                            onChange={(e) => handleReplyChange(activeCommentsPost.id, c.id, e.target.value)}
+                            placeholder={`Reply to ${c.authorId?.name || 'user'}...`}
+                            value={replyInputs[`${activeCommentsPost.id}-${c._id}`] || ''}
+                            onChange={(e) => handleReplyChange(activeCommentsPost.id, c._id, e.target.value)}
                             className="reply-input"
                           />
                           <button
                             className="reply-send"
-                            onClick={() => submitReply(activeCommentsPost.id, c.id)}
+                            onClick={() => submitReply(activeCommentsPost.id, c._id)}
                           >
                             Send
                           </button>
@@ -922,8 +1119,26 @@ const SocialPage = () => {
             </div>
 
             <div className="comment-composer">
-              <input type="text" placeholder="Write a comment..." className="composer-input" />
-              <button className="composer-send">➤</button>
+              <input
+                type="text"
+                placeholder="Write a comment..."
+                className="composer-input"
+                value={modalCommentInput}
+                onChange={(e) => setModalCommentInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    submitComment(activeCommentsPost.id, modalCommentInput);
+                    setModalCommentInput('');
+                  }
+                }}
+              />
+              <button
+                className="composer-send"
+                onClick={() => {
+                  submitComment(activeCommentsPost.id, modalCommentInput);
+                  setModalCommentInput('');
+                }}
+              >➤</button>
             </div>
           </div>
         </div>
@@ -1043,7 +1258,9 @@ const SocialPage = () => {
               notifications.map((notif) => (
                 <div
                   key={notif._id}
-                  className={`notification-item ${notif.isRead ? 'read' : 'unread'}`}
+                  className={`notification-item ${notif.isRead ? 'read' : 'unread'} ${notif.postId ? 'clickable' : ''}`}
+                  onClick={() => notif.postId && handleNotificationClick(notif)}
+                  style={notif.postId ? { cursor: 'pointer' } : {}}
                 >
                   <img
                     src={getProfilePic(notif.senderId?.profilePic)}

@@ -417,6 +417,15 @@
   font-weight: 500;
   transition: opacity 0.2s;
   background: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.journal-privacy-icon {
+  width: 13px;
+  height: 13px;
+  object-fit: contain;
 }
 
 .journal-privacy-btn.public {
@@ -434,10 +443,18 @@
 }
 
 .post-privacy-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   font-size: 11px;
   color: #888;
   margin-top: 2px;
+}
+
+.privacy-badge-icon {
+  width: 11px;
+  height: 11px;
+  object-fit: contain;
 }
 
 .journal-title {

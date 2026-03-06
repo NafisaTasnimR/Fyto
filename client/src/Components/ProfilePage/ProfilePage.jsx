@@ -28,6 +28,8 @@ export default function ProfilePage({ onEdit }) {
   const [activeCommentsPost, setActiveCommentsPost] = useState(null)
   const [replyInputs, setReplyInputs] = useState({})
   const [openReply, setOpenReply] = useState({ postId: null, commentId: null })
+  const [commentInputs, setCommentInputs] = useState({})
+  const [modalCommentInput, setModalCommentInput] = useState('')
   const [showEditModal, setShowEditModal] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [showProfilePicModal, setShowProfilePicModal] = useState(false)
@@ -91,7 +93,30 @@ export default function ProfilePage({ onEdit }) {
           setJournals(journalsData.data)
         } else if (activeTab === 'social') {
           const postsData = await getUserPosts()
-          setPosts(postsData.posts)
+          const fetchedPosts = postsData.posts
+          setPosts(fetchedPosts)
+          // Fetch comment counts for all posts in parallel
+          const token = localStorage.getItem('token')
+          const commentData = await Promise.all(
+            fetchedPosts.map(async (post) => {
+              try {
+                const res = await axios.get(
+                  `${process.env.REACT_APP_API_URL}/api/posts/${post._id}/comments`,
+                  { headers: { Authorization: `Bearer ${token}` } }
+                )
+                if (res.data.success) {
+                  const comments = res.data.comments || []
+                  const totalCount = comments.reduce((sum, c) => sum + 1 + (c.replies?.length || 0), 0)
+                  return { _id: post._id, comments, commentsCount: totalCount }
+                }
+              } catch {}
+              return { _id: post._id, comments: [], commentsCount: 0 }
+            })
+          )
+          setPosts(prev => prev.map(p => {
+            const data = commentData.find(d => d._id === p._id)
+            return data ? { ...p, comments: data.comments, commentsCount: data.commentsCount } : p
+          }))
         } else if (activeTab === 'marketplace') {
           const marketplaceData = await getUserMarketplacePosts()
           setMarketplacePosts(marketplaceData.posts)
@@ -204,29 +229,99 @@ export default function ProfilePage({ onEdit }) {
     setReplyInputs({ ...replyInputs, [`${postId}-${commentId}`]: value })
   }
 
-  const submitReply = (postId, commentId) => {
+  const fetchComments = async (postId) => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/posts/${postId}/comments`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      if (response.data.success) return response.data.comments
+    } catch (err) {
+      console.error('Error fetching comments:', err)
+    }
+    return []
+  }
+
+  const submitComment = async (postId, content) => {
+    if (!content.trim()) return
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/posts/${postId}/comments`,
+        { content: content.trim() },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      if (response.data.success) {
+        const newComment = { ...response.data.comment, replies: [] }
+        setPosts((prev) => prev.map((p) =>
+          p._id === postId ? { ...p, comments: [newComment, ...(p.comments || [])], commentsCount: (p.commentsCount ?? 0) + 1 } : p
+        ))
+        setActiveCommentsPost((prev) =>
+          prev && prev._id === postId
+            ? { ...prev, comments: [newComment, ...(prev.comments || [])], commentsCount: (prev.commentsCount ?? 0) + 1 }
+            : prev
+        )
+      }
+    } catch (err) {
+      console.error('Error submitting comment:', err)
+    }
+  }
+
+  const openCommentsModal = async (post) => {
+    const comments = await fetchComments(post._id)
+    const totalCount = comments.reduce((sum, c) => sum + 1 + (c.replies?.length || 0), 0)
+    setPosts((prev) => prev.map((p) =>
+      p._id === post._id ? { ...p, comments, commentsCount: totalCount } : p
+    ))
+    setActiveCommentsPost({ ...post, comments, commentsCount: totalCount })
+    setShowCommentsModal(true)
+    setModalCommentInput('')
+  }
+
+  const submitReply = async (postId, commentId) => {
     const key = `${postId}-${commentId}`
     const text = (replyInputs[key] || '').trim()
     if (!text) return
-
-    // Update post comments with reply
-    setPosts((prevPosts) => {
-      const newPosts = prevPosts.map((post) => {
-        if (post._id !== postId) return post
-        return {
-          ...post,
-          comments: (post.comments || []).map((c) =>
-            c.id === commentId
-              ? { ...c, replies: [...(c.replies || []), { id: Date.now(), username: 'You', text }] }
-              : c
-          ),
-        }
-      })
-      return newPosts
-    })
-
-    setReplyInputs({ ...replyInputs, [key]: '' })
-    setOpenReply({ postId: null, commentId: null })
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/comments/${commentId}/replies`,
+        { content: text },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      if (response.data.success) {
+        const newReply = response.data.comment
+        setPosts((prevPosts) => prevPosts.map((post) => {
+          if (post._id !== postId) return post
+          return {
+            ...post,
+            commentsCount: (post.commentsCount ?? 0) + 1,
+            comments: (post.comments || []).map((c) =>
+              c._id === commentId
+                ? { ...c, replies: [...(c.replies || []), newReply] }
+                : c
+            ),
+          }
+        }))
+        setActiveCommentsPost((prev) => {
+          if (!prev || prev._id !== postId) return prev
+          return {
+            ...prev,
+            commentsCount: (prev.commentsCount ?? 0) + 1,
+            comments: prev.comments.map((c) =>
+              c._id === commentId
+                ? { ...c, replies: [...(c.replies || []), newReply] }
+                : c
+            ),
+          }
+        })
+        setReplyInputs({ ...replyInputs, [key]: '' })
+        setOpenReply({ postId: null, commentId: null })
+      }
+    } catch (err) {
+      console.error('Error submitting reply:', err)
+    }
   }
 
   const handleDeletePost = (postId) => {
@@ -402,7 +497,8 @@ export default function ProfilePage({ onEdit }) {
                         onClick={() => toggleJournalPrivacy(journal)}
                         title={journal.isPublic ? 'Click to make private' : 'Click to make public'}
                       >
-                        {journal.isPublic ? '🌐 Public' : '🔒 Private'}
+                        <img src={journal.isPublic ? '/unlock.png' : '/lock.png'} alt={journal.isPublic ? 'Public' : 'Private'} className="journal-privacy-icon" />
+                        {journal.isPublic ? 'Public' : 'Private'}
                       </button>
                     </div>
                   </div>
@@ -430,14 +526,15 @@ export default function ProfilePage({ onEdit }) {
                       />
                       <div className="header-info">
                         <h3 className="username">
-                          {post.authorId?.name || 'Unknown User'}
+                          {post.authorId?.username || post.authorId?.name || 'Unknown User'}
                         </h3>
                         <span className="timestamp">
                           {formatTimestamp(post.createdAt)}
                         </span>
-                        {post.isPrivate && (
-                          <span className="post-privacy-badge">🔒 Private</span>
-                        )}
+                        <span className="post-privacy-badge">
+                          <img src={post.isPrivate ? '/lock.png' : '/unlock.png'} alt={post.isPrivate ? 'Private' : 'Public'} className="privacy-badge-icon" />
+                          {post.isPrivate ? 'Private' : 'Public'}
+                        </span>
                       </div>
                       <button
                         className="options-menu-btn"
@@ -507,12 +604,12 @@ export default function ProfilePage({ onEdit }) {
                       </button>
                       <button
                         className="action-btn comment-btn"
-                        onClick={() => {
-                          setActiveCommentsPost(post)
-                          setShowCommentsModal(true)
-                        }}
+                        onClick={() => openCommentsModal(post)}
                       >
                         <img src="/cmnt.png" alt="comment" className="action-icon" />
+                        {post.commentsCount !== null && post.commentsCount !== undefined && post.commentsCount > 0 && (
+                          <span className="action-count">{post.commentsCount}</span>
+                        )}
                       </button>
                       <button className="action-btn share-btn">
                         <img src="/send.png" alt="share" className="action-icon" />
@@ -527,26 +624,23 @@ export default function ProfilePage({ onEdit }) {
                       {post.comments && post.comments.length > 0 ? (
                         <>
                           {post.comments.slice(0, 2).map((comment) => (
-                            <div key={comment.id} className="comment">
+                            <div key={comment._id} className="comment">
                               <div className="comment-main">
-                                <strong>{comment.username}</strong> {comment.text}
+                                <strong>{comment.authorId?.name || comment.authorId?.username || 'User'}</strong> {comment.content}
                               </div>
                             </div>
                           ))}
                           {post.comments.length > 2 && (
                             <button
                               className="view-more-comments"
-                              onClick={() => {
-                                setActiveCommentsPost(post)
-                                setShowCommentsModal(true)
-                              }}
+                              onClick={() => openCommentsModal(post)}
                             >
                               View all {post.comments.length} comments
                             </button>
                           )}
                         </>
                       ) : (
-                        <p className="no-comments">No comments yet</p>
+                        post.commentsCount === 0 && <p className="no-comments">No comments yet</p>
                       )}
                     </div>
 
@@ -555,8 +649,22 @@ export default function ProfilePage({ onEdit }) {
                         type="text"
                         placeholder="Add a comment..."
                         className="comment-input"
+                        value={commentInputs[post._id] || ''}
+                        onChange={(e) => setCommentInputs({ ...commentInputs, [post._id]: e.target.value })}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            submitComment(post._id, commentInputs[post._id] || '')
+                            setCommentInputs({ ...commentInputs, [post._id]: '' })
+                          }
+                        }}
                       />
-                      <button className="post-comment-btn">Post</button>
+                      <button
+                        className="post-comment-btn"
+                        onClick={() => {
+                          submitComment(post._id, commentInputs[post._id] || '')
+                          setCommentInputs({ ...commentInputs, [post._id]: '' })
+                        }}
+                      >Post</button>
                     </div>
                   </div>
                 ))
@@ -1083,10 +1191,12 @@ export default function ProfilePage({ onEdit }) {
                 </button>
                 <button
                   className="action-btn comment-btn"
-                  onClick={() => {
-                    setActiveCommentsPost(viewingPost)
+                  onClick={async () => {
+                    const comments = await fetchComments(viewingPost._id)
+                    setActiveCommentsPost({ ...viewingPost, comments })
                     setShowCommentsModal(true)
                     setShowViewPostModal(false)
+                    setModalCommentInput('')
                   }}
                 >
                   <img src="/cmnt.png" alt="comment" className="action-icon" />
@@ -1107,7 +1217,7 @@ export default function ProfilePage({ onEdit }) {
       {/* Comments Modal */}
       {showCommentsModal && activeCommentsPost && (
         <div className="modal-overlay" onClick={() => setShowCommentsModal(false)}>
-          <div className="modal-content comments-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content comments-style" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>Comments</h2>
               <button
@@ -1119,50 +1229,52 @@ export default function ProfilePage({ onEdit }) {
               </button>
             </div>
 
-            <div className="comments-modal-content">
+            <div className="comments-list">
               {activeCommentsPost.comments && activeCommentsPost.comments.length > 0 ? (
                 activeCommentsPost.comments.map((c) => (
-                  <div key={c.id} className="comment-item">
-                    <div className="comment-header">
-                      <img src={getProfilePic(c.userAvatar)} alt={c.username} className="comment-avatar" />
-                      <strong>{c.username}</strong>
-                    </div>
-                    <div className="comment-text">{c.text}</div>
+                  <div key={c._id} className="comment-item">
+                    <img src={getProfilePic(c.authorId?.profilePic)} alt={c.authorId?.username || c.authorId?.name || 'User'} className="comment-avatar" />
+                    <div className="comment-body">
+                      <strong>{c.authorId?.username || c.authorId?.name || 'User'}</strong>
+                      <p>{c.content}</p>
 
-                    {c.replies && c.replies.length > 0 && (
-                      <div className="comment-replies">
-                        {c.replies.map((r) => (
-                          <div key={r.id} className="comment-reply">
-                            <strong>{r.username}</strong> {r.text}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    <button
-                      className="reply-btn"
-                      onClick={() => toggleReply(activeCommentsPost._id, c.id)}
-                    >
-                      Reply
-                    </button>
-
-                    {openReply.postId === activeCommentsPost._id && openReply.commentId === c.id && (
-                      <div className="reply-composer">
-                        <input
-                          type="text"
-                          placeholder={`Reply to ${c.username}...`}
-                          value={replyInputs[`${activeCommentsPost._id}-${c.id}`] || ''}
-                          onChange={(e) => handleReplyChange(activeCommentsPost._id, c.id, e.target.value)}
-                          className="reply-input"
-                        />
+                      <div className="modal-comment-actions">
                         <button
-                          className="reply-send"
-                          onClick={() => submitReply(activeCommentsPost._id, c.id)}
+                          className="reply-btn"
+                          onClick={() => toggleReply(activeCommentsPost._id, c._id)}
                         >
-                          Send
+                          Reply
                         </button>
                       </div>
-                    )}
+
+                      {c.replies && c.replies.length > 0 && (
+                        <div className="comment-replies modal-replies">
+                          {c.replies.map((r) => (
+                            <div key={r._id} className="comment-reply">
+                              <strong>{r.authorId?.username || r.authorId?.name || 'User'}</strong> {r.content}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {openReply.postId === activeCommentsPost._id && openReply.commentId === c._id && (
+                        <div className="reply-composer modal-reply-composer">
+                          <input
+                            type="text"
+                            placeholder={`Reply to ${c.authorId?.username || c.authorId?.name || 'user'}...`}
+                            value={replyInputs[`${activeCommentsPost._id}-${c._id}`] || ''}
+                            onChange={(e) => handleReplyChange(activeCommentsPost._id, c._id, e.target.value)}
+                            className="reply-input"
+                          />
+                          <button
+                            className="reply-send"
+                            onClick={() => submitReply(activeCommentsPost._id, c._id)}
+                          >
+                            Send
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))
               ) : (
@@ -1171,8 +1283,26 @@ export default function ProfilePage({ onEdit }) {
             </div>
 
             <div className="comment-composer">
-              <input type="text" placeholder="Write a comment..." className="composer-input" />
-              <button className="composer-send">➤</button>
+              <input
+                type="text"
+                placeholder="Write a comment..."
+                className="composer-input"
+                value={modalCommentInput}
+                onChange={(e) => setModalCommentInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    submitComment(activeCommentsPost._id, modalCommentInput)
+                    setModalCommentInput('')
+                  }
+                }}
+              />
+              <button
+                className="composer-send"
+                onClick={() => {
+                  submitComment(activeCommentsPost._id, modalCommentInput)
+                  setModalCommentInput('')
+                }}
+              >➤</button>
             </div>
           </div>
         </div>
