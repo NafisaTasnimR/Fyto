@@ -348,6 +348,41 @@ export default function ProfilePage({ onEdit }) {
     setEditPostImage(null)
   }
 
+  const togglePostPrivacy = async (post) => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/posts/${post._id}`,
+        { isPrivate: !post.isPrivate },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      if (response.data.success) {
+        setPosts(posts.map(p => p._id === post._id ? { ...p, isPrivate: !post.isPrivate } : p))
+      }
+    } catch (err) {
+      console.error('Error toggling post privacy:', err)
+      alert('Failed to update post privacy.')
+    }
+    setOpenMenuPostId(null)
+  }
+
+  const toggleJournalPrivacy = async (journal) => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/journals/${journal._id}`,
+        { isPublic: !journal.isPublic },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      if (response.data.success) {
+        setJournals(journals.map(j => j._id === journal._id ? { ...j, isPublic: !journal.isPublic } : j))
+      }
+    } catch (err) {
+      console.error('Error toggling journal privacy:', err)
+      alert('Failed to update journal privacy.')
+    }
+  }
+
   const renderContent = () => {
     switch (activeTab) {
       case 'journals':
@@ -358,9 +393,18 @@ export default function ProfilePage({ onEdit }) {
               {journals.length > 0 ? (
                 journals.map((journal) => (
                   <div key={journal._id} className="journal-item">
-                    <Link to={`/journal/${journal._id}`} className="journal-title">
-                      {journal.title}
-                    </Link>
+                    <div className="journal-item-row">
+                      <Link to={`/journal/${journal._id}`} className="journal-title">
+                        {journal.title}
+                      </Link>
+                      <button
+                        className={`journal-privacy-btn ${journal.isPublic ? 'public' : 'private'}`}
+                        onClick={() => toggleJournalPrivacy(journal)}
+                        title={journal.isPublic ? 'Click to make private' : 'Click to make public'}
+                      >
+                        {journal.isPublic ? '🌐 Public' : '🔒 Private'}
+                      </button>
+                    </div>
                   </div>
                 ))
               ) : (
@@ -391,6 +435,9 @@ export default function ProfilePage({ onEdit }) {
                         <span className="timestamp">
                           {formatTimestamp(post.createdAt)}
                         </span>
+                        {post.isPrivate && (
+                          <span className="post-privacy-badge">🔒 Private</span>
+                        )}
                       </div>
                       <button
                         className="options-menu-btn"
@@ -406,6 +453,13 @@ export default function ProfilePage({ onEdit }) {
                           >
                             <img src="/settings.png" alt="edit" className="menu-icon" />
                             Edit post
+                          </button>
+                          <button
+                            className="menu-option"
+                            onClick={() => togglePostPrivacy(post)}
+                          >
+                            <img src={post.isPrivate ? '/unlock.png' : '/lock.png'} alt="privacy" className="menu-icon" />
+                            {post.isPrivate ? 'Make Public' : 'Make Private'}
                           </button>
                           <button
                             className="menu-option delete"

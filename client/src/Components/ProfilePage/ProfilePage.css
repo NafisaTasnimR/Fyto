@@ -400,6 +400,46 @@
   border-bottom: none;
 }
 
+.journal-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.journal-privacy-btn {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: opacity 0.2s;
+  background: transparent;
+}
+
+.journal-privacy-btn.public {
+  color: #2f6b48;
+  border-color: #2f6b48;
+}
+
+.journal-privacy-btn.private {
+  color: #888;
+  border-color: #ccc;
+}
+
+.journal-privacy-btn:hover {
+  opacity: 0.75;
+}
+
+.post-privacy-badge {
+  display: inline-block;
+  font-size: 11px;
+  color: #888;
+  margin-top: 2px;
+}
+
 .journal-title {
   font-size: 16px;
   color: #333;
