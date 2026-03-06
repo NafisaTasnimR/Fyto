@@ -11,6 +11,7 @@ import ScrollToTop from './Components/Scrolltotop/Scrolltotop';
 import JournalLanding from './Components/Journal/JournalLanding';
 import Journal from './Components/Journal/Journal';
 import ProfilePage from './Components/ProfilePage/ProfilePage';
+import UserProfilePage from './Components/ProfilePage/UserProfilePage';
 import Challenges from './Components/Challenges/Challenges';
 import PlantInfo from './Components/PlantInfo/PlantInfo';
 import './App.css';
@@ -38,14 +39,15 @@ function App() {
           <Route path="/journal/new" element={<Journal />} />
           <Route path="/journal/continue" element={<Journal />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/user/:userId" element={<UserProfilePage />} />
           <Route path="/social" element={<SocialPage />} />
           <Route path="/challenges" element={<Challenges />} />
           <Route path="/preview-social" element={<PreviewSocialPage />} />
           <Route path="/preview-marketplace" element={<PreviewMarketplace />} />
           <Route path="/plant-info" element={<PlantInfo />} />
           <Route path="/plant-care" element={<PlantCare />} />
-          <Route path="/admin-login" element={<AdminLogin />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin-dashboard" element={<Admin />} />
         </Routes>
       </Router>
     </ConfirmedPostsProvider>

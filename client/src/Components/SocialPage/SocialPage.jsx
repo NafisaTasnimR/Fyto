@@ -4,9 +4,12 @@ import axios from 'axios';
 import './SocialPage.css';
 import Header from '../Shared/Header';
 import LeaderBoard from '../LeaderBoard/LeaderBoard';
+import { getCurrentUser } from '../../services/authService';
+import { getProfilePic } from '../../utils/imageUtils';
 
 const SocialPage = () => {
   const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState(null);
   const [showCreatePostModal, setShowCreatePostModal] = useState(false);
   const [showCommentsModal, setShowCommentsModal] = useState(false);
   const [activeCommentsPost, setActiveCommentsPost] = useState(null);
@@ -48,53 +51,8 @@ const SocialPage = () => {
     imagePreview: null,
   });
 
-  const [notifications, setNotifications] = useState([ // eslint-disable-line no-unused-vars
-    {
-      id: 1,
-      type: 'like',
-      username: 'garden_guru',
-      userAvatar: '/g.png',
-      action: 'liked your post',
-      timestamp: 'now',
-      read: false,
-    },
-    {
-      id: 2,
-      type: 'comment',
-      username: 'plant_scientist',
-      userAvatar: '/m.png',
-      action: 'commented on your post',
-      timestamp: '5 minutes ago',
-      read: false,
-    },
-    {
-      id: 3,
-      type: 'follow',
-      username: 'succulent_queen',
-      userAvatar: '/g1.jpg',
-      action: 'started following you',
-      timestamp: '1 hour ago',
-      read: true,
-    },
-    {
-      id: 4,
-      type: 'like',
-      username: 'veggie_grower',
-      userAvatar: '/g2.jpg',
-      action: 'liked your post',
-      timestamp: '2 hours ago',
-      read: true,
-    },
-    {
-      id: 5,
-      type: 'comment',
-      username: 'jungle_lover',
-      userAvatar: '/g3.jpg',
-      action: 'commented on your post',
-      timestamp: '1 day ago',
-      read: true,
-    },
-  ]);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -102,6 +60,8 @@ const SocialPage = () => {
 
   useEffect(() => {
     fetchPosts();
+    getCurrentUser().then(res => setCurrentUser(res.data)).catch(() => {});
+    fetchNotifications();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -132,6 +92,8 @@ const SocialPage = () => {
       const payload = JSON.parse(atob(tokenParts[1]));
       const currentUserId = payload._id;
 
+      console.log('Fetching posts from:', `${process.env.REACT_APP_API_URL}/api/posts`);
+
       const response = await axios.get(
         `${process.env.REACT_APP_API_URL}/api/posts`,
         {
@@ -141,33 +103,76 @@ const SocialPage = () => {
         }
       );
 
+      console.log('Posts response:', response.data);
+
       if (response.data.success) {
         if (!response.data.posts || response.data.posts.length === 0) {
+          console.warn('No posts found in response');
           setPosts([]);
-          setPostsError(response.data.message || 'No posts available');
+          setPostsError(null); // Don't show error message, just empty state
           setLoading(false);
           return;
         }
 
-        const formattedPosts = response.data.posts.map(post => ({
-          id: post._id,
-          username: post.authorId?.username || 'Unknown User',
-          userAvatar: post.authorId?.profilePic || '/boy.png',
-          postImage: post.images && post.images.length > 0 ? post.images[0] : null,
-          likes: post.likes?.length || 0,
-          caption: post.content || '',
-          timestamp: formatTimestamp(post.createdAt),
-          liked: post.likes?.includes(currentUserId) || false,
-          comments: [],
-        }));
+        console.log('Formatting', response.data.posts.length, 'posts');
+
+        const formattedPosts = response.data.posts.map(post => {
+          console.log('Formatting post:', post._id, 'by', post.authorId?.username);
+          return {
+            id: post._id,
+            username: post.authorId?.username || 'Unknown User',
+            userAvatar: getProfilePic(post.authorId?.profilePic),
+            authorUserId: post.authorId?._id || null,
+            postImage: post.images && post.images.length > 0 ? post.images[0] : null,
+            likes: post.likes?.length || 0,
+            caption: post.content || '',
+            timestamp: formatTimestamp(post.createdAt),
+            liked: post.likes?.includes(currentUserId) || false,
+            comments: [],
+          };
+        });
         setPosts(formattedPosts);
         setPostsError(null);
+        console.log('Successfully loaded', formattedPosts.length, 'posts');
+      } else {
+        console.error('API returned success: false', response.data);
+        setPostsError(response.data.message || 'Failed to load posts');
       }
       setLoading(false);
     } catch (err) {
       console.error('Error fetching posts:', err);
-      setPostsError(err.response?.data?.message || 'Failed to load posts');
+      console.error('Error details:', err.response?.data);
+      setPostsError(err.response?.data?.message || 'Failed to load posts. Please check your connection.');
       setLoading(false);
+    }
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/notifications`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setNotifications(res.data.notifications || []);
+      setUnreadCount(res.data.unreadCount || 0);
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+    }
+  };
+
+  const markAllNotificationsRead = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.patch(
+        `${process.env.REACT_APP_API_URL}/api/notifications/read-all`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    } catch (err) {
+      console.error('Error marking notifications as read:', err);
     }
   };
 
@@ -257,9 +262,9 @@ const SocialPage = () => {
   const [replyInputs, setReplyInputs] = useState({});
   const [openReply, setOpenReply] = useState({ postId: null, commentId: null });
 
-  const handleUserClick = (username) => {
-    if (username && username !== 'Unknown User') {
-      navigate(`/profile/${username}`);
+  const handleUserClick = (userId) => {
+    if (userId) {
+      navigate(`/user/${userId}`);
     }
   };
 
@@ -281,7 +286,8 @@ const SocialPage = () => {
     const formattedPost = {
       id: post._id,
       username: post.authorId?.username || 'Unknown User',
-      userAvatar: post.authorId?.profilePic || '/boy.png',
+      userAvatar: getProfilePic(post.authorId?.profilePic),
+      authorUserId: post.authorId?._id || null,
       postImage: post.images && post.images.length > 0 ? post.images[0] : null,
       likes: post.likes?.length || 0,
       caption: post.content || '',
@@ -399,7 +405,8 @@ const SocialPage = () => {
         const newPost = {
           id: response.data.post._id,
           username: response.data.post.authorId?.username || 'You',
-          userAvatar: response.data.post.authorId?.profilePic || '/boy.png',
+          userAvatar: getProfilePic(response.data.post.authorId?.profilePic),
+          authorUserId: response.data.post.authorId?._id || currentUser?._id || null,
           postImage: response.data.post.images && response.data.post.images.length > 0 ? response.data.post.images[0] : null,
           likes: 0,
           caption: response.data.post.content,
@@ -481,7 +488,7 @@ const SocialPage = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/posts/${reportingPost.id}/report`,
+        `${process.env.REACT_APP_API_URL}/api/reports/${reportingPost.id}`,
         { reason: reportReason },
         {
           headers: {
@@ -508,13 +515,13 @@ const SocialPage = () => {
             src={post.userAvatar}
             alt={post.username}
             className="avatar"
-            onClick={() => handleUserClick(post.username)}
+            onClick={() => handleUserClick(post.authorUserId)}
             style={{ cursor: 'pointer' }}
           />
           <div className="header-info">
             <h3
               className="username"
-              onClick={() => handleUserClick(post.username)}
+              onClick={() => handleUserClick(post.authorUserId)}
               style={{ cursor: 'pointer' }}
             >
               {post.username}
@@ -713,11 +720,24 @@ const SocialPage = () => {
             className={`nav-item ${activeNav === 'notifications' ? 'active' : ''}`}
             onClick={() => {
               setActiveNav('notifications');
-              setShowNotifications(!showNotifications);
+              const opening = !showNotifications;
+              setShowNotifications(opening);
               setShowSearchResults(false);
+              if (opening && unreadCount > 0) markAllNotificationsRead();
             }}
           >
-            <img src="/notification.png" alt="notifications" className="nav-icon-img" />
+            <div style={{ position: 'relative', display: 'inline-flex' }}>
+              <img src="/notification.png" alt="notifications" className="nav-icon-img" />
+              {unreadCount > 0 && (
+                <span style={{
+                  position: 'absolute', top: '-6px', right: '-6px',
+                  background: '#e53e3e', color: '#fff', borderRadius: '50%',
+                  fontSize: '10px', width: '18px', height: '18px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontWeight: 700, lineHeight: 1
+                }}>{unreadCount > 9 ? '9+' : unreadCount}</span>
+              )}
+            </div>
             <span className="nav-label">Notifications</span>
           </button>
         </nav>
@@ -764,10 +784,15 @@ const SocialPage = () => {
                         <div
                           key={item.data._id}
                           className="user-item"
-                          onClick={() => handleUserClick(item.data.username)}
+                          onClick={() => {
+                            handleUserClick(item.data._id);
+                            setShowSearchResults(false);
+                            setSearchQuery('');
+                            setSearchResults([]);
+                          }}
                         >
                           <img
-                            src={item.data.profilePic || '/boy.png'}
+                            src={getProfilePic(item.data.profilePic)}
                             alt={item.data.username}
                             className="user-avatar"
                           />
@@ -794,11 +819,11 @@ const SocialPage = () => {
                             className="post-search-header"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleUserClick(item.data.authorId?.username);
+                              handleUserClick(item.data.authorId?._id);
                             }}
                           >
                             <img
-                              src={item.data.authorId?.profilePic || '/boy.png'}
+                              src={getProfilePic(item.data.authorId?.profilePic)}
                               alt={item.data.authorId?.username}
                               className="user-avatar-small"
                             />
@@ -926,7 +951,7 @@ const SocialPage = () => {
                   className="post-avatar"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleUserClick(viewingPost.username);
+                    handleUserClick(viewingPost.authorUserId);
                   }}
                   style={{ cursor: 'pointer' }}
                 />
@@ -935,7 +960,7 @@ const SocialPage = () => {
                     className="post-username"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleUserClick(viewingPost.username);
+                      handleUserClick(viewingPost.authorUserId);
                     }}
                     style={{ cursor: 'pointer' }}
                   >
@@ -1017,15 +1042,19 @@ const SocialPage = () => {
             {notifications.length > 0 ? (
               notifications.map((notif) => (
                 <div
-                  key={notif.id}
-                  className={`notification-item ${notif.read ? 'read' : 'unread'}`}
+                  key={notif._id}
+                  className={`notification-item ${notif.isRead ? 'read' : 'unread'}`}
                 >
-                  <img src={notif.userAvatar} alt={notif.username} className="notif-avatar" />
+                  <img
+                    src={getProfilePic(notif.senderId?.profilePic)}
+                    alt={notif.senderId?.username || 'User'}
+                    className="notif-avatar"
+                  />
                   <div className="notif-content">
                     <p>
-                      <strong>{notif.username}</strong> {notif.action}
+                      <strong>{notif.senderId?.username || 'Someone'}</strong> {notif.message}
                     </p>
-                    <span className="notif-timestamp">{notif.timestamp}</span>
+                    <span className="notif-timestamp">{formatTimestamp(notif.createdAt)}</span>
                   </div>
                 </div>
               ))
@@ -1119,7 +1148,7 @@ const SocialPage = () => {
           <div className="create-post-section">
             <div className="create-post-container">
               <img
-                src="/boy.png"
+                src={getProfilePic(currentUser?.profilePic)}
                 alt="user"
                 className="create-post-avatar"
               />

@@ -339,6 +339,42 @@
   box-shadow: 0 6px 16px rgba(102, 187, 106, 0.4);
 }
 
+/* Already Participated Banner */
+.already-participated-banner {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: #f0faf0;
+  border: 1.5px solid #a5d6a7;
+  border-radius: 16px;
+  padding: 1.5rem 1.75rem;
+  margin-top: 1.5rem;
+}
+
+.already-participated-icon {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+}
+
+.already-participated-text h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+.already-participated-text p {
+  margin: 0 0 0.2rem;
+  font-size: 0.92rem;
+  color: #4a4a4a;
+}
+
+.already-participated-sub {
+  color: #888 !important;
+  font-size: 0.82rem !important;
+}
+
 /* Sidebar - Streak Calendar */
 .challenge-sidebar {
   position: sticky;

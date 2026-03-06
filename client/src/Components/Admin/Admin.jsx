@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Admin.css';
 
+const API = process.env.REACT_APP_API_URL;
+
 /* ── Decode JWT to get admin email ── */
 const decodeToken = (token) => {
   try {
@@ -13,98 +15,20 @@ const decodeToken = (token) => {
   }
 };
 
-/* ── Dummy reported posts (replace with API later) ── */
-const MOCK_SOCIAL_REPORTS = [
-  {
-    _id: 'sr1',
-    postId: 'p1',
-    postType: 'social',
-    reason: 'Inappropriate content – contains offensive language.',
-    reportedBy: { username: 'GreenThumb42', email: 'green42@mail.com' },
-    createdAt: '2026-02-27T14:30:00Z',
-    post: {
-      _id: 'p1',
-      authorId: { username: 'PlantLover99', profilePicture: '' },
-      content: 'Check out my new rare succulent collection! 🌵🪴',
-      images: ['/g1.jpg'],
-      createdAt: '2026-02-25T10:15:00Z',
-    },
+/* ── Transform server report → shape Admin.jsx renders ── */
+const transformReport = (r) => ({
+  _id: r._id,
+  postId: r.postId,
+  postType: r.postModel === 'Post' ? 'social' : 'marketplace',
+  reason: r.reports?.[0]?.reason || 'No reason provided.',
+  reportedBy: {
+    username: r.reports?.[0]?.reporterId?.username || 'Anonymous',
+    email: r.reports?.[0]?.reporterId?.email || '',
   },
-  {
-    _id: 'sr2',
-    postId: 'p2',
-    postType: 'social',
-    reason: 'Spam / promotional post not related to plants.',
-    reportedBy: { username: 'LeafyLena', email: 'lena@mail.com' },
-    createdAt: '2026-02-28T09:12:00Z',
-    post: {
-      _id: 'p2',
-      authorId: { username: 'SpamBot123', profilePicture: '' },
-      content: 'Buy cheap electronics at mystore.xyz!!!',
-      images: [],
-      createdAt: '2026-02-27T22:00:00Z',
-    },
-  },
-  {
-    _id: 'sr3',
-    postId: 'p3',
-    postType: 'social',
-    reason: 'Misinformation – dangerous plant care advice that could harm pets.',
-    reportedBy: { username: 'PetSafePlants', email: 'petsafe@mail.com' },
-    createdAt: '2026-03-01T07:45:00Z',
-    post: {
-      _id: 'p3',
-      authorId: { username: 'GardenGuru', profilePicture: '' },
-      content:
-        'Oleander leaves make a great herbal tea – totally safe for everyone including cats and dogs! 🍵',
-      images: [],
-      createdAt: '2026-02-28T18:30:00Z',
-    },
-  },
-];
-
-const MOCK_MARKETPLACE_REPORTS = [
-  {
-    _id: 'mr1',
-    postId: 'm1',
-    postType: 'marketplace',
-    reason: 'Selling prohibited / invasive plant species.',
-    reportedBy: { username: 'EcoWatch', email: 'eco@mail.com' },
-    createdAt: '2026-02-26T16:20:00Z',
-    post: {
-      _id: 'm1',
-      userId: { username: 'PlantDealer', profilePicture: '' },
-      treeName: 'Japanese Knotweed',
-      treeType: 'Invasive',
-      offering: 'Fresh cuttings ready to plant',
-      description: 'Fast‑growing ground cover – spreads quickly!',
-      postType: 'sell',
-      price: 15,
-      photos: ['/g2.jpg'],
-      createdAt: '2026-02-24T12:00:00Z',
-    },
-  },
-  {
-    _id: 'mr2',
-    postId: 'm2',
-    postType: 'marketplace',
-    reason: 'Fraudulent listing – price is unrealistic for this species.',
-    reportedBy: { username: 'PlantPolice', email: 'police@mail.com' },
-    createdAt: '2026-02-28T11:50:00Z',
-    post: {
-      _id: 'm2',
-      userId: { username: 'ShadyDeals', profilePicture: '' },
-      treeName: 'Monstera Albo Variegata',
-      treeType: 'Tropical',
-      offering: 'Full plant with 5 leaves',
-      description: 'Rare variegated Monstera at a steal!',
-      postType: 'sell',
-      price: 5,
-      photos: ['/g3.jpg'],
-      createdAt: '2026-02-27T08:30:00Z',
-    },
-  },
-];
+  reportCount: r.reportCount,
+  createdAt: r.createdAt,
+  post: r.postData,
+});
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -114,21 +38,37 @@ const Admin = () => {
   const [activeTab, setActiveTab] = useState('social');
   const [actionLoading, setActionLoading] = useState(null);
   const [confirmModal, setConfirmModal] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   /* ── Bootstrap ── */
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      navigate('/admin-login');
+      navigate('/admin');
       return;
     }
     const decoded = decodeToken(token);
     if (decoded?.email) setAdminEmail(decoded.email);
 
-    // TODO: replace with real API calls
-    // fetchReports(token);
-    setSocialReports(MOCK_SOCIAL_REPORTS);
-    setMarketplaceReports(MOCK_MARKETPLACE_REPORTS);
+    const fetchReports = async () => {
+      try {
+        const res = await axios.get(
+          `${API}/api/reports/admin/posts?status=pending&limit=100`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (res.data.success) {
+          const all = (res.data.reports || []).map(transformReport);
+          setSocialReports(all.filter((r) => r.postType === 'social'));
+          setMarketplaceReports(all.filter((r) => r.postType === 'marketplace'));
+        }
+      } catch (err) {
+        console.error('Failed to fetch reports:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReports();
   }, [navigate]);
 
   /* ── Helpers ── */
@@ -151,16 +91,11 @@ const Admin = () => {
     setActionLoading(report._id);
     try {
       const token = localStorage.getItem('token');
-      const endpoint =
-        report.postType === 'social'
-          ? `${process.env.REACT_APP_API_URL}/api/posts/${report.postId}`
-          : `${process.env.REACT_APP_API_URL}/api/marketplace/${report.postId}`;
+      await axios.delete(
+        `${API}/api/reports/admin/posts/${report._id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-      await axios.delete(endpoint, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      // Remove from local state
       if (report.postType === 'social') {
         setSocialReports((prev) => prev.filter((r) => r._id !== report._id));
       } else {
@@ -180,13 +115,12 @@ const Admin = () => {
   const handleDismissReport = async (report) => {
     setActionLoading(report._id);
     try {
-      // TODO: call dismiss‑report API
-      // const token = localStorage.getItem('token');
-      // await axios.patch(
-      //   `${process.env.REACT_APP_API_URL}/api/reports/${report._id}/dismiss`,
-      //   {},
-      //   { headers: { Authorization: `Bearer ${token}` } }
-      // );
+      const token = localStorage.getItem('token');
+      await axios.patch(
+        `${API}/api/reports/admin/posts/${report._id}/dismiss`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
       if (report.postType === 'social') {
         setSocialReports((prev) => prev.filter((r) => r._id !== report._id));
@@ -206,7 +140,7 @@ const Admin = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    navigate('/admin-login');
+    navigate('/admin');
   };
 
   /* ── Counts ── */
@@ -215,6 +149,15 @@ const Admin = () => {
     activeTab === 'social' ? socialReports : marketplaceReports;
 
   /* ── Render ── */
+  if (loading) {
+    return (
+      <div className="admin-loading">
+        <div className="loading-spinner" />
+        <p>Loading reports…</p>
+      </div>
+    );
+  }
+
   return (
     <div className="admin-dashboard">
       {/* ── Sidebar ── */}
@@ -232,7 +175,7 @@ const Admin = () => {
               }`}
               onClick={() => setActiveTab('social')}
             >
-              <span className="admin-nav-icon">📝</span>
+              <span className="admin-nav-icon"></span>
               Social Posts
               {socialReports.length > 0 && (
                 <span className="admin-badge">{socialReports.length}</span>
@@ -245,7 +188,7 @@ const Admin = () => {
               }`}
               onClick={() => setActiveTab('marketplace')}
             >
-              <span className="admin-nav-icon">🛒</span>
+              <span className="admin-nav-icon"></span>
               Marketplace
               {marketplaceReports.length > 0 && (
                 <span className="admin-badge">
@@ -309,7 +252,7 @@ const Admin = () => {
         {/* Reports grid */}
         {currentReports.length === 0 ? (
           <div className="admin-empty">
-            <span className="admin-empty-icon">✅</span>
+            <span className="admin-empty-icon"><img src="/check-mark.png" alt="All clear" /></span>
             <h3>All clear!</h3>
             <p>No reported {activeTab} posts to review.</p>
           </div>

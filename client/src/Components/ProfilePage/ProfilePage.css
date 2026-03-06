@@ -129,8 +129,8 @@
 }
 
 .points-icon1 {
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
 }
 
@@ -1050,24 +1050,51 @@
   display: none;
 }
 
+.pic-btn-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+}
+
 .file-input-label {
   display: inline-block;
 }
 
 .file-input-btn {
   display: inline-block;
-  padding: 10px 20px;
-  background: #4a9d6f;
-  color: white;
+  padding: 7px 14px;
+  background: #2f6b48;
+  color: #fff;
+  border: 1px solid #274b2f;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 12px;
   transition: background 0.3s ease;
+  
 }
 
 .file-input-btn:hover {
-  background: #3d8b5e;
+  background: #2f6b48;
+}
+
+.btn-remove-pic {
+  display: inline-block;
+  padding: 7px 14px;
+  background: transparent;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 12px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btn-remove-pic:hover {
+  background: #dc2626;
+  color: white;
 }
 
 .file-name {
