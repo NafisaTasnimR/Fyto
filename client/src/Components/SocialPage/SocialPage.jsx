@@ -92,6 +92,8 @@ const SocialPage = () => {
       const payload = JSON.parse(atob(tokenParts[1]));
       const currentUserId = payload._id;
 
+      console.log('Fetching posts from:', `${process.env.REACT_APP_API_URL}/api/posts`);
+
       const response = await axios.get(
         `${process.env.REACT_APP_API_URL}/api/posts`,
         {
@@ -101,33 +103,46 @@ const SocialPage = () => {
         }
       );
 
+      console.log('Posts response:', response.data);
+
       if (response.data.success) {
         if (!response.data.posts || response.data.posts.length === 0) {
+          console.warn('No posts found in response');
           setPosts([]);
-          setPostsError(response.data.message || 'No posts available');
+          setPostsError(null); // Don't show error message, just empty state
           setLoading(false);
           return;
         }
 
-        const formattedPosts = response.data.posts.map(post => ({
-          id: post._id,
-          username: post.authorId?.username || 'Unknown User',
-          userAvatar: getProfilePic(post.authorId?.profilePic),
-          authorUserId: post.authorId?._id || null,
-          postImage: post.images && post.images.length > 0 ? post.images[0] : null,
-          likes: post.likes?.length || 0,
-          caption: post.content || '',
-          timestamp: formatTimestamp(post.createdAt),
-          liked: post.likes?.includes(currentUserId) || false,
-          comments: [],
-        }));
+        console.log('Formatting', response.data.posts.length, 'posts');
+
+        const formattedPosts = response.data.posts.map(post => {
+          console.log('Formatting post:', post._id, 'by', post.authorId?.username);
+          return {
+            id: post._id,
+            username: post.authorId?.username || 'Unknown User',
+            userAvatar: getProfilePic(post.authorId?.profilePic),
+            authorUserId: post.authorId?._id || null,
+            postImage: post.images && post.images.length > 0 ? post.images[0] : null,
+            likes: post.likes?.length || 0,
+            caption: post.content || '',
+            timestamp: formatTimestamp(post.createdAt),
+            liked: post.likes?.includes(currentUserId) || false,
+            comments: [],
+          };
+        });
         setPosts(formattedPosts);
         setPostsError(null);
+        console.log('Successfully loaded', formattedPosts.length, 'posts');
+      } else {
+        console.error('API returned success: false', response.data);
+        setPostsError(response.data.message || 'Failed to load posts');
       }
       setLoading(false);
     } catch (err) {
       console.error('Error fetching posts:', err);
-      setPostsError(err.response?.data?.message || 'Failed to load posts');
+      console.error('Error details:', err.response?.data);
+      setPostsError(err.response?.data?.message || 'Failed to load posts. Please check your connection.');
       setLoading(false);
     }
   };
@@ -473,7 +488,7 @@ const SocialPage = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/posts/${reportingPost.id}/report`,
+        `${process.env.REACT_APP_API_URL}/api/reports/${reportingPost.id}`,
         { reason: reportReason },
         {
           headers: {
