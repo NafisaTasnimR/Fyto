@@ -319,6 +319,12 @@
   gap: 6px;
 }
 
+.action-count {
+  font-size: 13px;
+  font-weight: 600;
+  color: #262626;
+}
+
 /* Likes Info */
 .likes-info {
   padding: 0 16px;
@@ -401,6 +407,19 @@
   font-size: 13px;
   color: #444;
   margin: 6px 0;
+}
+
+.highlighted-reply {
+  background-color: #e8f5e9;
+  border-left: 3px solid #4caf50;
+  padding: 4px 8px;
+  border-radius: 4px;
+  animation: fadeHighlight 3s ease forwards;
+}
+
+@keyframes fadeHighlight {
+  0% { background-color: #c8e6c9; }
+  100% { background-color: #e8f5e9; }
 }
 
 .reply-composer {

@@ -3,6 +3,97 @@ import Header from '../Shared/Header';
 import { identifyPlant } from '../../services/plantService';
 import './PlantCare.css';
 
+// Helper function to detect if text is formatted as points
+const isPointFormat = (text) => {
+  if (!text || typeof text !== 'string') return false;
+  // Check for numbered points: 1., 2., 3., etc.
+  const numberedRegex = /^\s*\d+\.\s+/m;
+  // Check for bullet points: *, -, •
+  const bulletRegex = /^\s*[-•*]\s+/m;
+  return numberedRegex.test(text) || bulletRegex.test(text);
+};
+
+// Helper function to parse and render content
+const ContentRenderer = ({ content }) => {
+  // Convert content to string if it's not already
+  let contentStr = '';
+  if (!content) {
+    return <p>No information available</p>;
+  }
+  
+  if (typeof content === 'string') {
+    contentStr = content;
+  } else if (typeof content === 'object') {
+    contentStr = JSON.stringify(content);
+  } else {
+    contentStr = String(content);
+  }
+
+  // Check if content is in point format
+  if (isPointFormat(contentStr)) {
+    // Split by numbered pattern: "1. ", "2. ", "3. " etc
+    // This handles both "1. Text" and newline separated formats
+    let points = [];
+    
+    // First try splitting by number pattern
+    const numberedSplit = contentStr.split(/(?=\d+\.\s+)/);
+    if (numberedSplit.length > 1) {
+      points = numberedSplit.map(p => p.trim()).filter(p => p);
+    } else {
+      // Fall back to splitting by lines
+      points = contentStr.split('\n').filter(line => line.trim());
+    }
+    
+    return (
+      <ol className="content-list numbered">
+        {points.map((point, index) => {
+          // Ensure point is a string before processing
+          let displayText = String(point).trim();
+          
+          // Remove leading numbers, dashes, and asterisks since <ol> handles numbering automatically
+          displayText = displayText.replace(/^\d+\.\s*/, ''); // strip "1. "
+          displayText = displayText.replace(/^[-*](?!\*)\s*/, ''); // strip single "- " or "* " but NOT bold "**"
+          
+          // Check if line contains markdown bold markers
+          if (displayText.includes('**')) {
+            // Parse bold text in the line
+            const parts = displayText.split(/\*\*([^*]+)\*\*/);
+            return (
+              <li key={index} className="content-point">
+                {parts.map((part, i) => 
+                  i % 2 === 1 ? <strong key={i}>{part}</strong> : part
+                )}
+              </li>
+            );
+          }
+          
+          return (
+            <li key={index} className="content-point">
+              {displayText}
+            </li>
+          );
+        })}
+      </ol>
+    );
+  }
+
+  // If not point format, render as paragraphs
+  // Split by double newlines for paragraph breaks, otherwise keep as single paragraph
+  const paragraphs = contentStr.split('\n\n').filter(p => p.trim());
+  
+  if (paragraphs.length > 1) {
+    return (
+      <div className="content-paragraphs">
+        {paragraphs.map((para, index) => (
+          <p key={index}>{para.trim()}</p>
+        ))}
+      </div>
+    );
+  }
+
+  return <p>{contentStr}</p>;
+};
+
 const PlantCare = () => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [plantData, setPlantData] = useState(null);
@@ -123,32 +214,32 @@ const PlantCare = () => {
           <div className="info-grid">
             <div className="info-card">
               <h3><img src="/water.png" alt="water" className="card-icon" /> Watering Schedule</h3>
-              <p>{plantData.watering_schedule}</p>
+              <ContentRenderer content={plantData.watering_schedule} />
             </div>
             
             <div className="info-card">
               <h3><img src="/sun.png" alt="sun" className="card-icon" /> Sunlight</h3>
-              <p>{plantData.sunlight_requirement}</p>
+              <ContentRenderer content={plantData.sunlight_requirement} />
             </div>
 
             <div className="info-card">
               <h3><img src="/plant.png" alt="soil" className="card-icon" /> Soil Type</h3>
-              <p>{plantData.soil_type}</p>
+              <ContentRenderer content={plantData.soil_type} />
             </div>
 
             <div className="info-card">
               <h3><img src="/fertilizer.png" alt="fertilizer" className="card-icon" /> Fertilizer</h3>
-              <p>{plantData.fertilizer_schedule}</p>
+              <ContentRenderer content={plantData.fertilizer_schedule} />
             </div>
 
             <div className="info-card">
               <h3><img src="/pruning.png" alt="pruning" className="card-icon" /> Pruning</h3>
-              <p>{plantData.pruning_guide}</p>
+              <ContentRenderer content={plantData.pruning_guide} />
             </div>
 
             <div className="info-card">
               <h3><img src="/reuse.png" alt="repotting" className="card-icon" /> Repotting</h3>
-              <p>{plantData.repotting_frequency}</p>
+              <ContentRenderer content={plantData.repotting_frequency} />
             </div>
           </div>
 
