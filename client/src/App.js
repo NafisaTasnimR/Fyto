@@ -39,6 +39,7 @@ function App() {
           <Route path="/journal" element={<JournalLanding />} />
           <Route path="/journal/new" element={<Journal />} />
           <Route path="/journal/continue" element={<Journal />} />
+          <Route path="/journal/:id" element={<Journal />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/user/:userId" element={<UserProfilePage />} />
           <Route path="/social" element={<SocialPage />} />

@@ -6,7 +6,7 @@ import './ProfilePage.css'
 import '../SocialPage/SocialPage.css'
 import { getUserPosts, deletePost } from '../../services/postService' // eslint-disable-line no-unused-vars
 import { getUserMarketplacePosts } from '../../services/marketplaceService'
-import { getUserJournals } from '../../services/journalService'
+import { getUserJournals, deleteJournal } from '../../services/journalService'
 import { getCurrentUser } from '../../services/authService'
 import { getProfilePic } from '../../utils/imageUtils'
 
@@ -45,6 +45,8 @@ export default function ProfilePage({ onEdit }) {
   const [editPostImage, setEditPostImage] = useState(null)
   const [showDeleteMarketplaceModal, setShowDeleteMarketplaceModal] = useState(false)
   const [marketplacePostToDelete, setMarketplacePostToDelete] = useState(null)
+  const [showDeleteJournalModal, setShowDeleteJournalModal] = useState(false)
+  const [journalToDelete, setJournalToDelete] = useState(null)
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -87,8 +89,11 @@ export default function ProfilePage({ onEdit }) {
     const fetchData = async () => {
       try {
         if (activeTab === 'journals') {
-          const journalsData = await getUserJournals()
-          setJournals(journalsData.data)
+          const response = await getUserJournals()
+          console.log('Journals response:', response)
+          const journalsData = response.data || []
+          console.log('Journals data:', journalsData)
+          setJournals(journalsData)
         } else if (activeTab === 'social') {
           const postsData = await getUserPosts()
           setPosts(postsData.posts)
@@ -325,6 +330,31 @@ export default function ProfilePage({ onEdit }) {
     setOpenMenuPostId(null)
   }
 
+  const handleDeleteJournal = (journalId) => {
+    setJournalToDelete(journalId)
+    setShowDeleteJournalModal(true)
+  }
+
+  const confirmDeleteJournal = async () => {
+    try {
+      await deleteJournal(journalToDelete)
+      setJournals(journals.filter(j => j._id !== journalToDelete))
+      setShowDeleteJournalModal(false)
+      setJournalToDelete(null)
+      alert('Journal deleted successfully')
+    } catch (error) {
+      console.error('Error deleting journal:', error)
+      alert('Failed to delete journal. Please try again.')
+      setShowDeleteJournalModal(false)
+      setJournalToDelete(null)
+    }
+  }
+
+  const cancelDeleteJournal = () => {
+    setShowDeleteJournalModal(false)
+    setJournalToDelete(null)
+  }
+
   const handleSaveEditedPost = () => {
     // Update the posts list with the edited caption (frontend only)
     setPosts(prevPosts => 
@@ -354,17 +384,56 @@ export default function ProfilePage({ onEdit }) {
         return (
           <div className="tab-panel">
             <h2 className="journal-heading">Journals</h2>
-            <div className="journal-list">
+            <div className="profile-journals-list">
               {journals.length > 0 ? (
                 journals.map((journal) => (
-                  <div key={journal._id} className="journal-item">
-                    <Link to={`/journal/${journal._id}`} className="journal-title">
-                      {journal.title}
-                    </Link>
+                  <div
+                    key={journal._id}
+                    className="profile-journal-list-item"
+                  >
+                    <div
+                      className="profile-journal-image"
+                      onClick={() => window.location.href = `/journal/${journal._id}`}
+                      style={{
+                        backgroundImage: journal.coverImage?.url ? `url(${journal.coverImage.url})` : 'linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%)',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                      }}
+                    >
+                      <div className="profile-journal-header">
+                        <h3 className="profile-journal-list-title">{journal.title}</h3>
+                        <div className="profile-journal-menu">
+                          <button 
+                            className="profile-journal-menu-btn"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              const menu = e.currentTarget.nextElementSibling
+                              menu.style.display = menu.style.display === 'block' ? 'none' : 'block'
+                            }}
+                            title="Options"
+                          >
+                            ⋮
+                          </button>
+                          <div className="profile-journal-menu-dropdown">
+                            <button 
+                              className="profile-journal-menu-item delete"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleDeleteJournal(journal._id)
+                                const menu = e.currentTarget.parentElement
+                                menu.style.display = 'none'
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 ))
               ) : (
-                <p className="journal-item">No journals found.</p>
+                <p className="journal-empty-message">No journals found. Create your first journal to get started!</p>
               )}
             </div>
           </div>
@@ -1508,6 +1577,43 @@ export default function ProfilePage({ onEdit }) {
               <button
                 className="btn-delete"
                 onClick={confirmDeleteMarketplacePost}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteJournalModal && (
+        <div className="modal-overlay" onClick={() => cancelDeleteJournal()}>
+          <div className="delete-confirmation-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Delete Journal</h2>
+              <button
+                className="modal-close-btn"
+                onClick={() => cancelDeleteJournal()}
+                aria-label="Close modal"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <p className="delete-warning">Are you sure you want to delete this journal?</p>
+              <p className="delete-subtext">This action cannot be undone.</p>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                className="btn-cancel"
+                onClick={() => cancelDeleteJournal()}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn-delete"
+                onClick={confirmDeleteJournal}
               >
                 Delete
               </button>

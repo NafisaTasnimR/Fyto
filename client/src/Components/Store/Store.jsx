@@ -222,18 +222,20 @@ const Store = () => {
     setReportSubmitting(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/marketplace/${reportModal.postId}/report`,
-        { reason: reportReason },
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/report/${reportModal.postId}`,
+        { reason: reportReason, postType: 'marketplace' },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      setReportSubmitting(false);
+      setReportModal({ open: false, postId: null });
+      setReportReason('');
+      alert(response.data.message || 'Report submitted. Thank you!');
     } catch (err) {
+      setReportSubmitting(false);
       console.error('Report error:', err);
+      alert(err.response?.data?.message || 'Failed to submit report. Please try again.');
     }
-    setReportSubmitting(false);
-    setReportModal({ open: false, postId: null });
-    setReportReason('');
-    alert('Report submitted. Thank you!');
   };
 
   return (
