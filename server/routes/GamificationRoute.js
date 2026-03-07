@@ -40,7 +40,10 @@ router.post('/extra', completeExtraChallenge);
 // Get user's stats
 router.get('/stats', getUserStats);
 
-// Get leaderboard (query params: type=total|monthly|daily, limit=10)
+// Get leaderboard (query params: type=total|overall|monthly|daily|streak, limit=10)
+// type=daily or type=streak -> sorts by current streak (days)
+// type=overall or type=total -> sorts by total points
+// type=monthly -> sorts by monthly points
 router.get('/leaderboard', getLeaderboard);
 
 // Get challenge history (query params: challengeType, page, limit)
