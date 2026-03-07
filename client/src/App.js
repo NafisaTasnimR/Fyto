@@ -20,6 +20,7 @@ import PreviewMarketplace from './Components/LandingPage/PreviewMarketplace';
 import PreviewPlantInfo from './Components/LandingPage/PreviewPlantInfo';
 
 
+import SharedPost from './Components/SharedPost/SharedPost';
 import PlantCare from './Components/PlantCare/PlantCare';
 import AdminLogin from './Components/Admin/AdminLogin';
 import Admin from './Components/Admin/Admin';
@@ -51,6 +52,7 @@ function App() {
           <Route path="/plant-care" element={<PlantCare />} />
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin-dashboard" element={<Admin />} />
+          <Route path="/post/:postId" element={<SharedPost />} />
         </Routes>
       </Router>
     </ConfirmedPostsProvider>
