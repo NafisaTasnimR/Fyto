@@ -19,6 +19,7 @@ const Store = () => {
  
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
   const [availabilityFilter, setAvailabilityFilter] = useState('all');
+  const [favouriteIds, setFavouriteIds] = useState([]);
   
   const navigate = useNavigate();
   const { isPostConfirmed } = useConfirmedPosts(); 
@@ -26,11 +27,15 @@ const Store = () => {
   const tabs = ['For you', 'Buy', 'Exchange', 'Donate', 'Favourites'];
 
   useEffect(() => {
-    fetchMarketplacePosts();
+    if (activeTab === 'Favourites') {
+      fetchSavedPosts();
+    } else {
+      fetchMarketplacePosts(activeTab);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
-  const fetchMarketplacePosts = async () => {
+  const fetchMarketplacePosts = async (tab = activeTab) => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
@@ -43,13 +48,13 @@ const Store = () => {
 
       let url = `${process.env.REACT_APP_API_URL}/api/marketplace`;
 
-      if (activeTab !== 'For you' && activeTab !== 'Favourites') {
+      if (tab !== 'For you' && tab !== 'Favourites') {
         const tabToPostTypeMap = {
           'Buy': 'sell',
           'Exchange': 'exchange',
           'Donate': 'donate'
         };
-        const postType = tabToPostTypeMap[activeTab];
+        const postType = tabToPostTypeMap[tab];
         url = `${process.env.REACT_APP_API_URL}/api/marketplace/search?postType=${postType}`;
       }
 
@@ -61,13 +66,36 @@ const Store = () => {
 
       if (response.data.success) {
         const posts = response.data.posts || [];
-        
         setMarketplacePosts(posts);
       }
       setLoading(false);
     } catch (err) {
       console.error('Error fetching marketplace posts:', err);
       setError('Failed to load marketplace posts');
+      setLoading(false);
+    }
+  };
+
+  const fetchSavedPosts = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      if (!token) { setError('Please login to view favourites'); setLoading(false); return; }
+
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/marketplace/saved`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        const posts = response.data.posts || [];
+        setMarketplacePosts(posts);
+        setFavouriteIds(posts.map(p => p._id));
+      }
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching saved posts:', err);
+      setError('Failed to load saved posts');
       setLoading(false);
     }
   };
@@ -142,6 +170,13 @@ const Store = () => {
     setActiveTab(tab);
     localStorage.setItem('storeActiveTab', tab);
     setVisibleProjects(12);
+    setMarketplacePosts([]);
+    setError(null);
+    if (tab === 'Favourites') {
+      fetchSavedPosts();
+    } else {
+      fetchMarketplacePosts(tab);
+    }
   };
 
   const handleSearchChange = (e) => {
