@@ -273,6 +273,29 @@
   border-bottom: 1px solid #f0f2f0;
 }
 
+/* Deleted post message */
+.admin-post-deleted {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  text-align: center;
+  opacity: 0.7;
+}
+
+.admin-deleted-icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.admin-deleted-text {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+  font-style: italic;
+}
+
 /* Author row */
 .admin-post-author {
   display: flex;
@@ -405,13 +428,44 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: #999;
-  margin: 0 0 6px;
+  margin: 0 0 12px;
+}
+
+.admin-reports-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-individual-report {
+  background: #fff;
+  border: 1px solid #e8ebe8;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.admin-report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.admin-report-header strong {
+  font-size: 13px;
+  color: #2f6b48;
+  font-weight: 600;
+}
+
+.admin-report-time {
+  font-size: 11px;
+  color: #999;
 }
 
 .admin-reason-text {
-  font-size: 13.5px;
+  font-size: 13px;
   color: #c0392b;
-  margin: 0 0 8px;
+  margin: 0;
   line-height: 1.5;
   font-weight: 500;
 }
@@ -561,6 +615,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -571,6 +626,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -641,5 +697,7 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }

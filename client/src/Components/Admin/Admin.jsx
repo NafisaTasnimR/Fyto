@@ -20,11 +20,7 @@ const transformReport = (r) => ({
   _id: r._id,
   postId: r.postId,
   postType: r.postModel === 'Post' ? 'social' : 'marketplace',
-  reason: r.reports?.[0]?.reason || 'No reason provided.',
-  reportedBy: {
-    username: r.reports?.[0]?.reporterId?.username || 'Anonymous',
-    email: r.reports?.[0]?.reporterId?.email || '',
-  },
+  reports: r.reports || [],
   reportCount: r.reportCount,
   createdAt: r.createdAt,
   post: r.postData,
@@ -170,9 +166,8 @@ const Admin = () => {
 
           <nav className="admin-nav">
             <button
-              className={`admin-nav-btn ${
-                activeTab === 'social' ? 'active' : ''
-              }`}
+              className={`admin-nav-btn ${activeTab === 'social' ? 'active' : ''
+                }`}
               onClick={() => setActiveTab('social')}
             >
               <span className="admin-nav-icon"></span>
@@ -183,9 +178,8 @@ const Admin = () => {
             </button>
 
             <button
-              className={`admin-nav-btn ${
-                activeTab === 'marketplace' ? 'active' : ''
-              }`}
+              className={`admin-nav-btn ${activeTab === 'marketplace' ? 'active' : ''
+                }`}
               onClick={() => setActiveTab('marketplace')}
             >
               <span className="admin-nav-icon"></span>
@@ -232,17 +226,15 @@ const Admin = () => {
         {/* Tab pills (mobile) */}
         <div className="admin-tabs-mobile">
           <button
-            className={`admin-tab-pill ${
-              activeTab === 'social' ? 'active' : ''
-            }`}
+            className={`admin-tab-pill ${activeTab === 'social' ? 'active' : ''
+              }`}
             onClick={() => setActiveTab('social')}
           >
             Social ({socialReports.length})
           </button>
           <button
-            className={`admin-tab-pill ${
-              activeTab === 'marketplace' ? 'active' : ''
-            }`}
+            className={`admin-tab-pill ${activeTab === 'marketplace' ? 'active' : ''
+              }`}
             onClick={() => setActiveTab('marketplace')}
           >
             Marketplace ({marketplaceReports.length})
@@ -263,19 +255,30 @@ const Admin = () => {
                 {/* Report badge */}
                 <div className="admin-report-badge">
                   <span className="admin-report-flag">⚠️</span>
-                  <span>Reported {formatDate(report.createdAt)}</span>
+                  <span>
+                    {report.reportCount} Report{report.reportCount !== 1 ? 's' : ''} •
+                    {formatDate(report.createdAt)}
+                  </span>
                 </div>
 
                 {/* Post preview */}
                 <div className="admin-post-preview">
-                  {report.postType === 'social' ? (
+                  {!report.post ? (
+                    /* Post has been deleted */
+                    <div className="admin-post-deleted">
+                      <span className="admin-deleted-icon">🗑️</span>
+                      <p className="admin-deleted-text">
+                        This post has been deleted or is no longer available.
+                      </p>
+                    </div>
+                  ) : report.postType === 'social' ? (
                     /* Social post */
                     <>
                       <div className="admin-post-author">
                         <div className="admin-author-avatar">
-                          {report.post.authorId?.profilePicture ? (
+                          {report.post.authorId?.profilePic ? (
                             <img
-                              src={report.post.authorId.profilePicture}
+                              src={report.post.authorId.profilePic}
                               alt=""
                             />
                           ) : (
@@ -316,9 +319,9 @@ const Admin = () => {
                     <>
                       <div className="admin-post-author">
                         <div className="admin-author-avatar">
-                          {report.post.userId?.profilePicture ? (
+                          {report.post.userId?.profilePic ? (
                             <img
-                              src={report.post.userId.profilePicture}
+                              src={report.post.userId.profilePic}
                               alt=""
                             />
                           ) : (
@@ -379,14 +382,28 @@ const Admin = () => {
                   )}
                 </div>
 
-                {/* Report reason */}
+                {/* Report reasons - show all reports */}
                 <div className="admin-report-reason">
-                  <p className="admin-reason-label">Reason for report</p>
-                  <p className="admin-reason-text">{report.reason}</p>
-                  <p className="admin-reporter">
-                    Reported by&nbsp;
-                    <strong>{report.reportedBy?.username || 'Anonymous'}</strong>
+                  <p className="admin-reason-label">
+                    {report.reportCount} Report{report.reportCount !== 1 ? 's' : ''}
                   </p>
+                  <div className="admin-reports-list">
+                    {report.reports.map((individualReport, idx) => (
+                      <div key={idx} className="admin-individual-report">
+                        <div className="admin-report-header">
+                          <strong>
+                            {individualReport.reporterId?.username || 'Anonymous'}
+                          </strong>
+                          <span className="admin-report-time">
+                            {formatDate(individualReport.createdAt)}
+                          </span>
+                        </div>
+                        <p className="admin-reason-text">
+                          {individualReport.reason}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Actions */}
@@ -437,11 +454,10 @@ const Admin = () => {
                 Cancel
               </button>
               <button
-                className={`admin-action-btn ${
-                  confirmModal.type === 'delete'
+                className={`admin-action-btn ${confirmModal.type === 'delete'
                     ? 'admin-delete-btn'
                     : 'admin-dismiss-btn'
-                }`}
+                  }`}
                 onClick={() =>
                   confirmModal.type === 'delete'
                     ? handleDeletePost(confirmModal.report)

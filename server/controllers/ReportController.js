@@ -171,12 +171,13 @@ export const getReportedPosts = async (req, res) => {
                 const reportObj = report.toObject();
                 try {
                     const Model = report.postModel === 'Post' ? Post : MarketplacePost;
+                    const populateField = report.postModel === 'Post' ? 'authorId' : 'userId';
                     const post = await Model.findById(report.postId)
-                        .populate('authorId', 'name username profilePic')
-                        .populate('userId', 'name username profilePic');
+                        .populate(populateField, 'name username profilePic');
 
                     reportObj.postData = post;
                 } catch (err) {
+                    console.error(`Error fetching post ${report.postId}:`, err);
                     reportObj.postData = null;
                 }
                 return reportObj;
