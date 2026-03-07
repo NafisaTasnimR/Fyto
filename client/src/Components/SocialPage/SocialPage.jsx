@@ -667,12 +667,16 @@ const SocialPage = () => {
       alert('Please provide a reason for reporting');
       return;
     }
+    if (reportReason.trim().length < 10) {
+      alert('Report reason must be at least 10 characters long.');
+      return;
+    }
 
     try {
       const token = localStorage.getItem('token');
       await axios.post(
         `${process.env.REACT_APP_API_URL}/api/reports/${reportingPost.id}`,
-        { reason: reportReason },
+        { reason: reportReason, postType: 'social' },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -685,7 +689,7 @@ const SocialPage = () => {
       setReportReason('');
     } catch (err) {
       console.error('Error reporting post:', err);
-      alert('Failed to report post. Please try again.');
+      alert(err.response?.data?.message || 'Failed to report post. Please try again.');
     }
   };
 
@@ -1432,7 +1436,7 @@ const SocialPage = () => {
               <p>Why are you reporting this post?</p>
               <textarea
                 className="report-textarea"
-                placeholder="Please provide a reason for reporting this post..."
+                placeholder="Please provide a reason for reporting this post (minimum 10 characters)..."
                 value={reportReason}
                 onChange={(e) => setReportReason(e.target.value)}
                 rows={5}
