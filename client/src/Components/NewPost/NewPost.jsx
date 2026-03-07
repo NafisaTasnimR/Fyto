@@ -7,11 +7,6 @@ import Header from '../Shared/Header.jsx';
 const NewPost = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
-  const [showCropper, setShowCropper] = useState(false);
-  const [cropperImage, setCropperImage] = useState(null);
-  // eslint-disable-next-line no-unused-vars
-  const canvasRef = useRef(null);
-  const [cropData, setCropData] = useState({ x: 0, y: 0, scale: 1 });
 
   const [formData, setFormData] = useState({
     treeName: '',
@@ -63,57 +58,48 @@ const NewPost = () => {
 
   const handleImageClick = () => { fileInputRef.current.click(); };
 
+  // ── SocialPage-style: compress directly, no cropper ────────────────────
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setErrors(prev => ({ ...prev, image: 'Image size should be less than 5MB' }));
-        return;
-      }
-      if (!file.type.startsWith('image/')) {
-        setErrors(prev => ({ ...prev, image: 'Please select a valid image file' }));
-        return;
-      }
-      compressImage(file);
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors(prev => ({ ...prev, image: 'Image size should be less than 5MB' }));
+      return;
     }
+    if (!file.type.startsWith('image/')) {
+      setErrors(prev => ({ ...prev, image: 'Please select a valid image file' }));
+      return;
+    }
+    compressImage(file);
   };
 
   const compressImage = (file) => {
     const reader = new FileReader();
-    reader.onload = (e) => { setCropperImage(e.target.result); setShowCropper(true); };
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        let width = img.width;
+        let height = img.height;
+        const maxSize = 1200;
+        if (width > height) {
+          if (width > maxSize) { height = (height * maxSize) / width; width = maxSize; }
+        } else {
+          if (height > maxSize) { width = (width * maxSize) / height; height = maxSize; }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+        setFormData(prev => ({ ...prev, image: file, imagePreview: compressedBase64 }));
+        setErrors(prev => ({ ...prev, image: '' }));
+      };
+      img.src = e.target.result;
+    };
     reader.readAsDataURL(file);
   };
-
-  const applyCrop = () => {
-    if (!cropperImage) return;
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const cropSize = 400;
-      canvas.width = cropSize;
-      canvas.height = cropSize;
-      const scaledWidth = img.width * cropData.scale;
-      const scaledHeight = img.height * cropData.scale;
-      const x = (cropSize / 2) - (scaledWidth / 2) + cropData.x;
-      const y = (cropSize / 2) - (scaledHeight / 2) + cropData.y;
-      ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
-      const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-      setFormData(prev => ({ ...prev, imagePreview: compressedBase64 }));
-      setErrors(prev => ({ ...prev, image: '' }));
-      setShowCropper(false);
-      setCropperImage(null);
-      setCropData({ x: 0, y: 0, scale: 1 });
-    };
-    img.src = cropperImage;
-  };
-
-  const cancelCrop = () => {
-    setShowCropper(false);
-    setCropperImage(null);
-    setCropData({ x: 0, y: 0, scale: 1 });
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  };
+  // ────────────────────────────────────────────────────────────────────────
 
   const handleRemoveImage = () => {
     setFormData(prev => ({ ...prev, image: null, imagePreview: null }));
@@ -196,56 +182,6 @@ const NewPost = () => {
   return (
     <div className="new-post-container">
       <Header />
-
-      {showCropper && (
-        <div className="crop-modal-overlay">
-          <div className="crop-modal">
-            <h3 className="crop-modal-title">Adjust Image Position</h3>
-            <div className="crop-container">
-              <div className="crop-preview-box">
-                <img
-                  src={cropperImage}
-                  alt="Crop preview"
-                  className="crop-preview-image"
-                  style={{ transform: `translate(${cropData.x}px, ${cropData.y}px) scale(${cropData.scale})` }}
-                  draggable
-                  onDragStart={(e) => {
-                    e.dataTransfer.effectAllowed = 'move';
-                    const startX = e.clientX, startY = e.clientY;
-                    const startDataX = cropData.x, startDataY = cropData.y;
-                    const handleDragOver = (moveEvent) => {
-                      moveEvent.preventDefault();
-                      setCropData(prev => ({ ...prev, x: startDataX + moveEvent.clientX - startX, y: startDataY + moveEvent.clientY - startY }));
-                    };
-                    const handleDragEnd = () => {
-                      document.removeEventListener('dragover', handleDragOver);
-                      document.removeEventListener('dragend', handleDragEnd);
-                    };
-                    document.addEventListener('dragover', handleDragOver);
-                    document.addEventListener('dragend', handleDragEnd);
-                  }}
-                />
-              </div>
-              <div className="crop-controls">
-                <div className="control-group">
-                  <label>Zoom</label>
-                  <input
-                    type="range" min="0.5" max="3" step="0.1" value={cropData.scale}
-                    onChange={(e) => setCropData(prev => ({ ...prev, scale: parseFloat(e.target.value) }))}
-                    className="crop-slider"
-                  />
-                  <span className="scale-value">{(cropData.scale * 100).toFixed(0)}%</span>
-                  <p className="control-hint">Drag the image to adjust position</p>
-                </div>
-              </div>
-            </div>
-            <div className="crop-actions">
-              <button type="button" className="crop-cancel-btn" onClick={cancelCrop}>Cancel</button>
-              <button type="button" className="crop-apply-btn" onClick={applyCrop}>Apply & Continue</button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <main className="new-post-main">
         <button className="back-button" onClick={() => navigate('/store')} title="Back to Store">
@@ -364,30 +300,17 @@ const NewPost = () => {
           <div className="form-section">
             <label className="section-label">Post Type *</label>
             <div className="post-type-buttons">
-              <button
-                type="button"
-                className={`post-type-btn ${formData.postType === 'sell' ? 'active' : ''}`}
-                onClick={() => handlePostTypeChange('sell')}
-              >
-                <span className="post-type-taka">৳</span>
-                Sell
+              <button type="button" className={`post-type-btn ${formData.postType === 'sell' ? 'active' : ''}`} onClick={() => handlePostTypeChange('sell')}>
+                <span className="post-type-taka">৳</span> Sell
               </button>
-              <button
-                type="button"
-                className={`post-type-btn ${formData.postType === 'exchange' ? 'active' : ''}`}
-                onClick={() => handlePostTypeChange('exchange')}
-              >
+              <button type="button" className={`post-type-btn ${formData.postType === 'exchange' ? 'active' : ''}`} onClick={() => handlePostTypeChange('exchange')}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M16 3l4 4-4 4"/><path d="M20 7H4"/>
                   <path d="M8 21l-4-4 4-4"/><path d="M4 17h16"/>
                 </svg>
                 Exchange
               </button>
-              <button
-                type="button"
-                className={`post-type-btn ${formData.postType === 'donate' ? 'active' : ''}`}
-                onClick={() => handlePostTypeChange('donate')}
-              >
+              <button type="button" className={`post-type-btn ${formData.postType === 'donate' ? 'active' : ''}`} onClick={() => handlePostTypeChange('donate')}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                 </svg>
@@ -404,12 +327,8 @@ const NewPost = () => {
             <div className="np-price-wrapper">
               <span className="np-currency">৳</span>
               <input
-                type="text"
-                id="np-price"
-                name="price"
-                value={formData.price}
-                onChange={handleInputChange}
-                placeholder="0.00"
+                type="text" id="np-price" name="price" value={formData.price}
+                onChange={handleInputChange} placeholder="0.00"
                 disabled={formData.postType !== 'sell'}
                 className={`form-input np-price-input ${errors.price ? 'error' : ''} ${formData.postType !== 'sell' ? 'disabled' : ''}`}
               />
@@ -434,21 +353,13 @@ const NewPost = () => {
           <div className="form-section">
             <label className="section-label">Contact Method *</label>
             <div className="contact-type-buttons">
-              <button
-                type="button"
-                className={`contact-type-btn ${formData.contactType === 'phone' ? 'active' : ''}`}
-                onClick={() => handleContactTypeChange('phone')}
-              >
+              <button type="button" className={`contact-type-btn ${formData.contactType === 'phone' ? 'active' : ''}`} onClick={() => handleContactTypeChange('phone')}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                 </svg>
                 Phone Number
               </button>
-              <button
-                type="button"
-                className={`contact-type-btn ${formData.contactType === 'email' ? 'active' : ''}`}
-                onClick={() => handleContactTypeChange('email')}
-              >
+              <button type="button" className={`contact-type-btn ${formData.contactType === 'email' ? 'active' : ''}`} onClick={() => handleContactTypeChange('email')}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                   <polyline points="22,6 12,13 2,6"/>
@@ -477,7 +388,6 @@ const NewPost = () => {
 
           {/* Disclaimer + Actions */}
           <div className="post-disclaimer">
-            
             <span> * This post will be automatically deleted after <strong>30 days</strong> from the date of creation.</span>
           </div>
 
