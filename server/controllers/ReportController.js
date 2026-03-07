@@ -248,7 +248,7 @@ export const getReportedPostById = async (req, res) => {
 export const deleteReportedPost = async (req, res) => {
     try {
         const { reportId } = req.params;
-        const { adminNotes } = req.body;
+        const adminNotes = req.body?.adminNotes;
         const adminId = req.user._id;
 
         const report = await PostReport.findById(reportId);
@@ -258,6 +258,35 @@ export const deleteReportedPost = async (req, res) => {
                 success: false,
                 message: 'Report not found.'
             });
+        }
+
+        // Notify the post author before deleting the post
+        try {
+            await createNotification({
+                recipientId: report.postAuthorId,
+                senderId: adminId,
+                type: 'admin_action',
+                message: `Your ${report.postModel === 'Post' ? 'social' : 'marketplace'} post has been removed by an administrator due to multiple reports.`
+            });
+        } catch (notifError) {
+            console.error('Failed to send notification to post author:', notifError);
+            // Continue with deletion even if notification fails
+        }
+
+        // Notify all reporters that the post was deleted
+        try {
+            const reporterNotifications = report.reports.map(r =>
+                createNotification({
+                    recipientId: r.reporterId,
+                    senderId: adminId,
+                    type: 'admin_action',
+                    message: `A ${report.postModel === 'Post' ? 'social' : 'marketplace'} post you reported has been reviewed and removed by an administrator.`
+                })
+            );
+            await Promise.all(reporterNotifications);
+        } catch (notifError) {
+            console.error('Failed to send notifications to reporters:', notifError);
+            // Continue with deletion even if notification fails
         }
 
         // Delete the actual post
@@ -278,16 +307,6 @@ export const deleteReportedPost = async (req, res) => {
         report.adminNotes = adminNotes || 'Post deleted by admin after review.';
         await report.save();
 
-        // Optionally notify the post author that their post was removed
-        await createNotification({
-            recipientId: report.postAuthorId,
-            senderId: adminId,
-            type: 'admin_action',
-            postId: report.postId,
-            postModel: report.postModel,
-            message: 'Your post has been removed by an administrator due to multiple reports.'
-        });
-
         return res.status(200).json({
             success: true,
             message: 'Post deleted successfully.'
@@ -306,7 +325,7 @@ export const deleteReportedPost = async (req, res) => {
 export const dismissReport = async (req, res) => {
     try {
         const { reportId } = req.params;
-        const { adminNotes } = req.body;
+        const adminNotes = req.body?.adminNotes;
         const adminId = req.user._id;
 
         const report = await PostReport.findById(reportId);
@@ -323,6 +342,22 @@ export const dismissReport = async (req, res) => {
         report.reviewedAt = new Date();
         report.adminNotes = adminNotes || 'Report dismissed by admin after review.';
         await report.save();
+
+        // Notify all reporters that their report was reviewed but dismissed
+        try {
+            const reporterNotifications = report.reports.map(r =>
+                createNotification({
+                    recipientId: r.reporterId,
+                    senderId: adminId,
+                    type: 'admin_action',
+                    message: `A ${report.postModel === 'Post' ? 'social' : 'marketplace'} post you reported has been reviewed. The report was dismissed as the post does not violate our guidelines.`
+                })
+            );
+            await Promise.all(reporterNotifications);
+        } catch (notifError) {
+            console.error('Failed to send notifications to reporters:', notifError);
+            // Continue even if notification fails
+        }
 
         return res.status(200).json({
             success: true,
