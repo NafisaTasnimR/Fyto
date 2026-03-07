@@ -179,7 +179,7 @@ export default function LandingPage() {
             <p className="top-sub">A community-driven platform for plant lovers.</p>
             <div className="top-ctas">
               <button className="cta primary" onClick={() => openModal('signup')}>Join Community</button>
-              <button className="cta secondary" onClick={() => { window.scrollTo({ top: document.body.scrollHeight/4, behavior: 'smooth' }); }}>Explore Plants</button>
+              <button className="cta secondary" onClick={() => navigate('/preview-marketplace')}>Explore Plants</button>
             </div>
           </div>
 
@@ -242,7 +242,7 @@ export default function LandingPage() {
         <div className="secondary-content">
           <h2>From Seed to Story — Grow Together on Fyto</h2>
           <p>Track your plants, share milestones, ask for help, and celebrate growth — all in one place.</p>
-          <button className="secondary-btn">Get Started</button>
+          <button className="secondary-btn" onClick={() => navigate('/signin')}>Get Started</button>
         </div>
       </section>
 
