@@ -294,30 +294,41 @@ export default function ProfilePage({ onEdit }) {
   }
 
   const handleMarkMarketplacePostUnavailable = async (postId) => {
-    if (!window.confirm('Mark this post as unavailable?')) {
+    const post = marketplacePosts.find(p => p._id === postId)
+    const isCurrentlyUnavailable = post?.status === 'unavailable'
+    const newStatus = isCurrentlyUnavailable ? 'available' : 'unavailable'
+    const confirmMessage = isCurrentlyUnavailable 
+      ? 'Mark this post as available again?' 
+      : 'Mark this post as unavailable?'
+
+    if (!window.confirm(confirmMessage)) {
       return
     }
 
     try {
       const token = localStorage.getItem('token')
-      await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/marketplace/${postId}`,
-        { status: 'unavailable' },
+      const response = await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/marketplace/${postId}/status`,
+        { status: newStatus },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       )
+      
       setMarketplacePosts(
         marketplacePosts.map(post =>
-          post._id === postId ? { ...post, status: 'unavailable' } : post
+          post._id === postId ? { ...post, status: newStatus } : post
         )
       )
       setOpenMarketplaceMenuId(null)
-      alert('Post marked as unavailable!')
+      const successMessage = newStatus === 'unavailable' 
+        ? 'Post marked as unavailable!' 
+        : 'Post marked as available again!'
+      alert(successMessage)
     } catch (error) {
-      console.error('Error marking post unavailable:', error)
+      console.error('Error updating post status:', error)
       alert('Failed to update post status. Please try again.')
     }
   }
@@ -588,12 +599,17 @@ export default function ProfilePage({ onEdit }) {
             {marketplacePosts.length > 0 ? (
               <div className="profile-marketplace-list">
                 {marketplacePosts.map((post) => (
-                  <div key={post._id} className="profile-marketplace-item">
+                  <div key={post._id} className={`profile-marketplace-item ${post.status === 'unavailable' ? 'profile-marketplace-item-unavailable' : ''}`}>
                     <div className="profile-marketplace-item-image">
                       <img
                         src={post.photos && post.photos.length > 0 ? post.photos[0] : '/tree-placeholder.png'}
                         alt={post.treeName}
                       />
+                      {post.status === 'unavailable' && (
+                        <div className="profile-marketplace-unavailable-overlay">
+                          <span>NO LONGER AVAILABLE</span>
+                        </div>
+                      )}
                     </div>
                     <div className="profile-marketplace-item-content">
                       <div className="profile-marketplace-item-header">
@@ -634,7 +650,7 @@ export default function ProfilePage({ onEdit }) {
                                   className="marketplace-post-menu-item"
                                   onClick={() => handleMarkMarketplacePostUnavailable(post._id)}
                                 >
-                                  Mark Unavailable
+                                  {post.status === 'unavailable' ? 'Mark Available' : 'Mark Unavailable'}
                                 </button>
                                 <button
                                   className="marketplace-post-menu-item delete"

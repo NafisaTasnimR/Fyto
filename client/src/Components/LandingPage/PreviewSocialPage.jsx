@@ -85,7 +85,11 @@ const PreviewSocialPage = () => {
             >
               Marketplace
             </button>
-            <button className="nav-link-landing">
+            
+             <button 
+               className="nav-link-landing"
+              onClick={() => navigate('/preview-plant-info')}
+              >
               Plant Info
             </button>
           </nav>
