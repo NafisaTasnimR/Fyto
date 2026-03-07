@@ -49,33 +49,37 @@ const PreviewMarketplace = () => {
     <div className="preview-marketplace-page">
       {showModal && <LoginSignup mode={modalMode} onClose={() => setShowModal(false)} />}
 
-      <header className="fixed-header preview-header">
+      <header className="fixed-header">
         <div className="header-content">
-          <div className="logo">
+          <div className="logo" onClick={() => navigate('/')}>
             <img src="/2.png" alt="Fyto logo" className="site-logo" />
             <span>Fyto</span>
           </div>
-          
-          <div className="preview-page-title-container">
-            <h1>Marketplace</h1>
-          </div>
-          
-          <div className="preview-header-right">
-            <button className="preview-login-btn" onClick={() => { setModalMode('login'); setShowModal(true); }}>
-              Login
+
+          <nav className="center-nav-landing">
+            <button
+              className="nav-link-landing"
+              onClick={() => navigate('/preview-social')}
+            >
+              Social
             </button>
-            <button className="preview-signup-btn" onClick={() => { setModalMode('signup'); setShowModal(true); }}>
-              Sign In
+            <button
+              className="nav-link-landing active"
+              onClick={() => navigate('/preview-marketplace')}
+            >
+              Marketplace
             </button>
-          </div>
+            <button className="nav-link-landing">
+              Plant Info
+            </button>
+          </nav>
+
+          <nav className="nav-buttons">
+            <button className="nav-btn1" onClick={() => { setModalMode('login'); setShowModal(true); }}>Login</button>
+            <button className="nav-btn1 signup-btn1" onClick={() => { setModalMode('signup'); setShowModal(true); }}>Sign In</button>
+          </nav>
         </div>
       </header>
-
-      <button className="back-button-preview" onClick={() => navigate('/')} title="Back">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-      </button>
 
       <div className="preview-marketplace-container">
       <div className="preview-marketplace-header">
