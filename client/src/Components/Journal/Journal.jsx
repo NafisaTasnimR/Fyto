@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import './Journal.css';
 import Header from '../Shared/Header';
 import Sidebar from './Sidebar';
@@ -58,8 +58,10 @@ const UnsavedWarningModal = ({ onCancel, onLeave }) => {
 function Journal() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { id } = useParams();
   const isNewJournal = location.pathname === '/journal/new';
   const isContinue = location.pathname === '/journal/continue';
+  const isExistingJournal = !!id;
 
   const [showCoverSelection, setShowCoverSelection] = useState(isNewJournal);
   const [selectedCover, setSelectedCover] = useState(null);
@@ -68,6 +70,27 @@ function Journal() {
   const [pages, setPages] = useState([]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // Load existing journal if ID is provided
+  useEffect(() => {
+    if (isExistingJournal && id) {
+      const loadExistingJournal = async () => {
+        try {
+          console.log('Loading journal with ID:', id);
+          const response = await journalService.getJournalById(id);
+          console.log('Journal loaded:', response);
+          if (response && response.data) {
+            setCurrentJournal(response.data);
+          }
+        } catch (error) {
+          console.error('Error loading journal:', error);
+          alert('Failed to load journal');
+          navigate('/profile');
+        }
+      };
+      loadExistingJournal();
+    }
+  }, [id, isExistingJournal, navigate]);
   const [draggedElement, setDraggedElement] = useState(null);
   const [resizingElement, setResizingElement] = useState(null);
   const [editingTitle, setEditingTitle] = useState(false);

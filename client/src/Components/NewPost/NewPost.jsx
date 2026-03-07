@@ -7,23 +7,18 @@ import Header from '../Shared/Header.jsx';
 const NewPost = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
-  const [showCropper, setShowCropper] = useState(false);
-  const [cropperImage, setCropperImage] = useState(null);
-  // eslint-disable-next-line no-unused-vars
-  const canvasRef = useRef(null);
-  const [cropData, setCropData] = useState({ x: 0, y: 0, scale: 1 });
 
   const [formData, setFormData] = useState({
     treeName: '',
     treeType: '',
-    customTreeType: '', 
-    treePart: '', 
-    customTreePart: '', 
+    customTreeType: '',
+    treePart: '',
+    customTreePart: '',
     description: '',
-    postType: 'sell', 
+    postType: 'sell',
     price: '',
-    exchangeFor: '', 
-    contactType: 'phone', 
+    exchangeFor: '',
+    contactType: 'phone',
     contact: '',
     image: null,
     imagePreview: null
@@ -32,48 +27,19 @@ const NewPost = () => {
   const [errors, setErrors] = useState({});
 
   const treeTypes = [
-    'Maple',
-    'Oak',
-    'Pine',
-    'Birch',
-    'Willow',
-    'Cherry Blossom',
-    'Magnolia',
-    'Palm',
-    'Evergreen',
-    'Fruit Tree',
-    'Flowering Tree',
-    'Shade Tree',
-    'Other'
+    'Maple','Oak','Pine','Birch','Willow','Cherry Blossom','Magnolia',
+    'Palm','Evergreen','Fruit Tree','Flowering Tree','Shade Tree','Other'
   ];
 
   const treeParts = [
-    'Seeds',
-    'Seedling',
-    'Sapling',
-    'Young Tree',
-    'Mature Tree',
-    'Cuttings',
-    'Root Division',
-    'Whole Tree with Root Ball',
-    'Bare Root Tree',
-    'Potted Tree',
-    'Other'
+    'Seeds','Seedling','Sapling','Young Tree','Mature Tree','Cuttings',
+    'Root Division','Whole Tree with Root Ball','Bare Root Tree','Potted Tree','Other'
   ];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
   const handlePostTypeChange = (type) => {
@@ -86,217 +52,102 @@ const NewPost = () => {
   };
 
   const handleContactTypeChange = (type) => {
-    setFormData(prev => ({
-      ...prev,
-      contactType: type,
-      contact: '' 
-    }));
-    
-    if (errors.contact) {
-      setErrors(prev => ({
-        ...prev,
-        contact: ''
-      }));
-    }
+    setFormData(prev => ({ ...prev, contactType: type, contact: '' }));
+    if (errors.contact) setErrors(prev => ({ ...prev, contact: '' }));
   };
 
-  const handleImageClick = () => {
-    fileInputRef.current.click();
-  };
+  const handleImageClick = () => { fileInputRef.current.click(); };
 
+  // ── SocialPage-style: compress directly, no cropper ────────────────────
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-     
-      if (file.size > 5 * 1024 * 1024) {
-        setErrors(prev => ({
-          ...prev,
-          image: 'Image size should be less than 5MB'
-        }));
-        return;
-      }
-
-      
-      if (!file.type.startsWith('image/')) {
-        setErrors(prev => ({
-          ...prev,
-          image: 'Please select a valid image file'
-        }));
-        return;
-      }
-
-      
-      compressImage(file);
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors(prev => ({ ...prev, image: 'Image size should be less than 5MB' }));
+      return;
     }
+    if (!file.type.startsWith('image/')) {
+      setErrors(prev => ({ ...prev, image: 'Please select a valid image file' }));
+      return;
+    }
+    compressImage(file);
   };
 
   const compressImage = (file) => {
     const reader = new FileReader();
     reader.onload = (e) => {
-      setCropperImage(e.target.result);
-      setShowCropper(true);
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        let width = img.width;
+        let height = img.height;
+        const maxSize = 1200;
+        if (width > height) {
+          if (width > maxSize) { height = (height * maxSize) / width; width = maxSize; }
+        } else {
+          if (height > maxSize) { width = (width * maxSize) / height; height = maxSize; }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+        setFormData(prev => ({ ...prev, image: file, imagePreview: compressedBase64 }));
+        setErrors(prev => ({ ...prev, image: '' }));
+      };
+      img.src = e.target.result;
     };
     reader.readAsDataURL(file);
   };
-
-  const applyCrop = () => {
-    if (!cropperImage) return;
-
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-
-      const cropSize = 400;
-      canvas.width = cropSize;
-      canvas.height = cropSize;
-
-      const scaledWidth = img.width * cropData.scale;
-      const scaledHeight = img.height * cropData.scale;
-      const x = (cropSize / 2) - (scaledWidth / 2) + cropData.x;
-      const y = (cropSize / 2) - (scaledHeight / 2) + cropData.y;
-
-      ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
-
-      const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-
-      setFormData(prev => ({
-        ...prev,
-        imagePreview: compressedBase64
-      }));
-      setErrors(prev => ({
-        ...prev,
-        image: ''
-      }));
-      setShowCropper(false);
-      setCropperImage(null);
-      setCropData({ x: 0, y: 0, scale: 1 });
-    };
-    img.src = cropperImage;
-  };
-
-  const cancelCrop = () => {
-    setShowCropper(false);
-    setCropperImage(null);
-    setCropData({ x: 0, y: 0, scale: 1 });
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
+  // ────────────────────────────────────────────────────────────────────────
 
   const handleRemoveImage = () => {
-    setFormData(prev => ({
-      ...prev,
-      image: null,
-      imagePreview: null
-    }));
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    setFormData(prev => ({ ...prev, image: null, imagePreview: null }));
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const validatePhone = (phone) => {
-  const digitsOnly = phone.replace(/\D/g, '');
-
-
-
-  if (!(digitsOnly.length === 11 || digitsOnly.length === 13)) {
-    return false;
-  }
-
-  
-  if (
-    !digitsOnly.startsWith("01") &&
-    !digitsOnly.startsWith("8801")
-  ) {
-    return false;
-  }
-
-  return true;
-};
-
+    const digitsOnly = phone.replace(/\D/g, '');
+    if (!(digitsOnly.length === 11 || digitsOnly.length === 13)) return false;
+    if (!digitsOnly.startsWith("01") && !digitsOnly.startsWith("8801")) return false;
+    return true;
+  };
 
   const validateEmail = (email) => {
-   
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
   const validateForm = () => {
     const newErrors = {};
-
-    if (!formData.treeName.trim()) {
-      newErrors.treeName = 'Tree name is required';
+    if (!formData.treeName.trim()) newErrors.treeName = 'Tree name is required';
+    if (!formData.treeType) newErrors.treeType = 'Please select a tree type';
+    else if (formData.treeType === 'Other' && !formData.customTreeType.trim()) newErrors.customTreeType = 'Please specify the tree type';
+    if (!formData.treePart) newErrors.treePart = 'Please select what part of the tree you are offering';
+    else if (formData.treePart === 'Other' && !formData.customTreePart.trim()) newErrors.customTreePart = 'Please specify what you are offering';
+    if (!formData.description.trim()) newErrors.description = 'Description is required';
+    else if (formData.description.trim().length < 20) newErrors.description = 'Description should be at least 20 characters';
+    if (formData.postType === 'sell' && !formData.price.trim()) newErrors.price = 'Price is required for selling';
+    else if (formData.postType === 'sell' && isNaN(formData.price)) newErrors.price = 'Please enter a valid price';
+    if (formData.postType === 'exchange' && !formData.exchangeFor.trim()) newErrors.exchangeFor = 'Please specify what you want in exchange';
+    if (!formData.contact.trim()) newErrors.contact = 'Contact information is required';
+    else {
+      if (formData.contactType === 'phone' && !validatePhone(formData.contact)) newErrors.contact = 'Please enter a valid phone number';
+      else if (formData.contactType === 'email' && !validateEmail(formData.contact)) newErrors.contact = 'Please enter a valid email address (e.g., example@email.com)';
     }
-
-    if (!formData.treeType) {
-      newErrors.treeType = 'Please select a tree type';
-    } else if (formData.treeType === 'Other' && !formData.customTreeType.trim()) {
-      newErrors.customTreeType = 'Please specify the tree type';
-    }
-
-    if (!formData.treePart) {
-      newErrors.treePart = 'Please select what part of the tree you are offering';
-    } else if (formData.treePart === 'Other' && !formData.customTreePart.trim()) {
-      newErrors.customTreePart = 'Please specify what you are offering';
-    }
-
-    if (!formData.description.trim()) {
-      newErrors.description = 'Description is required';
-    } else if (formData.description.trim().length < 20) {
-      newErrors.description = 'Description should be at least 20 characters';
-    }
-
-    if (formData.postType === 'sell' && !formData.price.trim()) {
-      newErrors.price = 'Price is required for selling';
-    } else if (formData.postType === 'sell' && isNaN(formData.price)) {
-      newErrors.price = 'Please enter a valid price';
-    }
-
-    if (formData.postType === 'exchange' && !formData.exchangeFor.trim()) {
-      newErrors.exchangeFor = 'Please specify what you want in exchange';
-    }
-
-    
-    if (!formData.contact.trim()) {
-      newErrors.contact = 'Contact information is required';
-    } else {
-      if (formData.contactType === 'phone') {
-        if (!validatePhone(formData.contact)) {
-          newErrors.contact = 'Please enter a valid phone number ';
-        }
-      } else if (formData.contactType === 'email') {
-        if (!validateEmail(formData.contact)) {
-          newErrors.contact = 'Please enter a valid email address (e.g., example@email.com)';
-        }
-      }
-    }
-
-    if (!formData.imagePreview) {
-      newErrors.image = 'Please upload an image of the tree';
-    }
-
+    if (!formData.imagePreview) newErrors.image = 'Please upload an image of the tree';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (validateForm()) {
       try {
         const token = localStorage.getItem('token');
-
-        if (!token) {
-          alert('Please login to create a post');
-          navigate('/login');
-          return;
-        }
-
-        
+        if (!token) { alert('Please login to create a post'); navigate('/login'); return; }
         const finalTreeType = formData.treeType === 'Other' ? formData.customTreeType : formData.treeType;
         const finalTreePart = formData.treePart === 'Other' ? formData.customTreePart : formData.treePart;
-
         const marketplaceData = {
           photos: formData.imagePreview ? [formData.imagePreview] : [],
           treeName: formData.treeName,
@@ -306,151 +157,47 @@ const NewPost = () => {
           postType: formData.postType,
           price: formData.postType === 'sell' ? parseFloat(formData.price) : 0,
           contactInfo: formData.contact,
-          treeAge: 0 
+          treeAge: 0
         };
-
-        
-        if (formData.postType === 'exchange') {
-          marketplaceData.description += `\n\nLooking for: ${formData.exchangeFor}`;
-        }
-
+        if (formData.postType === 'exchange') marketplaceData.description += `\n\nLooking for: ${formData.exchangeFor}`;
         const response = await axios.post(
           `${process.env.REACT_APP_API_URL}/api/marketplace`,
           marketplaceData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          }
+          { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
         );
-
-        if (response.data.success) {
-          alert('Marketplace post created successfully!');
-          navigate('/store'); 
-        } else {
-          alert('Failed to create post: ' + response.data.message);
-        }
+        if (response.data.success) { alert('Marketplace post created successfully!'); navigate('/store'); }
+        else alert('Failed to create post: ' + response.data.message);
       } catch (error) {
         console.error('Error creating post:', error);
         alert('Failed to create post. Please try again.');
       }
     } else {
       const firstError = document.querySelector('.error-message');
-      if (firstError) {
-        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   };
 
-  const handleCancel = () => {
-    navigate('/');
-  };
+  const handleCancel = () => { navigate('/'); };
 
   return (
     <div className="new-post-container">
-  
-         <Header />
-
-      {showCropper && (
-        <div className="crop-modal-overlay">
-          <div className="crop-modal">
-            <h3 className="crop-modal-title">Adjust Image Position</h3>
-            <div className="crop-container">
-              <div className="crop-preview-box">
-                <img 
-                  src={cropperImage} 
-                  alt="Crop preview" 
-                  className="crop-preview-image"
-                  style={{
-                    transform: `translate(${cropData.x}px, ${cropData.y}px) scale(${cropData.scale})`
-                  }}
-                  draggable
-                  onDragStart={(e) => {
-                    e.dataTransfer.effectAllowed = 'move';
-                    const startX = e.clientX;
-                    const startY = e.clientY;
-                    const startDataX = cropData.x;
-                    const startDataY = cropData.y;
-                    
-                    const handleDragOver = (moveEvent) => {
-                      moveEvent.preventDefault();
-                      const deltaX = moveEvent.clientX - startX;
-                      const deltaY = moveEvent.clientY - startY;
-                      setCropData(prev => ({
-                        ...prev,
-                        x: startDataX + deltaX,
-                        y: startDataY + deltaY
-                      }));
-                    };
-                    
-                    const handleDragEnd = () => {
-                      document.removeEventListener('dragover', handleDragOver);
-                      document.removeEventListener('dragend', handleDragEnd);
-                    };
-                    
-                    document.addEventListener('dragover', handleDragOver);
-                    document.addEventListener('dragend', handleDragEnd);
-                  }}
-                />
-              </div>
-              <div className="crop-controls">
-                <div className="control-group">
-                  <label>Zoom</label>
-                  <input 
-                    type="range" 
-                    min="0.5" 
-                    max="3" 
-                    step="0.1" 
-                    value={cropData.scale}
-                    onChange={(e) => setCropData(prev => ({
-                      ...prev,
-                      scale: parseFloat(e.target.value)
-                    }))}
-                    className="crop-slider"
-                  />
-                  <span className="scale-value">{(cropData.scale * 100).toFixed(0)}%</span>
-                  <p className="control-hint">Drag the image to adjust position</p>
-                </div>
-              </div>
-            </div>
-            <div className="crop-actions">
-              <button 
-                type="button" 
-                className="crop-cancel-btn" 
-                onClick={cancelCrop}
-              >
-                Cancel
-              </button>
-              <button 
-                type="button" 
-                className="crop-apply-btn" 
-                onClick={applyCrop}
-              >
-                Apply & Continue
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Header />
 
       <main className="new-post-main">
-        <button 
-          className="back-button" 
-          onClick={() => navigate('/store')}
-          title="Back to Store"
-        >
+        <button className="back-button" onClick={() => navigate('/store')} title="Back to Store">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </button>
+
         <div className="form-header">
           <h2 className="form-title">Create New Post</h2>
           <p className="form-subtitle">Share your tree with the community</p>
         </div>
 
         <form onSubmit={handleSubmit} className="post-form">
-          
+
+          {/* Image */}
           <div className="form-section">
             <label className="section-label">Tree Photo *</label>
             <div className="image-upload-container">
@@ -459,74 +206,53 @@ const NewPost = () => {
                   <img src={formData.imagePreview} alt="Tree preview" className="image-preview" />
                   <button type="button" className="remove-image-btn" onClick={handleRemoveImage}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                      <line x1="6" y1="6" x2="18" y2="18" />
+                      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                     </svg>
                   </button>
                 </div>
               ) : (
                 <div className="image-upload-placeholder" onClick={handleImageClick}>
                   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                    <circle cx="8.5" cy="8.5" r="1.5" />
-                    <polyline points="21 15 16 10 5 21" />
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
                   </svg>
                   <p className="upload-text">Click to upload image</p>
                   <p className="upload-hint">PNG, JPG up to 5MB</p>
                 </div>
               )}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="file-input"
-              />
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} className="file-input" />
             </div>
             {errors.image && <span className="error-message">{errors.image}</span>}
           </div>
 
-          
+          {/* Tree Name */}
           <div className="form-section">
             <label htmlFor="treeName" className="section-label">Tree Name *</label>
             <input
-              type="text"
-              id="treeName"
-              name="treeName"
-              value={formData.treeName}
-              onChange={handleInputChange}
-              placeholder="e.g., Japanese Maple Tree"
+              type="text" id="treeName" name="treeName" value={formData.treeName}
+              onChange={handleInputChange} placeholder="e.g., Japanese Maple Tree"
               className={`form-input ${errors.treeName ? 'error' : ''}`}
             />
             {errors.treeName && <span className="error-message">{errors.treeName}</span>}
           </div>
 
-         
+          {/* Tree Type */}
           <div className="form-section">
             <label htmlFor="treeType" className="section-label">Tree Type *</label>
             <select
-              id="treeType"
-              name="treeType"
-              value={formData.treeType}
-              onChange={handleInputChange}
-              className={`form-select ${errors.treeType ? 'error' : ''}`}
+              id="treeType" name="treeType" value={formData.treeType}
+              onChange={handleInputChange} className={`form-select ${errors.treeType ? 'error' : ''}`}
             >
               <option value="">Select tree type</option>
-              {treeTypes.map((type) => (
-                <option key={type} value={type}>{type}</option>
-              ))}
+              {treeTypes.map((type) => <option key={type} value={type}>{type}</option>)}
             </select>
             {errors.treeType && <span className="error-message">{errors.treeType}</span>}
-
-           
             {formData.treeType === 'Other' && (
               <div style={{ marginTop: '12px' }}>
                 <input
-                  type="text"
-                  name="customTreeType"
-                  value={formData.customTreeType}
-                  onChange={handleInputChange}
-                  placeholder="Please specify the tree type"
+                  type="text" name="customTreeType" value={formData.customTreeType}
+                  onChange={handleInputChange} placeholder="Please specify the tree type"
                   className={`form-input ${errors.customTreeType ? 'error' : ''}`}
                 />
                 {errors.customTreeType && <span className="error-message">{errors.customTreeType}</span>}
@@ -534,32 +260,22 @@ const NewPost = () => {
             )}
           </div>
 
-          
+          {/* Tree Part */}
           <div className="form-section">
             <label htmlFor="treePart" className="section-label">What are you offering? *</label>
             <select
-              id="treePart"
-              name="treePart"
-              value={formData.treePart}
-              onChange={handleInputChange}
-              className={`form-select ${errors.treePart ? 'error' : ''}`}
+              id="treePart" name="treePart" value={formData.treePart}
+              onChange={handleInputChange} className={`form-select ${errors.treePart ? 'error' : ''}`}
             >
               <option value="">Select what you're offering</option>
-              {treeParts.map((part) => (
-                <option key={part} value={part}>{part}</option>
-              ))}
+              {treeParts.map((part) => <option key={part} value={part}>{part}</option>)}
             </select>
             {errors.treePart && <span className="error-message">{errors.treePart}</span>}
-
-           
             {formData.treePart === 'Other' && (
               <div style={{ marginTop: '12px' }}>
                 <input
-                  type="text"
-                  name="customTreePart"
-                  value={formData.customTreePart}
-                  onChange={handleInputChange}
-                  placeholder="Please specify what you're offering"
+                  type="text" name="customTreePart" value={formData.customTreePart}
+                  onChange={handleInputChange} placeholder="Please specify what you're offering"
                   className={`form-input ${errors.customTreePart ? 'error' : ''}`}
                 />
                 {errors.customTreePart && <span className="error-message">{errors.customTreePart}</span>}
@@ -567,122 +283,83 @@ const NewPost = () => {
             )}
           </div>
 
-          
+          {/* Description */}
           <div className="form-section">
             <label htmlFor="description" className="section-label">Description *</label>
             <textarea
-              id="description"
-              name="description"
-              value={formData.description}
+              id="description" name="description" value={formData.description}
               onChange={handleInputChange}
               placeholder="Describe your tree, its age, condition, special features..."
-              rows="5"
-              className={`form-textarea ${errors.description ? 'error' : ''}`}
+              rows="5" className={`form-textarea ${errors.description ? 'error' : ''}`}
             />
-            <div className="char-count">
-              {formData.description.length} characters
-            </div>
+            <div className="char-count">{formData.description.length} characters</div>
             {errors.description && <span className="error-message">{errors.description}</span>}
           </div>
 
-          
+          {/* Post Type */}
           <div className="form-section">
             <label className="section-label">Post Type *</label>
             <div className="post-type-buttons">
-              <button
-                type="button"
-                className={`post-type-btn ${formData.postType === 'sell' ? 'active' : ''}`}
-                onClick={() => handlePostTypeChange('sell')}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="12" y1="1" x2="12" y2="23" />
-                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                </svg>
-                Sell
+              <button type="button" className={`post-type-btn ${formData.postType === 'sell' ? 'active' : ''}`} onClick={() => handlePostTypeChange('sell')}>
+                <span className="post-type-taka">৳</span> Sell
               </button>
-              <button
-                type="button"
-                className={`post-type-btn ${formData.postType === 'exchange' ? 'active' : ''}`}
-                onClick={() => handlePostTypeChange('exchange')}
-              >
+              <button type="button" className={`post-type-btn ${formData.postType === 'exchange' ? 'active' : ''}`} onClick={() => handlePostTypeChange('exchange')}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M16 3l4 4-4 4" />
-                  <path d="M20 7H4" />
-                  <path d="M8 21l-4-4 4-4" />
-                  <path d="M4 17h16" />
+                  <path d="M16 3l4 4-4 4"/><path d="M20 7H4"/>
+                  <path d="M8 21l-4-4 4-4"/><path d="M4 17h16"/>
                 </svg>
                 Exchange
               </button>
-              <button
-                type="button"
-                className={`post-type-btn ${formData.postType === 'donate' ? 'active' : ''}`}
-                onClick={() => handlePostTypeChange('donate')}
-              >
+              <button type="button" className={`post-type-btn ${formData.postType === 'donate' ? 'active' : ''}`} onClick={() => handlePostTypeChange('donate')}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                 </svg>
                 Donate
               </button>
             </div>
           </div>
 
-         
+          {/* Price */}
           <div className="form-section">
-            <label htmlFor="price" className="section-label">
+            <label htmlFor="np-price" className="section-label">
               Price {formData.postType === 'sell' ? '*' : '(Only for selling)'}
             </label>
-            <div className="price-input-wrapper">
-              <span className="currency-symbol">৳</span>
+            <div className="np-price-wrapper">
+              <span className="np-currency">৳</span>
               <input
-                type="text"
-                id="price"
-                name="price"
-                value={formData.price}
-                onChange={handleInputChange}
-                placeholder="0.00"
+                type="text" id="np-price" name="price" value={formData.price}
+                onChange={handleInputChange} placeholder="0.00"
                 disabled={formData.postType !== 'sell'}
-                className={`form-input price-input ${errors.price ? 'error' : ''} ${formData.postType !== 'sell' ? 'disabled' : ''}`}
+                className={`form-input np-price-input ${errors.price ? 'error' : ''} ${formData.postType !== 'sell' ? 'disabled' : ''}`}
               />
             </div>
             {errors.price && <span className="error-message">{errors.price}</span>}
           </div>
 
-          
+          {/* Exchange For */}
           {formData.postType === 'exchange' && (
             <div className="form-section">
               <label htmlFor="exchangeFor" className="section-label">What do you want in exchange? *</label>
               <input
-                type="text"
-                id="exchangeFor"
-                name="exchangeFor"
-                value={formData.exchangeFor}
-                onChange={handleInputChange}
-                placeholder="e.g., Oak tree seedlings, Gardening tools, etc."
+                type="text" id="exchangeFor" name="exchangeFor" value={formData.exchangeFor}
+                onChange={handleInputChange} placeholder="e.g., Oak tree seedlings, Gardening tools, etc."
                 className={`form-input ${errors.exchangeFor ? 'error' : ''}`}
               />
               {errors.exchangeFor && <span className="error-message">{errors.exchangeFor}</span>}
             </div>
           )}
 
-         
+          {/* Contact Method */}
           <div className="form-section">
             <label className="section-label">Contact Method *</label>
             <div className="contact-type-buttons">
-              <button
-                type="button"
-                className={`contact-type-btn ${formData.contactType === 'phone' ? 'active' : ''}`}
-                onClick={() => handleContactTypeChange('phone')}
-              >
+              <button type="button" className={`contact-type-btn ${formData.contactType === 'phone' ? 'active' : ''}`} onClick={() => handleContactTypeChange('phone')}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                 </svg>
                 Phone Number
               </button>
-              <button
-                type="button"
-                className={`contact-type-btn ${formData.contactType === 'email' ? 'active' : ''}`}
-                onClick={() => handleContactTypeChange('email')}
-              >
+              <button type="button" className={`contact-type-btn ${formData.contactType === 'email' ? 'active' : ''}`} onClick={() => handleContactTypeChange('email')}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                   <polyline points="22,6 12,13 2,6"/>
@@ -692,42 +369,33 @@ const NewPost = () => {
             </div>
           </div>
 
-          
+          {/* Contact */}
           <div className="form-section">
             <label htmlFor="contact" className="section-label">
               {formData.contactType === 'phone' ? 'Phone Number *' : 'Email Address *'}
             </label>
             <input
               type={formData.contactType === 'email' ? 'email' : 'tel'}
-              id="contact"
-              name="contact"
-              value={formData.contact}
+              id="contact" name="contact" value={formData.contact}
               onChange={handleInputChange}
-              placeholder={
-                formData.contactType === 'phone' 
-                  ? 'e.g., +8801234567890 or 01234567890' 
-                  : 'e.g., example@email.com'
-              }
+              placeholder={formData.contactType === 'phone' ? 'e.g., +8801234567890 or 01234567890' : 'e.g., example@email.com'}
               className={`form-input ${errors.contact ? 'error' : ''}`}
             />
             {errors.contact && <span className="error-message">{errors.contact}</span>}
-            {!errors.contact && formData.contactType === 'phone' && (
-              <span className="input-hint">Enter a valid phone number </span>
-            )}
-            {!errors.contact && formData.contactType === 'email' && (
-              <span className="input-hint">Enter a valid email address</span>
-            )}
+            {!errors.contact && formData.contactType === 'phone' && <span className="input-hint">Enter a valid phone number</span>}
+            {!errors.contact && formData.contactType === 'email' && <span className="input-hint">Enter a valid email address</span>}
           </div>
 
-          
-          <div className="form-actions">
-            <button type="button" className="cancel-btn" onClick={handleCancel}>
-              Cancel
-            </button>
-            <button type="submit" className="submit-btn">
-              Create Post
-            </button>
+          {/* Disclaimer + Actions */}
+          <div className="post-disclaimer">
+            <span> * This post will be automatically deleted after <strong>30 days</strong> from the date of creation.</span>
           </div>
+
+          <div className="form-actions">
+            <button type="button" className="cancel-btn" onClick={handleCancel}>Cancel</button>
+            <button type="submit" className="submit-btn">Create Post</button>
+          </div>
+
         </form>
       </main>
     </div>

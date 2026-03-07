@@ -63,7 +63,6 @@ const JournalsList = ({ onSelectJournal, onBack }) => {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          Back
         </button>
         <div className="journals-list-loading">
           <p>Loading your journals...</p>
@@ -80,7 +79,6 @@ const JournalsList = ({ onSelectJournal, onBack }) => {
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
-        Back
       </button>
 
       <div className="journals-list-content">
