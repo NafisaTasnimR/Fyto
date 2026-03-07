@@ -5,7 +5,7 @@ import User from '../models/User.js';
 import Notification from '../models/Notification.js';
 import { createNotification } from './NotificationController.js';
 
-const REPORT_THRESHOLD = 10; // Number of reports needed to notify admins
+const REPORT_THRESHOLD = 5; // Number of reports needed to notify admins
 
 // Report a post
 export const reportPost = async (req, res) => {
