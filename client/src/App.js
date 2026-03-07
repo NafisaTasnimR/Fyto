@@ -17,8 +17,10 @@ import PlantInfo from './Components/PlantInfo/PlantInfo';
 import './App.css';
 import PreviewSocialPage from './Components/LandingPage/PreviewSocialPage';
 import PreviewMarketplace from './Components/LandingPage/PreviewMarketplace';
+import PreviewPlantInfo from './Components/LandingPage/PreviewPlantInfo';
 
 
+import SharedPost from './Components/SharedPost/SharedPost';
 import PlantCare from './Components/PlantCare/PlantCare';
 import AdminLogin from './Components/Admin/AdminLogin';
 import Admin from './Components/Admin/Admin';
@@ -38,16 +40,19 @@ function App() {
           <Route path="/journal" element={<JournalLanding />} />
           <Route path="/journal/new" element={<Journal />} />
           <Route path="/journal/continue" element={<Journal />} />
+          <Route path="/journal/:id" element={<Journal />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/user/:userId" element={<UserProfilePage />} />
           <Route path="/social" element={<SocialPage />} />
           <Route path="/challenges" element={<Challenges />} />
           <Route path="/preview-social" element={<PreviewSocialPage />} />
           <Route path="/preview-marketplace" element={<PreviewMarketplace />} />
+          <Route path="/preview-plant-info" element={<PreviewPlantInfo />} />
           <Route path="/plant-info" element={<PlantInfo />} />
           <Route path="/plant-care" element={<PlantCare />} />
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin-dashboard" element={<Admin />} />
+          <Route path="/post/:postId" element={<SharedPost />} />
         </Routes>
       </Router>
     </ConfirmedPostsProvider>

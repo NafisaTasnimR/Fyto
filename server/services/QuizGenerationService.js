@@ -21,6 +21,19 @@ const initializeClients = () => {
     }
 };
 
+// Helper function to generate real plant image URL from Unsplash
+const generatePlantImageUrl = (plantName) => {
+    // Extract just the plant name (remove scientific name parts in parentheses)
+    const cleanName = plantName
+        .replace(/\([^)]*\)/g, '') // Remove parentheses content
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '+'); // Replace spaces with +
+
+    // Use Unsplash Source API for random plant images with search term
+    return `https://source.unsplash.com/800x600/?plant,${cleanName}`;
+};
+
 // Generate quiz using Gemini
 const generateQuizWithGemini = async (quizType, difficulty) => {
     try {
@@ -30,7 +43,7 @@ const generateQuizWithGemini = async (quizType, difficulty) => {
             throw new Error('Gemini API key not configured. Add QUIZ_PROVIDER to .env file.');
         }
 
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         const prompt = createQuizPrompt(quizType, difficulty);
 
@@ -40,7 +53,14 @@ const generateQuizWithGemini = async (quizType, difficulty) => {
         // Clean the response
         text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
 
-        return JSON.parse(text);
+        const quiz = JSON.parse(text);
+
+        // Replace placeholder image URL with real Unsplash URL for image quizzes
+        if (quiz.type === 'image-quiz' && quiz.plantName) {
+            quiz.imageUrl = generatePlantImageUrl(quiz.plantName);
+        }
+
+        return quiz;
     } catch (error) {
         console.error("Gemini Quiz Generation Error:", error.message);
         throw new Error(`Failed to generate quiz with Gemini: ${error.message}`);
@@ -66,7 +86,7 @@ Return STRICT JSON format:
   "difficulty": "${difficulty}",
   "question": "Identify this plant:",
   "plantName": "Scientific name (Common name)",
-  "imageUrl": "https://example.com/plant-image.jpg",
+  "imageUrl": "USE_PLACEHOLDER",
   "options": [
     "Correct plant name",
     "Wrong option 1",
@@ -81,7 +101,7 @@ Return STRICT JSON format:
 
 Requirements:
 - Use real plant scientific names
-- Provide plausible image URL (use placeholder services like Unsplash or plant image APIs)
+- For imageUrl, ALWAYS use exactly the text "USE_PLACEHOLDER" (it will be replaced with a real image)
 - Make sure options are similar enough to be challenging
 - Shuffle options (correct answer can be at any position)
 - Keep question educational and engaging
