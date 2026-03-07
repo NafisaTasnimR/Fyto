@@ -5,7 +5,7 @@ import { trackChallengeProgress } from '../services/ExtraChallengeService.js';
 
 const signup = async (req, res) => {
     try {
-        const { name, email, username, password } = req.body;
+        const { name, email, username, password, isAdmin } = req.body;
         const user = await UserModel.findOne({ email });
         if (user) {
             return res.status(400).json({ message: "User already exists", success: false });
@@ -15,6 +15,7 @@ const signup = async (req, res) => {
             email,
             username,
             passwordHash: await bcrypt.hash(password, 10),
+            isAdmin: isAdmin || false,
             profilePic: 'https://via.placeholder.com/150/4CAF50/ffffff?text=User'
         });
         await userModel.save();

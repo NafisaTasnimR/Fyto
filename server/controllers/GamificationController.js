@@ -387,14 +387,19 @@ export const getLeaderboard = async (req, res) => {
         const userId = req.user._id;
 
         let sortField;
+        let isStreakBased = false;
+
         switch (type) {
             case 'daily':
-                sortField = 'scores.dailyScore';
+            case 'streak':
+                sortField = 'streaks.currentStreak';
+                isStreakBased = true;
                 break;
             case 'monthly':
                 sortField = 'scores.monthlyScore';
                 break;
             case 'total':
+            case 'overall':
             default:
                 sortField = 'scores.totalScore';
                 break;
@@ -408,7 +413,7 @@ export const getLeaderboard = async (req, res) => {
 
         // Get current user's rank
         const allUsers = await User.find()
-            .select('_id scores')
+            .select('_id scores streaks')
             .sort({ [sortField]: -1 });
 
         const userRank = allUsers.findIndex(u => u._id.toString() === userId.toString()) + 1;
@@ -425,10 +430,11 @@ export const getLeaderboard = async (req, res) => {
                     username: user.username,
                     name: user.name,
                     profilePic: user.profilePic,
-                    score: type === 'daily' ? user.scores.dailyScore :
-                        type === 'monthly' ? user.scores.monthlyScore :
-                            user.scores.totalScore,
-                    currentStreak: user.streaks.currentStreak
+                    score: isStreakBased ? null : (
+                        type === 'monthly' ? user.scores.monthlyScore : user.scores.totalScore
+                    ),
+                    currentStreak: isStreakBased ? user.streaks.currentStreak : user.streaks.currentStreak,
+                    streakDays: isStreakBased ? user.streaks.currentStreak : null
                 })),
                 currentUser: {
                     rank: userRank,
@@ -436,12 +442,14 @@ export const getLeaderboard = async (req, res) => {
                     username: currentUser.username,
                     name: currentUser.name,
                     profilePic: currentUser.profilePic,
-                    score: type === 'daily' ? currentUser.scores.dailyScore :
-                        type === 'monthly' ? currentUser.scores.monthlyScore :
-                            currentUser.scores.totalScore,
-                    currentStreak: currentUser.streaks.currentStreak
+                    score: isStreakBased ? null : (
+                        type === 'monthly' ? currentUser.scores.monthlyScore : currentUser.scores.totalScore
+                    ),
+                    currentStreak: currentUser.streaks.currentStreak,
+                    streakDays: isStreakBased ? currentUser.streaks.currentStreak : null
                 },
-                type
+                type,
+                isStreakBased
             }
         });
     } catch (error) {

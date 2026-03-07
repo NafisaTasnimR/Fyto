@@ -101,6 +101,9 @@ export const createJournalWithFirstPage = async (req, res) => {
 
         await session.commitTransaction();
 
+        // Track extra challenge progress
+        await trackChallengeProgress(userId, 'journal_create');
+
         return res.status(201).json({
             success: true,
             message: "Journal and first page created successfully",
