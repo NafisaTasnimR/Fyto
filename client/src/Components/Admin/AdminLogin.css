@@ -1,5 +1,104 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
+/* ── Access Denied Overlay ── */
+.admin-denied-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.admin-denied-modal {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  padding: 2.5rem 3rem;
+  text-align: center;
+  max-width: 380px;
+  width: 90%;
+  animation: deniedPopIn 0.2s ease;
+}
+
+@keyframes deniedPopIn {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.admin-denied-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  line-height: 1;
+}
+
+.admin-denied-icon img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.admin-denied-emoji {
+  display: none;
+}
+
+.admin-denied-icon img[style*="display: none"] + .admin-denied-emoji {
+  display: inline;
+}
+
+.admin-denied-modal h2 {
+  margin: 0 0 0.5rem;
+  color: #c0392b;
+  font-size: 1.45rem;
+  font-weight: 700;
+}
+
+.admin-denied-modal p {
+  color: #666;
+  margin: 0 0 1.6rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.admin-denied-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.admin-denied-dismiss {
+  background: #f0f0f0;
+  color: #444;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 1.4rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.admin-denied-dismiss:hover {
+  background: #e0e0e0;
+}
+
+.admin-denied-home {
+  background: #2f6b48;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 1.4rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.admin-denied-home:hover {
+  background: #255538;
+}
+
 /* ── Page Shell ── */
 .admin-login-page {
   display: flex;
@@ -84,7 +183,7 @@
 
 .admin-password-toggle {
   position: absolute;
-  right: 0;
+  right: 8px;
   bottom: 12px;
   cursor: pointer;
   user-select: none;

@@ -1,26 +1,39 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './AdminLogin.css';
 
 const AdminLogin = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [deniedMessage, setDeniedMessage] = useState(
+    location.state?.accessDenied ? 'You do not have admin privileges to access this panel.' : ''
+  );
+  const [showDeniedPopup, setShowDeniedPopup] = useState(
+    !!location.state?.accessDenied
+  );
+
+  const decodeToken = (token) => {
+    try {
+      return JSON.parse(atob(token.split('.')[1]));
+    } catch {
+      return null;
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    if (error) setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
 
     if (!formData.email || !formData.password) {
-      setError('Please fill in all fields.');
+      setDeniedMessage('Please fill in both email and password.');
+      setShowDeniedPopup(true);
       return;
     }
 
@@ -34,13 +47,18 @@ const AdminLogin = () => {
       });
 
       if (response.data.success) {
+        const decoded = decodeToken(response.data.token);
+        if (!decoded?.isAdmin) {
+          setDeniedMessage('You do not have admin privileges to access this panel.');
+          setShowDeniedPopup(true);
+          return;
+        }
         localStorage.setItem('token', response.data.token);
         navigate('/admin-dashboard');
       }
     } catch (err) {
-      setError(
-        err.response?.data?.message || 'Login failed. Please try again.'
-      );
+      setDeniedMessage('You do not have admin privileges to access this panel.');
+      setShowDeniedPopup(true);
     } finally {
       setIsLoading(false);
     }
@@ -48,12 +66,32 @@ const AdminLogin = () => {
 
   return (
     <div className="admin-login-page">
+      {showDeniedPopup && (
+        <div className="admin-denied-overlay">
+          <div className="admin-denied-modal">
+            <div className="admin-denied-icon">
+              <img src="/stop.png" alt="denied" onError={(e) => { e.target.style.display='none'; }} />
+              <span className="admin-denied-emoji">⛔</span>
+            </div>
+            <h2>Access Denied</h2>
+            <p>{deniedMessage}</p>
+            <div className="admin-denied-actions">
+              <button className="admin-denied-dismiss" onClick={() => setShowDeniedPopup(false)}>
+                Dismiss
+              </button>
+              <button className="admin-denied-home" onClick={() => navigate('/')}>
+                Go to Home
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Left – Form */}
       <div className="admin-login-left">
         <div className="admin-form-wrapper">
           <h1 className="admin-heading">Admin Login</h1>
 
-          {error && <div className="admin-error-message">{error}</div>}
+          {/* ── No inline error message; popup handles all errors ── */}
 
           <form onSubmit={handleSubmit}>
             <div className="admin-form-group">
