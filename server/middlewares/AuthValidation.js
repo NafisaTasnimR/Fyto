@@ -21,7 +21,8 @@ const signupValidation = (req, res, next) => {
             'string.min': 'Password must be at least 6 characters long',
             'string.max': 'Password must not exceed 100 characters',
             'any.required': 'Password is required'
-        })
+        }),
+        isAdmin: Joi.boolean().optional()
     });
     const { error } = schema.validate(req.body);
     if (error) {
