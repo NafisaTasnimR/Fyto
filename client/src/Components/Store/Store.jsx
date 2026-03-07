@@ -20,11 +20,22 @@ const Store = () => {
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
   const [availabilityFilter, setAvailabilityFilter] = useState('all');
   const [favouriteIds, setFavouriteIds] = useState([]);
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [reportModal, setReportModal] = useState({ open: false, postId: null });
+  const [reportReason, setReportReason] = useState('');
+  const [reportSubmitting, setReportSubmitting] = useState(false);
   
   const navigate = useNavigate();
   const { isPostConfirmed } = useConfirmedPosts(); 
 
   const tabs = ['For you', 'Buy', 'Exchange', 'Donate', 'Favourites'];
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const close = () => setOpenMenuId(null);
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, []);
 
   useEffect(() => {
     if (activeTab === 'Favourites') {
@@ -199,6 +210,32 @@ const Store = () => {
     setVisibleProjects(12);
   };
 
+  const handleReportOpen = (e, postId) => {
+    e.stopPropagation();
+    setOpenMenuId(null);
+    setReportModal({ open: true, postId });
+    setReportReason('');
+  };
+
+  const handleReportSubmit = async () => {
+    if (!reportReason.trim()) return;
+    setReportSubmitting(true);
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/marketplace/${reportModal.postId}/report`,
+        { reason: reportReason },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch (err) {
+      console.error('Report error:', err);
+    }
+    setReportSubmitting(false);
+    setReportModal({ open: false, postId: null });
+    setReportReason('');
+    alert('Report submitted. Thank you!');
+  };
+
   return (
     <div className="store-page">
       <Header />
@@ -268,12 +305,27 @@ const Store = () => {
                         alt={post.treeName}
                         className="store-card-image"
                       />
-                      <span className="store-card-badge">
-                        {post.postType === 'sell' ? 'Buy' : 
-                         post.postType === 'exchange' ? 'Exchange' : 
-                         post.postType === 'donate' ? 'Donate' : 'Buy'}
-                      </span>
-                      
+                      <div className="store-card-top-right" onClick={e => e.stopPropagation()}>
+                        <div className="store-card-menu-wrap">
+                          <button
+                            className="store-card-menu-btn"
+                            onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === post._id ? null : post._id); }}
+                          >
+                            <span /><span /><span />
+                          </button>
+                          {openMenuId === post._id && (
+                            <div className="store-card-dropdown">
+                              <button onClick={e => handleReportOpen(e, post._id)}>Report</button>
+                            </div>
+                          )}
+                        </div>
+                        <span className="store-card-badge">
+                          {post.postType === 'sell' ? 'Buy' : 
+                           post.postType === 'exchange' ? 'Exchange' : 
+                           post.postType === 'donate' ? 'Donate' : 'Buy'}
+                        </span>
+                      </div>
+
                       {isConfirmed && (
                         <div className="confirmed-overlay">
                           
@@ -390,6 +442,31 @@ const Store = () => {
             <div className="filter-modal-footer">
               <button className="clear-filters-btn" onClick={handleClearFilters}>Clear All</button>
               <button className="apply-filters-btn" onClick={handleApplyFilters}>Apply Filters</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {reportModal.open && (
+        <div className="report-modal-overlay" onClick={() => setReportModal({ open: false, postId: null })}>
+          <div className="report-modal" onClick={e => e.stopPropagation()}>
+            <div className="report-modal-header">
+              <h3>Report Post</h3>
+              <button className="report-modal-close" onClick={() => setReportModal({ open: false, postId: null })}>×</button>
+            </div>
+            <div className="report-modal-body">
+              <p>Why are you reporting this post?</p>
+              <textarea
+                className="report-textarea"
+                placeholder="Please provide a reason for reporting this post..."
+                value={reportReason}
+                onChange={e => setReportReason(e.target.value)}
+              />
+            </div>
+            <div className="report-modal-footer">
+              <button className="report-cancel-btn" onClick={() => setReportModal({ open: false, postId: null })}>Cancel</button>
+              <button className="report-submit-btn" onClick={handleReportSubmit} disabled={reportSubmitting || !reportReason.trim()}>
+                {reportSubmitting ? 'Submitting...' : 'Submit Report'}
+              </button>
             </div>
           </div>
         </div>
