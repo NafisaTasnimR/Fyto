@@ -17,6 +17,7 @@ import PlantInfo from './Components/PlantInfo/PlantInfo';
 import './App.css';
 import PreviewSocialPage from './Components/LandingPage/PreviewSocialPage';
 import PreviewMarketplace from './Components/LandingPage/PreviewMarketplace';
+import PreviewPlantInfo from './Components/LandingPage/PreviewPlantInfo';
 
 
 import PlantCare from './Components/PlantCare/PlantCare';
@@ -44,6 +45,7 @@ function App() {
           <Route path="/challenges" element={<Challenges />} />
           <Route path="/preview-social" element={<PreviewSocialPage />} />
           <Route path="/preview-marketplace" element={<PreviewMarketplace />} />
+          <Route path="/preview-plant-info" element={<PreviewPlantInfo />} />
           <Route path="/plant-info" element={<PlantInfo />} />
           <Route path="/plant-care" element={<PlantCare />} />
           <Route path="/admin" element={<AdminLogin />} />
