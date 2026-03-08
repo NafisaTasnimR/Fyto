@@ -1168,3 +1168,13 @@ body {
     margin-left: 0;
   }
 }
+/* Spin animation for save loading */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Save button unsaved indicator pulse */
+.journal-save-button {
+  animation: none;
+}
