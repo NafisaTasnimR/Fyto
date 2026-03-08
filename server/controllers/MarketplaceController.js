@@ -200,7 +200,7 @@ export const searchMarketplacePosts = async (req, res) => {
             ];
         }
 
-        const skip = (Number(page) - 1) * Number(limit);
+        const skip = (Number(page) - 1) * Number(limit);S
 
         const posts = await MarketplacePost.find(filter)
             .populate('userId', 'name username email profilePic')
@@ -313,6 +313,7 @@ export const getUserMarketplacePosts = async (req, res) => {
 
 
         const posts = await MarketplacePost.find(filter)
+            .populate('userId', 'name username email profilePic')
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(Number(limit));

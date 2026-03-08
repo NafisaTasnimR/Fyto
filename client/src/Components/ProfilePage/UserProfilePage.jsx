@@ -108,12 +108,12 @@ export default function UserProfilePage() {
                   <div key={post._id} className="post">
                     <div className="post-header">
                       <img
-                        src={getProfilePic(user?.profilePic)}
-                        alt={user?.username || 'User'}
+                        src={getProfilePic(post.authorId?.profilePic || user?.profilePic)}
+                        alt={post.authorId?.username || user?.username || 'User'}
                         className="avatar"
                       />
                       <div className="header-info">
-                        <h3 className="username">{user?.username}</h3>
+                        <h3 className="username">{post.authorId?.username || post.authorId?.name || user?.username || 'Anonymous'}</h3>
                         <span className="timestamp">{formatTimestamp(post.createdAt)}</span>
                       </div>
                     </div>
@@ -133,7 +133,7 @@ export default function UserProfilePage() {
                       onClick={() => { setViewingPost(post); setShowViewPostModal(true) }}
                       style={{ cursor: 'pointer' }}
                     >
-                      <p><strong>{user?.username}</strong> {post.content}</p>
+                      <p><strong>{post.authorId?.username || post.authorId?.name || user?.username || 'Anonymous'}</strong> {post.content}</p>
                     </div>
 
                     <div className="post-actions">
@@ -348,12 +348,12 @@ export default function UserProfilePage() {
             <div className="view-post-content">
               <div className="post-header">
                 <img
-                  src={getProfilePic(user?.profilePic)}
-                  alt={user?.username || 'User'}
+                  src={getProfilePic(viewingPost.authorId?.profilePic || user?.profilePic)}
+                  alt={viewingPost.authorId?.username || user?.username || 'User'}
                   className="post-avatar"
                 />
                 <div className="post-user-info">
-                  <strong className="post-username">{user?.username}</strong>
+                  <strong className="post-username">{viewingPost.authorId?.username || viewingPost.authorId?.name || user?.username || 'Anonymous'}</strong>
                   <span className="post-timestamp">{formatTimestamp(viewingPost.createdAt)}</span>
                 </div>
               </div>
@@ -373,7 +373,7 @@ export default function UserProfilePage() {
               )}
 
               <div className="post-caption">
-                <p><strong>{user?.username}</strong> {viewingPost.content}</p>
+                <p><strong>{viewingPost.authorId?.username || viewingPost.authorId?.name || user?.username || 'Anonymous'}</strong> {viewingPost.content}</p>
               </div>
 
               <div className="likes-info">

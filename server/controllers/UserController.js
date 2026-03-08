@@ -101,6 +101,7 @@ const getUserProfile = async (req, res) => {
             : { authorId: userId, isPrivate: false };
 
         const posts = await Post.find(postsQuery)
+            .populate('authorId', 'username name profilePic')
             .sort({ createdAt: -1 })
             .limit(10);
 
@@ -110,6 +111,7 @@ const getUserProfile = async (req, res) => {
             : { userId: userId, isPublic: true };
 
         const journals = await Journal.find(journalsQuery)
+            .populate('userId', 'username name profilePic')
             .sort({ createdAt: -1 })
             .limit(10);
 
