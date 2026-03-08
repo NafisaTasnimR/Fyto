@@ -71,7 +71,7 @@ body {
 .marketplace-tab-active::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: -5px;
   left: 0;
   right: 0;
   height: 2px;
@@ -844,3 +844,105 @@ body {
 
 .report-submit-btn:hover:not(:disabled) { background: #c62a38; }
 .report-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Report Success Modal */
+.report-success-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+}
+
+.report-success-card {
+  background: white;
+  border-radius: 12px;
+  padding: 40px 30px;
+  max-width: 400px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.report-success-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #8e8e8e;
+  padding: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.report-success-close:hover {
+  background-color: #f0f0f0;
+  color: #191919;
+}
+
+.report-success-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.report-success-icon-container {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #ed4956 0%, #d63447 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.report-success-icon {
+  width: 56px;
+  height: 56px;
+}
+
+.report-success-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #191919;
+  margin: 0;
+}
+
+.report-success-message {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}

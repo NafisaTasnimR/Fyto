@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './SocialPage.css';
 import Header from '../Shared/Header';
+import Loader from '../Shared/Loader';
+import EmptyState from '../Shared/EmptyState';
 import LeaderBoard from '../LeaderBoard/LeaderBoard';
 import { getCurrentUser } from '../../services/authService';
 import { getProfilePic } from '../../utils/imageUtils';
@@ -35,6 +37,7 @@ const SocialPage = () => {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportingPost, setReportingPost] = useState(null);
   const [reportReason, setReportReason] = useState('');
+  const [showReportSuccess, setShowReportSuccess] = useState(false);
 
   React.useEffect(() => {
 
@@ -683,10 +686,10 @@ const SocialPage = () => {
           },
         }
       );
-      alert('Post reported successfully');
       setShowReportModal(false);
       setReportingPost(null);
       setReportReason('');
+      setShowReportSuccess(true);
     } catch (err) {
       console.error('Error reporting post:', err);
       alert(err.response?.data?.message || 'Failed to report post. Please try again.');
@@ -1384,17 +1387,19 @@ const SocialPage = () => {
 
           <div className="posts-feed">
             {loading ? (
-              <div className="loading-message">
-                <p>Loading posts...</p>
-              </div>
+              <Loader size="medium" message="Loading posts..." />
             ) : postsError ? (
-              <div className="error-message">
-                <p>{postsError}</p>
-              </div>
+              <EmptyState 
+                title="Error Loading Posts"
+                message={postsError}
+                iconSrc="/images/no-posts-cat.png"
+              />
             ) : posts.length === 0 ? (
-              <div className="no-posts-message">
-                <p>No posts yet. Be the first to share your plant journey!</p>
-              </div>
+              <EmptyState 
+                title="No Posts Yet"
+                message="Be the first to share your plant journey!"
+                iconSrc="/images/no-posts-cat.png"
+              />
             ) : (
               posts.map((post) => (
                 <Post key={post.id} post={post} />
@@ -1458,6 +1463,27 @@ const SocialPage = () => {
               >
                 Submit Report
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showReportSuccess && (
+        <div className="modal-overlay" onClick={() => setShowReportSuccess(false)}>
+          <div className="success-modal-card" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="success-modal-close"
+              onClick={() => setShowReportSuccess(false)}
+              title="Close"
+            >
+              ✕
+            </button>
+            <div className="success-modal-content">
+              <div className="success-icon-container">
+                <img src="/reportIcon.png" alt="report icon" className="report-icon" />
+              </div>
+              <h2 className="success-title">Report Submitted</h2>
+              <p className="success-message">Thank you for reporting. We'll review it shortly.</p>
             </div>
           </div>
         </div>

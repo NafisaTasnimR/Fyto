@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import Header from '../Shared/Header'
+import Loader from '../Shared/Loader'
+import EmptyState from '../Shared/EmptyState'
 import './ProfilePage.css'
 import '../SocialPage/SocialPage.css'
 import { getUserPosts, deletePost } from '../../services/postService' // eslint-disable-line no-unused-vars
@@ -49,6 +51,14 @@ export default function ProfilePage({ onEdit }) {
   const [marketplacePostToDelete, setMarketplacePostToDelete] = useState(null)
   const [showDeleteJournalModal, setShowDeleteJournalModal] = useState(false)
   const [journalToDelete, setJournalToDelete] = useState(null)
+  
+  // Loading states for each tab
+  const [loadingStates, setLoadingStates] = useState({
+    journals: true,
+    social: false,
+    marketplace: false,
+    leaderboard: false,
+  })
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -90,6 +100,9 @@ export default function ProfilePage({ onEdit }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Set loading to true for the current tab
+        setLoadingStates(prev => ({ ...prev, [activeTab]: true }))
+        
         if (activeTab === 'journals') {
           const response = await getUserJournals()
           console.log('Journals response:', response)
@@ -153,6 +166,9 @@ export default function ProfilePage({ onEdit }) {
         }
       } catch (error) {
         console.error(`Error fetching ${activeTab}:`, error)
+      } finally {
+        
+        setLoadingStates(prev => ({ ...prev, [activeTab]: false }))
       }
     }
 
@@ -462,7 +478,7 @@ export default function ProfilePage({ onEdit }) {
   }
 
   const handleSaveEditedPost = () => {
-    // Update the posts list with the edited caption (frontend only)
+   
     setPosts(prevPosts => 
       prevPosts.map(p => 
         p._id === editingPost._id 
@@ -522,6 +538,9 @@ export default function ProfilePage({ onEdit }) {
   const renderContent = () => {
     switch (activeTab) {
       case 'journals':
+        if (loadingStates.journals) {
+          return <Loader size="medium" message="Loading journals..." />
+        }
         return (
           <div className="tab-panel">
             <h2 className="journal-heading">Journals</h2>
@@ -574,12 +593,19 @@ export default function ProfilePage({ onEdit }) {
                   </div>
                 ))
               ) : (
-                <p className="journal-empty-message">No journals found. Create your first journal to get started!</p>
+                <EmptyState 
+                  title="No Journals Yet"
+                  message="Start creating your first journal to record your plant care journey!"
+                  iconSrc="/alert.png"
+                />
               )}
             </div>
           </div>
         )
       case 'social':
+        if (loadingStates.social) {
+          return <Loader size="medium" message="Loading your posts..." />
+        }
         return (
           <div className="tab-panel">
             <h2 className="journal-heading">Posts</h2>
@@ -739,12 +765,19 @@ export default function ProfilePage({ onEdit }) {
                   </div>
                 ))
               ) : (
-                <p className="journal-item">No social posts found.</p>
+                <EmptyState 
+                  title="No Posts Yet"
+                  message="You haven't shared any posts yet. Start sharing your plant journey!"
+                  iconSrc="/alert.png"
+                />
               )}
             </div>
           </div>
         )
       case 'marketplace':
+        if (loadingStates.marketplace) {
+          return <Loader size="medium" message="Loading your marketplace listings..." />
+        }
         return (
           <div className="tab-panel">
             <h2 className="journal-heading">Marketplace</h2>
@@ -820,11 +853,18 @@ export default function ProfilePage({ onEdit }) {
                 ))}
               </div>
             ) : (
-              <p className="journal-item">No marketplace posts found.</p>
+              <EmptyState 
+                title="No Marketplace Listings"
+                message="You haven't posted anything to the marketplace yet. Share your plants!"
+                iconSrc="/alert.png"
+              />
             )}
           </div>
         )
       case 'leaderboard':
+        if (loadingStates.leaderboard) {
+          return <Loader size="medium" message="Loading leaderboard..." />
+        }
         return (
           <div className="tab-panel">
             <h2 className="journal-heading">Leader board</h2>
@@ -880,10 +920,11 @@ export default function ProfilePage({ onEdit }) {
                 </div>
               </div>
             ) : (
-              <div className="no-participation">
-                <img src="/alert.png" alt="Alert" className="no-participation-icon" />
-                <p className="no-participation-text">You haven't participated in any challenges</p>
-              </div>
+              <EmptyState 
+                title="No Challenge Participation"
+                message="You haven't participated in any challenges yet. Take on a challenge to see your position!"
+                iconSrc="/alert.png"
+              />
             )}
           </div>
         )

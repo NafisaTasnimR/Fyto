@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Store.css';
 import Header from '../Shared/Header';
+import Loader from '../Shared/Loader';
+import EmptyState from '../Shared/EmptyState';
 import { useConfirmedPosts } from '../Context/ConfirmedPostsContext'; 
 
 const Store = () => {
@@ -24,6 +26,7 @@ const Store = () => {
   const [reportModal, setReportModal] = useState({ open: false, postId: null });
   const [reportReason, setReportReason] = useState('');
   const [reportSubmitting, setReportSubmitting] = useState(false);
+  const [showReportSuccess, setShowReportSuccess] = useState(false);
   
   const navigate = useNavigate();
   const { isPostConfirmed } = useConfirmedPosts(); 
@@ -222,15 +225,15 @@ const Store = () => {
     setReportSubmitting(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/report/${reportModal.postId}`,
+      await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/reports/${reportModal.postId}`,
         { reason: reportReason, postType: 'marketplace' },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setReportSubmitting(false);
       setReportModal({ open: false, postId: null });
       setReportReason('');
-      alert(response.data.message || 'Report submitted. Thank you!');
+      setShowReportSuccess(true);
     } catch (err) {
       setReportSubmitting(false);
       console.error('Report error:', err);
@@ -281,9 +284,13 @@ const Store = () => {
      
       <div className="store-content">
         {loading ? (
-          <div className="store-message">Loading marketplace posts...</div>
+          <Loader size="medium" message="Loading marketplace posts..." />
         ) : error ? (
-          <div className="store-message">{error}</div>
+          <EmptyState 
+            title="Error Loading Posts"
+            message={error}
+            iconSrc="/images/no-posts-cat.png"
+          />
         ) : displayedProjects.length > 0 ? (
           <>
             <div className="store-grid">
@@ -359,7 +366,11 @@ const Store = () => {
             )}
           </>
         ) : (
-          <div className="store-message">No marketplace posts found matching your criteria.</div>
+          <EmptyState 
+            title="No Marketplace Posts"
+            message="No marketplace posts found matching your criteria. Try adjusting your filters or search!"
+            iconSrc="/alert.png"
+          />
         )}
       </div>
 
@@ -469,6 +480,27 @@ const Store = () => {
               <button className="report-submit-btn" onClick={handleReportSubmit} disabled={reportSubmitting || !reportReason.trim()}>
                 {reportSubmitting ? 'Submitting...' : 'Submit Report'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showReportSuccess && (
+        <div className="report-success-overlay" onClick={() => setShowReportSuccess(false)}>
+          <div className="report-success-card" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="report-success-close"
+              onClick={() => setShowReportSuccess(false)}
+              title="Close"
+            >
+              ✕
+            </button>
+            <div className="report-success-content">
+              <div className="report-success-icon-container">
+                <img src="/reportIcon.png" alt="report icon" className="report-success-icon" />
+              </div>
+              <h2 className="report-success-title">Report Submitted</h2>
+              <p className="report-success-message">Thank you for reporting. We'll review it shortly.</p>
             </div>
           </div>
         </div>
