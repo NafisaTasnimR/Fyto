@@ -427,7 +427,7 @@ body {
 .confirm-btn {
   width: 100%;
   padding: 18px 32px;
-  background-color: #30181d;
+  background-color: #2f6b48;
   color: white;
   border: none;
   border-radius: 8px;
@@ -439,7 +439,7 @@ body {
 }
 
 .confirm-btn:hover {
-  background-color: #1f0f13;
+  background-color: #2f6b48;
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(48, 24, 29, 0.3);
 }
@@ -854,7 +854,7 @@ body {
   margin-top: 12px;
   width: 100%;
   padding: 14px;
-  background: #30181d;
+  background: #2f6b48;
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -865,6 +865,6 @@ body {
 }
 
 .pd-contact-ok-btn:hover {
-  background: #1f0f13;
+  background: #2f6b48;
   transform: translateY(-1px);
 }

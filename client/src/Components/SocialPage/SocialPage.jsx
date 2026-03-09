@@ -104,75 +104,6 @@ const Post = ({
         <span className="likes-count">{post.likes} likes</span>
       </div>
 
-      <div className="comments-section">
-        {post.comments.length > 0 ? (
-          <>
-            {post.comments.slice(0, 2).map((comment) => (
-              <div key={comment._id} className="comment">
-                <div className="comment-header-inline">
-                  <img
-                    src={getProfilePic(comment.authorId?.profilePic)}
-                    alt={comment.authorId?.username || 'User'}
-                    className="comment-avatar-inline"
-                  />
-                  <div className="comment-info-inline">
-                    <span className="comment-username-inline">{comment.authorId?.username || 'User'}</span>
-                  </div>
-                  <button
-                    className="reply-btn"
-                    onClick={() => toggleReply(post.id, comment._id)}
-                    title="Reply"
-                  >
-                    Reply
-                  </button>
-                </div>
-                <div className="comment-text-inline">{comment.content}</div>
-
-                {comment.replies && comment.replies.length > 0 && (
-                  <div className="comment-replies">
-                    {comment.replies.map((r) => (
-                      <div key={r._id} className="comment-reply">
-                        <img
-                          src={getProfilePic(r.authorId?.profilePic)}
-                          alt={r.authorId?.username || 'User'}
-                          className="comment-avatar-reply"
-                        />
-                        <div className="comment-reply-body">
-                          <span className="comment-username-inline">{r.authorId?.username || 'User'}</span>
-                          <span className="comment-reply-text">{r.content}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {openReply.postId === post.id && openReply.commentId === comment._id && (
-                  <div className="reply-composer">
-                    <input
-                      type="text"
-                      placeholder={`Reply to ${comment.authorId?.username || 'user'}...`}
-                      value={replyInputs[`${post.id}-${comment._id}`] || ''}
-                      onChange={(e) => handleReplyChange(post.id, comment._id, e.target.value)}
-                      className="reply-input"
-                    />
-                    <button className="reply-send" onClick={() => submitReply(post.id, comment._id)}>
-                      Send
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
-            {post.comments.length > 2 && (
-              <button className="view-more-comments" onClick={() => openCommentsModal(post)}>
-                View all {post.comments.length} comments
-              </button>
-            )}
-          </>
-        ) : (
-          post.commentsCount === 0 && <p className="no-comments">No comments yet. Be the first to comment!</p>
-        )}
-      </div>
-
       <div className="add-comment">
         <input
           type="text"
@@ -294,7 +225,7 @@ const SocialPage = () => {
           return;
         }
 
-        const formattedPosts = response.data.posts.map(post => ({
+        const formattedPosts = response.data.posts.filter(post => post.visibility !== 'private').map(post => ({
           id: post._id,
           username: post.authorId?.username || 'Unknown User',
           userAvatar: getProfilePic(post.authorId?.profilePic),
@@ -973,11 +904,10 @@ const SocialPage = () => {
                                 </div>
                                 {canDeleteComment && (
                                   <button
-                                    className="delete-reply-btn"
+                                    className="delete-comment-btn"
                                     onClick={() => handleDeleteComment(r._id, activeCommentsPost.id)}
                                     title="Delete reply"
-                                    style={{ marginLeft: '10px', fontSize: '0.8em', opacity: 0.7, background: 'none', border: 'none', cursor: 'pointer', color: '#e53e3e', flexShrink: 0 }}
-                                  >✕</button>
+                                  >Delete</button>
                                 )}
                               </div>
                             ))}

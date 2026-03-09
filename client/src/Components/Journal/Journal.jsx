@@ -30,7 +30,7 @@ const SaveSuccessModal = ({ onClose, onViewJournals }) => {
           <button
             onClick={onViewJournals}
             className="journal-unsaved-warning-btn-m"
-            style={{ background: 'linear-gradient(135deg, #81C784 0%, #4CAF50 100%)', color: 'white' }}
+            style={{ background: '#2f6b48', color: 'white' }}
           >
             My Journals
           </button>

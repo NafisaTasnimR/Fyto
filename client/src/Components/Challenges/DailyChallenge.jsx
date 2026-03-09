@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './DailyChallenge.css';
+import Loader from '../Shared/Loader';
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -195,7 +196,7 @@ const DailyChallenge = () => {
   const imageUrl = !isRiddle ? (quiz?.imageUrl || quiz?.image) : null;
 
   if (loading) {
-    return <div className="daily-challenge-container">Loading today's challenge...</div>;
+    return <div className="daily-challenge-container"><Loader size="medium" message="Loading today's challenge..." /></div>;
   }
 
   if (error) {

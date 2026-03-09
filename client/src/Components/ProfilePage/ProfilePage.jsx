@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import axios from 'axios'
 import Header from '../Shared/Header'
 import Loader from '../Shared/Loader'
@@ -345,6 +344,38 @@ export default function ProfilePage({ onEdit }) {
     }
   }
 
+  const handleDeleteComment = async (commentId, postId) => {
+    if (!window.confirm('Are you sure you want to delete this comment?')) return
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.delete(
+        `${process.env.REACT_APP_API_URL}/api/comments/${commentId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      if (response.data.success) {
+        setPosts((prevPosts) => prevPosts.map((post) => {
+          if (post._id !== postId) return post
+          return {
+            ...post,
+            comments: post.comments.filter((c) => c._id !== commentId),
+            commentsCount: Math.max(0, (post.commentsCount ?? 0) - 1),
+          }
+        }))
+        setActiveCommentsPost((prev) => {
+          if (!prev || prev._id !== postId) return prev
+          return {
+            ...prev,
+            comments: prev.comments.filter((c) => c._id !== commentId),
+            commentsCount: Math.max(0, (prev.commentsCount ?? 0) - 1),
+          }
+        })
+      }
+    } catch (err) {
+      console.error('Error deleting comment:', err)
+      alert('Failed to delete comment. Please try again.')
+    }
+  }
+
   const handleDeletePost = (postId) => {
     setPostToDelete(postId)
     setShowDeleteModal(true)
@@ -417,16 +448,6 @@ export default function ProfilePage({ onEdit }) {
     }
 
     try {
-      const token = localStorage.getItem('token')
-      const response = await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/marketplace/${postId}/status`,
-        { status: newStatus },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
       
       setMarketplacePosts(
         marketplacePosts.map(post =>
@@ -518,22 +539,6 @@ export default function ProfilePage({ onEdit }) {
     setOpenMenuPostId(null)
   }
 
-  const toggleJournalPrivacy = async (journal) => {
-    try {
-      const token = localStorage.getItem('token')
-      const response = await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/journals/${journal._id}`,
-        { isPublic: !journal.isPublic },
-        { headers: { Authorization: `Bearer ${token}` } }
-      )
-      if (response.data.success) {
-        setJournals(journals.map(j => j._id === journal._id ? { ...j, isPublic: !journal.isPublic } : j))
-      }
-    } catch (err) {
-      console.error('Error toggling journal privacy:', err)
-      alert('Failed to update journal privacy.')
-    }
-  }
 
   const renderContent = () => {
     switch (activeTab) {
@@ -714,30 +719,6 @@ export default function ProfilePage({ onEdit }) {
 
                     <div className="likes-info">
                       <span className="likes-count">{post.likes?.length || 0} likes</span>
-                    </div>
-
-                    <div className="comments-section">
-                      {post.comments && post.comments.length > 0 ? (
-                        <>
-                          {post.comments.slice(0, 2).map((comment) => (
-                            <div key={comment._id} className="comment">
-                              <div className="comment-main">
-                                <strong>{comment.authorId?.name || comment.authorId?.username || 'User'}</strong> {comment.content}
-                              </div>
-                            </div>
-                          ))}
-                          {post.comments.length > 2 && (
-                            <button
-                              className="view-more-comments"
-                              onClick={() => openCommentsModal(post)}
-                            >
-                              View all {post.comments.length} comments
-                            </button>
-                          )}
-                        </>
-                      ) : (
-                        post.commentsCount === 0 && <p className="no-comments">No comments yet</p>
-                      )}
                     </div>
 
                     <div className="add-comment">
@@ -1347,7 +1328,19 @@ export default function ProfilePage({ onEdit }) {
 
             <div className="comments-list">
               {activeCommentsPost.comments && activeCommentsPost.comments.length > 0 ? (
-                activeCommentsPost.comments.map((c) => (
+                activeCommentsPost.comments.map((c) => {
+                  const token = localStorage.getItem('token')
+                  let currentUserId = null
+                  if (token) {
+                    try {
+                      const tokenParts = token.split('.')
+                      const payload = JSON.parse(atob(tokenParts[1]))
+                      currentUserId = payload._id
+                    } catch (e) {}
+                  }
+                  const canDeleteComment = currentUserId === c.authorId?._id || currentUserId === activeCommentsPost.authorId?._id
+
+                  return (
                   <div key={c._id} className="comment-item">
                     <img src={getProfilePic(c.authorId?.profilePic)} alt={c.authorId?.username || c.authorId?.name || 'User'} className="comment-avatar" />
                     <div className="comment-body">
@@ -1361,13 +1354,36 @@ export default function ProfilePage({ onEdit }) {
                         >
                           Reply
                         </button>
+                        {canDeleteComment && (
+                          <button
+                            className="delete-comment-btn"
+                            onClick={() => handleDeleteComment(c._id, activeCommentsPost._id)}
+                          >
+                            Delete
+                          </button>
+                        )}
                       </div>
 
                       {c.replies && c.replies.length > 0 && (
                         <div className="comment-replies modal-replies">
                           {c.replies.map((r) => (
                             <div key={r._id} className="comment-reply">
-                              <strong>{r.authorId?.username || r.authorId?.name || 'User'}</strong> {r.content}
+                              <img
+                                src={getProfilePic(r.authorId?.profilePic)}
+                                alt={r.authorId?.username || 'User'}
+                                className="comment-avatar-reply"
+                              />
+                              <div className="comment-reply-body" style={{ flex: 1 }}>
+                                <strong style={{ fontSize: '13px' }}>{r.authorId?.username || r.authorId?.name || 'User'}</strong>
+                                <span style={{ fontSize: '13px', color: '#444', marginLeft: '6px' }}>{r.content}</span>
+                              </div>
+                              {canDeleteComment && (
+                                <button
+                                  className="delete-comment-btn"
+                                  onClick={() => handleDeleteComment(r._id, activeCommentsPost._id)}
+                                  title="Delete reply"
+                                >Delete</button>
+                              )}
                             </div>
                           ))}
                         </div>
@@ -1392,7 +1408,8 @@ export default function ProfilePage({ onEdit }) {
                       )}
                     </div>
                   </div>
-                ))
+                  )
+                })
               ) : (
                 <p className="no-comments">No comments yet.</p>
               )}

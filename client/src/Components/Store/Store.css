@@ -11,24 +11,22 @@ body {
   color: #191919;
 }
 
-/* Store Page Container */
 .store-page {
   min-height: 100vh;
   background-color: #f5f5f5;
   display: flex;
   flex-direction: column;
-  padding-top: 65px; /* Further reduced */
+  padding-top: 65px;
 }
 
-/* Navigation Bar with Tabs and Search */
 .marketplace-navbar-wrapper {
   display: flex !important;
   justify-content: space-between;
   align-items: center;
-  padding: 0 24px; /* Reduced from 32px */
+  padding: 0 24px;
   background-color: #ffffff;
   border-bottom: 1px solid #e0e0e0;
-  gap: 20px; /* Reduced from 24px */
+  gap: 20px;
   min-height: 50px;
   width: 100%;
   visibility: visible !important;
@@ -38,7 +36,6 @@ body {
   z-index: 50;
 }
 
-/* Tabs Container */
 .marketplace-tabs-container {
   display: flex !important;
   gap: 0;
@@ -46,7 +43,7 @@ body {
 }
 
 .marketplace-tab-button {
-  padding: 12px 18px; /* Further reduced from 14px 20px */
+  padding: 12px 18px;
   background: none;
   border: none;
   font-size: 14px;
@@ -78,7 +75,6 @@ body {
   background-color: #191919;
 }
 
-/* Search Container */
 .marketplace-search-wrapper {
   display: flex !important;
   align-items: center;
@@ -96,11 +92,11 @@ body {
 }
 
 .marketplace-search-input {
-  width: 320px; /* Reduced from 360px */
-  padding: 8px 44px 8px 38px; /* Reduced vertical padding */
+  width: 320px;
+  padding: 8px 44px 8px 38px;
   border: 1px solid #d0d0d0;
-  border-radius: 20px; /* Slightly smaller radius */
-  font-size: 13px; /* Reduced from 14px */
+  border-radius: 20px;
+  font-size: 13px;
   outline: none;
   transition: all 0.2s;
   background-color: #fafafa;
@@ -129,28 +125,25 @@ body {
 
 .marketplace-filter-btn:hover {
   background-color: #f0f0f0;
-  color: #191919;
+  color: #2f6b48;
 }
 
-/* Content Area - Added top margin to push cards down */
 .store-content {
-  padding: 12px 24px; /* Further reduced */
+  padding: 12px 24px;
   padding-bottom: 100px;
   flex: 1;
 }
 
-/* Grid Layout */
 .store-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr); /* Changed from 4 to 5 columns */
-  gap: 12px; /* Reduced from 16px */
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
   width: 100%;
 }
 
-/* Card Styles */
 .store-card {
   background-color: #ffffff;
-  border-radius: 4px; /* Reduced from 6px */
+  border-radius: 4px;
   overflow: hidden;
   cursor: pointer;
   transition: all 0.2s;
@@ -165,7 +158,7 @@ body {
 .store-card-image-wrapper {
   position: relative;
   width: 100%;
-  padding-top: 75%; /* Changed from 100% (square) to 75% (4:3 ratio) for less height */
+  padding-top: 75%;
   overflow: hidden;
   background-color: #f0f0f0;
 }
@@ -186,31 +179,31 @@ body {
 
 .store-card-badge {
   position: absolute;
-  top: 8px; /* Reduced from 10px */
-  right: 8px; /* Reduced from 10px */
+  top: 8px;
+  right: 8px;
   background-color: rgba(0, 0, 0, 0.75);
   color: white;
-  padding: 4px 8px; /* Reduced from 5px 10px */
-  border-radius: 12px; /* Reduced from 14px */
-  font-size: 10px; /* Reduced from 11px */
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 10px;
   font-weight: 600;
   backdrop-filter: blur(8px);
 }
 
 .store-card-info {
-  padding: 8px; /* Reduced from 10px */
+  padding: 8px;
 }
 
 .store-card-title-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 4px; /* Reduced from 6px */
-  margin-bottom: 2px; /* Reduced from 3px */
+  gap: 4px;
+  margin-bottom: 2px;
 }
 
 .store-card-title {
-  font-size: 13px; /* Reduced from 14px */
+  font-size: 13px;
   font-weight: 600;
   color: #191919;
   line-height: 1.2;
@@ -222,7 +215,7 @@ body {
 }
 
 .store-card-price {
-  font-size: 13px; /* Reduced from 14px */
+  font-size: 13px;
   font-weight: 700;
   color: #191919;
   white-space: nowrap;
@@ -231,14 +224,13 @@ body {
 
 .store-card-author {
   font-size: 11px;
-  color: #999; /* Lighter color */
+  color: #999;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   margin: 0;
 }
 
-/* Confirmed/Unavailable Card Styles */
 .store-card.confirmed {
   opacity: 0.85;
   cursor: not-allowed;
@@ -259,7 +251,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: #2f6b48;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -273,12 +265,12 @@ body {
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  background-color: #4caf50;
+  background-color: #2f6b48;
   color: white;
   border-radius: 20px;
   font-weight: 700;
   font-size: 14px;
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+  box-shadow: 0 4px 12px rgba(47, 107, 72, 0.4);
 }
 
 .confirmed-badge svg {
@@ -293,7 +285,6 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* Filter Modal */
 .filter-modal-overlay {
   position: fixed;
   top: 0;
@@ -456,7 +447,6 @@ body {
   background: #000000;
 }
 
-/* Messages */
 .store-message {
   text-align: center;
   padding: 80px 20px;
@@ -465,32 +455,30 @@ body {
   grid-column: 1 / -1;
 }
 
-/* Load More Button */
 .store-load-more-container {
   display: flex;
   justify-content: center;
-  margin-top: 24px; /* Reduced from 40px */
+  margin-top: 24px;
 }
 
 .store-load-more-button {
-  padding: 10px 40px; /* Reduced from 12px 48px */
-  background-color: #191919;
+  padding: 10px 40px;
+  background-color: #2f6b48;
   color: white;
   border: none;
-  border-radius: 20px; /* Reduced from 24px */
-  font-size: 13px; /* Reduced from 14px */
+  border-radius: 20px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .store-load-more-button:hover {
-  background-color: #000000;
+  background-color: #265c3d;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(47, 107, 72, 0.3);
 }
 
-/* Floating Action Button */
 .store-fab {
   position: fixed;
   bottom: 40px;
@@ -498,38 +486,30 @@ body {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+  background: linear-gradient(135deg, #2f6b48 0%, #1e4d32 100%);
   border: none;
   color: white;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 6px 20px rgba(47, 107, 72, 0.35);
   transition: all 0.3s;
   z-index: 1000;
 }
 
 .store-fab:hover {
   transform: scale(1.1) rotate(90deg);
-  box-shadow: 0 8px 28px rgba(46, 125, 50, 0.4);
+  box-shadow: 0 8px 28px rgba(47, 107, 72, 0.45);
 }
 
 .store-fab:active {
   transform: scale(1.05) rotate(90deg);
 }
 
-/* Responsive Design */
 @media (max-width: 1400px) {
   .store-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-/* Responsive Design */
-@media (max-width: 1400px) {
-  .store-grid {
-    grid-template-columns: repeat(4, 1fr); /* 4 columns on smaller desktops */
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -549,7 +529,7 @@ body {
   }
 
   .store-grid {
-    grid-template-columns: repeat(3, 1fr); /* 3 columns on tablets */
+    grid-template-columns: repeat(3, 1fr);
     gap: 12px;
   }
 
@@ -593,7 +573,7 @@ body {
   }
 
   .store-grid {
-    grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
 
@@ -649,7 +629,7 @@ body {
 
 @media (min-width: 1600px) {
   .store-grid {
-    grid-template-columns: repeat(6, 1fr); /* 6 columns on very large screens */
+    grid-template-columns: repeat(6, 1fr);
   }
 
   .store-content {
@@ -658,9 +638,9 @@ body {
     margin-right: auto;
   }
 }
+
 /* ── Three-dot menu ────────────────────────────────────────────────────── */
 
-/* Shared top-right row: [Badge] [⋮] */
 .store-card-top-right {
   position: absolute;
   top: 8px;
@@ -672,7 +652,6 @@ body {
   z-index: 10;
 }
 
-/* Badge is now inline inside the row — override its absolute positioning */
 .store-card-top-right .store-card-badge {
   position: static;
 }
@@ -845,7 +824,6 @@ body {
 .report-submit-btn:hover:not(:disabled) { background: #c62a38; }
 .report-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* Report Success Modal */
 .report-success-overlay {
   position: fixed;
   top: 0;
@@ -945,4 +923,4 @@ body {
   color: #666;
   margin: 0;
   line-height: 1.5;
-}
+} 
