@@ -50,6 +50,9 @@ export default function ProfilePage({ onEdit }) {
   const [marketplacePostToDelete, setMarketplacePostToDelete] = useState(null)
   const [showDeleteJournalModal, setShowDeleteJournalModal] = useState(false)
   const [journalToDelete, setJournalToDelete] = useState(null)
+  const [showLikesModal, setShowLikesModal] = useState(false)
+  const [likersData, setLikersData] = useState([])
+  const [likersLoading, setLikersLoading] = useState(false)
   
   // Loading states for each tab
   const [loadingStates, setLoadingStates] = useState({
@@ -191,6 +194,35 @@ export default function ProfilePage({ onEdit }) {
     if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
     if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
     return postDate.toLocaleDateString()
+  }
+
+  const openLikesModal = async (likerIds) => {
+    setShowLikesModal(true)
+    if (!likerIds || likerIds.length === 0) {
+      setLikersData([])
+      return
+    }
+    setLikersLoading(true)
+    try {
+      const token = localStorage.getItem('token')
+      const results = await Promise.all(
+        likerIds.map(async (userId) => {
+          try {
+            const res = await axios.get(
+              `${process.env.REACT_APP_API_URL}/api/users/${userId}/profile`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            )
+            return res.data?.data?.user || null
+          } catch {
+            return null
+          }
+        })
+      )
+      setLikersData(results.filter(Boolean))
+    } catch {
+      setLikersData([])
+    }
+    setLikersLoading(false)
   }
 
   const toggleLike = async (postId) => {
@@ -718,7 +750,11 @@ export default function ProfilePage({ onEdit }) {
                     </div>
 
                     <div className="likes-info">
-                      <span className="likes-count">{post.likes?.length || 0} likes</span>
+                      <span
+                        className="likes-count"
+                        onClick={() => post.likes?.length > 0 && openLikesModal(post.likes)}
+                        style={post.likes?.length > 0 ? { cursor: 'pointer' } : {}}
+                      >{post.likes?.length || 0} likes</span>
                     </div>
 
                     <div className="add-comment">
@@ -1304,7 +1340,11 @@ export default function ProfilePage({ onEdit }) {
               </div>
 
               <div className="likes-info">
-                <span className="likes-count">{viewingPost.likes?.length || 0} likes</span>
+                <span
+                  className="likes-count"
+                  onClick={() => viewingPost.likes?.length > 0 && openLikesModal(viewingPost.likes)}
+                  style={viewingPost.likes?.length > 0 ? { cursor: 'pointer' } : {}}
+                >{viewingPost.likes?.length || 0} likes</span>
               </div>
             </div>
           </div>
@@ -1865,6 +1905,34 @@ export default function ProfilePage({ onEdit }) {
               >
                 Delete
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showLikesModal && (
+        <div className="modal-overlay" onClick={() => { setShowLikesModal(false); setLikersData([]) }}>
+          <div className="modal-content likes-list-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Liked by</h2>
+              <button className="close-btn" onClick={() => { setShowLikesModal(false); setLikersData([]) }} title="Close">✕</button>
+            </div>
+            <div className="likes-list-body">
+              {likersLoading ? (
+                <p className="likes-list-message">Loading...</p>
+              ) : likersData.length === 0 ? (
+                <p className="likes-list-message">No likes yet.</p>
+              ) : (
+                likersData.map((liker) => (
+                  <div key={liker._id} className="likes-list-item">
+                    <img src={getProfilePic(liker.profilePic)} alt={liker.username} className="likes-list-avatar" />
+                    <div className="likes-list-info">
+                      <span className="likes-list-name">{liker.name}</span>
+                      <span className="likes-list-username">@{liker.username}</span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
