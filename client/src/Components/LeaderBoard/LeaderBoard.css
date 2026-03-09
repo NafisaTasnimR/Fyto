@@ -50,6 +50,9 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  flex: 1;
+  min-width: 0;
+  max-width: 33%;
 }
 
 .podium-item.first {
@@ -143,6 +146,10 @@
   font-weight: 600;
   color: #333;
   text-align: center;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .podium-points {
