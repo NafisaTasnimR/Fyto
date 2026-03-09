@@ -40,10 +40,14 @@ const Admin = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      navigate('/admin');
+      navigate('/admin', { state: { accessDenied: true } });
       return;
     }
     const decoded = decodeToken(token);
+    if (!decoded?.isAdmin) {
+      navigate('/admin', { state: { accessDenied: true } });
+      return;
+    }
     if (decoded?.email) setAdminEmail(decoded.email);
 
     const fetchReports = async () => {

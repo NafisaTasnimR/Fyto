@@ -21,17 +21,44 @@ const initializeClients = () => {
     }
 };
 
-// Helper function to generate real plant image URL from Unsplash
-const generatePlantImageUrl = (plantName) => {
-    // Extract just the plant name (remove scientific name parts in parentheses)
+// Fetch a real plant image URL — iNaturalist primary, Wikipedia secondary
+const fetchPlantImageUrl = async (plantName) => {
+    // Strip parenthetical common names: "Monstera deliciosa (Swiss Cheese Plant)" → "Monstera deliciosa"
     const cleanName = plantName
-        .replace(/\([^)]*\)/g, '') // Remove parentheses content
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, '+'); // Replace spaces with +
+        .replace(/\([^)]*\)/g, '')
+        .trim();
 
-    // Use Unsplash Source API for random plant images with search term
-    return `https://source.unsplash.com/800x600/?plant,${cleanName}`;
+    // 1. Try iNaturalist (purpose-built flora/fauna photo platform, reliable CDN URLs)
+    try {
+        const inatUrl = `https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(cleanName)}&per_page=1`;
+        const inatRes = await fetch(inatUrl, { signal: AbortSignal.timeout(6000) });
+        if (inatRes.ok) {
+            const inatData = await inatRes.json();
+            const photo = inatData.results?.[0]?.default_photo?.medium_url;
+            if (photo) return photo;
+        }
+    } catch (_) {
+        // iNaturalist failed; try Wikipedia
+    }
+
+    // 2. Try Wikipedia REST API
+    try {
+        const wikiTitle = encodeURIComponent(cleanName.replace(/\s+/g, '_'));
+        const wikiRes = await fetch(
+            `https://en.wikipedia.org/api/rest_v1/page/summary/${wikiTitle}`,
+            { signal: AbortSignal.timeout(5000) }
+        );
+        if (wikiRes.ok) {
+            const wikiData = await wikiRes.json();
+            const wikiImg = wikiData?.thumbnail?.source;
+            if (wikiImg) return wikiImg;
+        }
+    } catch (_) {
+        // Wikipedia failed too
+    }
+
+    // 3. Absolute fallback — a confirmed working iNaturalist hosted image
+    return 'https://static.inaturalist.org/photos/10534833/medium.jpeg';
 };
 
 // Generate quiz using Gemini
@@ -55,9 +82,9 @@ const generateQuizWithGemini = async (quizType, difficulty) => {
 
         const quiz = JSON.parse(text);
 
-        // Replace placeholder image URL with real Unsplash URL for image quizzes
+        // Replace placeholder image URL with real Wikipedia image for image quizzes
         if (quiz.type === 'image-quiz' && quiz.plantName) {
-            quiz.imageUrl = generatePlantImageUrl(quiz.plantName);
+            quiz.imageUrl = await fetchPlantImageUrl(quiz.plantName);
         }
 
         return quiz;
@@ -211,7 +238,7 @@ const getFallbackQuiz = (quizType, difficulty) => {
             difficulty: difficulty,
             question: "Identify this plant:",
             plantName: "Monstera deliciosa (Swiss Cheese Plant)",
-            imageUrl: "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=800",
+            imageUrl: "https://static.inaturalist.org/photos/10534833/medium.jpeg",
             options: [
                 "Monstera deliciosa",
                 "Philodendron bipinnatifidum",

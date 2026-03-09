@@ -200,7 +200,7 @@ const LoginSignup = ({ mode = 'login', onClose, onModeChange }) => {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="auth-modal-overlay" onClick={onClose}>
       <div className="login-signup-container" onClick={(e) => e.stopPropagation()}>
         <button className="close-modal" onClick={onClose}>&times;</button>
         <div className="form-wrapper">

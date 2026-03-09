@@ -1,12 +1,22 @@
 export const validateUpdateProfile = (req, res, next) => {
-    const { name, username, bio, profilePic } = req.body;
+    const { name, username, bio, profilePic, previousPassword, newPassword } = req.body;
 
     // Check if at least one field is provided
-    if (!name && !username && bio === undefined && !profilePic) {
+    if (!name && !username && bio === undefined && !profilePic && !previousPassword && !newPassword) {
         return res.status(400).json({
             success: false,
-            message: 'At least one field (name, username, bio, or profilePic) is required for update.'
+            message: 'At least one field is required for update.'
         });
+    }
+
+    // Validate password change fields
+    if (previousPassword !== undefined || newPassword !== undefined) {
+        if (!previousPassword) {
+            return res.status(400).json({ success: false, message: 'Current password is required to set a new password.' });
+        }
+        if (!newPassword || newPassword.length < 6) {
+            return res.status(400).json({ success: false, message: 'New password must be at least 6 characters long.' });
+        }
     }
 
     // Validate name
