@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './LeaderBoard.css';
 import { getProfilePic } from '../../utils/imageUtils';
+import Loader from '../Shared/Loader';
 
 const LeaderBoard = () => {
   const [activeTab, setActiveTab] = useState('daily');
@@ -39,7 +40,7 @@ const LeaderBoard = () => {
   if (loading) {
     return (
       <div className="leaderboard">
-        <p style={{ textAlign: 'center', padding: '1rem', color: '#888' }}>Loading...</p>
+        <Loader size="small" message="Loading..." />
       </div>
     );
   }

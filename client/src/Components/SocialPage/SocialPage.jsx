@@ -826,7 +826,7 @@ const SocialPage = () => {
           </div>
           <div className="search-results">
             {searchLoading ? (
-              <div className="search-message">Searching...</div>
+              <Loader size="small" message="Searching..." />
             ) : !searchQuery ? (
               <div className="search-message">Search for users and posts</div>
             ) : searchResults.length > 0 ? (
