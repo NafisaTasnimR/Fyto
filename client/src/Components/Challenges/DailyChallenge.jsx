@@ -224,7 +224,14 @@ const DailyChallenge = () => {
 
           {!isRiddle && imageUrl && (
             <div className="challenge-image-container">
-              <img src={imageUrl} alt="Plant identification challenge" />
+              <img
+                src={imageUrl}
+                alt="Plant identification challenge"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'https://static.inaturalist.org/photos/10534833/medium.jpeg';
+                }}
+              />
               <div className="image-label">Plant identification challenge</div>
             </div>
           )}

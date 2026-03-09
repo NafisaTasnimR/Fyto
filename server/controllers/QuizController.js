@@ -1,6 +1,34 @@
 import { generateDailyQuiz, generateMultipleQuizzes, validateQuizAnswer } from '../services/QuizGenerationService.js';
 import ChallengeParticipation from '../models/ChallengeParticipation.js';
 
+// Per-user daily quiz cache: { [userId_dateKey]: quiz }
+// Each user gets their own unique quiz, generated on first visit and reused for the rest of the day.
+const userQuizCache = {};
+
+const getTodayDateKey = () => new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+
+const getUserQuiz = async (userId, type, difficulty) => {
+    const dateKey = getTodayDateKey();
+    const cacheKey = `${userId}_${dateKey}`;
+
+    // Purge entries from previous days
+    for (const key of Object.keys(userQuizCache)) {
+        if (!key.endsWith(`_${dateKey}`)) {
+            delete userQuizCache[key];
+        }
+    }
+
+    if (userQuizCache[cacheKey]) {
+        console.log(`📦 Returning cached quiz for user ${userId}`);
+        return userQuizCache[cacheKey];
+    }
+
+    console.log(`🎯 Generating new quiz for user ${userId}`);
+    const quiz = await generateDailyQuiz(type, difficulty);
+    userQuizCache[cacheKey] = quiz;
+    return quiz;
+};
+
 // Get today's daily quiz
 export const getTodaysDailyQuiz = async (req, res) => {
     try {
@@ -19,8 +47,8 @@ export const getTodaysDailyQuiz = async (req, res) => {
             participatedAt: { $gte: today, $lt: tomorrow }
         });
 
-        // Generate quiz
-        const quiz = await generateDailyQuiz(type, difficulty);
+        // Each user gets their own quiz; cached after first generation so it stays consistent
+        const quiz = await getUserQuiz(userId.toString(), type, difficulty);
 
         // Return quiz with participation status
         return res.status(200).json({
