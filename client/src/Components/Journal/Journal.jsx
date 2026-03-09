@@ -8,6 +8,38 @@ import CoverSelection from './CoverSelection';
 import JournalsList from './JournalsList';
 import * as journalService from '../../services/journalService';
 
+// Success Modal Component
+const SaveSuccessModal = ({ onClose, onViewJournals }) => {
+  return (
+    <div className="journal-unsaved-warning-modal-overlay-m">
+      <div className="journal-unsaved-warning-modal-m" style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}></div>
+        <h2 style={{ fontSize: '1.4rem', fontWeight: 600, color: '#2d5016', marginBottom: '0.75rem', fontFamily: 'Poppins, sans-serif' }}>
+          Journal Saved!
+        </h2>
+        <p style={{ fontSize: '0.95rem', color: '#5a7a4d', marginBottom: '1.75rem', fontFamily: 'Poppins, sans-serif', lineHeight: 1.5 }}>
+          Your journal has been saved successfully. What would you like to do next?
+        </p>
+        <div className="journal-unsaved-warning-actions-m">
+          <button
+            onClick={onClose}
+            className="journal-unsaved-warning-btn-m journal-unsaved-warning-btn-cancel-m"
+          >
+            Keep Writing
+          </button>
+          <button
+            onClick={onViewJournals}
+            className="journal-unsaved-warning-btn-m"
+            style={{ background: '#2f6b48', color: 'white' }}
+          >
+            My Journals
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const defaultPreferences = {
   pageColor: '#ffffff',
   textColor: '#000000',
@@ -67,6 +99,14 @@ function Journal() {
   const [selectedCover, setSelectedCover] = useState(null);
   const [currentJournal, setCurrentJournal] = useState(null);
   const [showJournalsList, setShowJournalsList] = useState(isContinue);
+
+  
+  useEffect(() => {
+    if (isContinue) {
+      setShowJournalsList(true);
+      setCurrentJournal(null);
+    }
+  }, [location.pathname,isContinue]);
   const [pages, setPages] = useState([]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -102,6 +142,7 @@ function Journal() {
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState(null);
   const [journalTitle, setJournalTitle] = useState('My Fyto Journal');
+  const [showSaveSuccess, setShowSaveSuccess] = useState(false);
 
   const currentPage = pages[currentPageIndex];
 
@@ -272,7 +313,7 @@ function Journal() {
       }),
       preferences: {
         ...defaultPreferences,
-        pageColor: cover.bgColor || '#FFFFFF'
+        pageColor: '#ffffff'
       },
       wordCount: 0,
       lastSaved: null,
@@ -486,7 +527,7 @@ function Journal() {
       setHasUnsavedChanges(false);
       setCurrentJournal(newJournal);
 
-      alert('Journal saved successfully!');
+      setShowSaveSuccess(true);
     } catch (error) {
       console.error('Error saving journal:', error);
       console.error('Error details:', {
@@ -501,6 +542,79 @@ function Journal() {
         window.location.href = '/login';
       } else {
         alert(`Failed to save journal. Error: ${error.message || 'Unknown error'}. Check console for details.`);
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const saveExistingJournal = async () => {
+    if (!currentJournal || pages.length === 0) return;
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('You need to be logged in to save.');
+      window.location.href = '/login';
+      return;
+    }
+
+    try {
+      setSaving(true);
+
+      // Update journal title
+      await journalService.updateJournal(currentJournal._id, { title: journalTitle });
+
+      // Save each page that has a backendId
+      for (const page of pages) {
+        if (!page.backendId) continue;
+
+        // Update page background
+        await journalService.updatePage(page.backendId, {
+          backgroundColor: page.preferences.pageColor,
+          pageSize: {
+            width: page.preferences.pageWidth,
+            height: page.preferences.pageHeight
+          }
+        });
+
+        // Delete old text blocks and re-create
+        if (page.textBlocks && page.textBlocks.length > 0) {
+          for (const block of page.textBlocks) {
+            try { await journalService.deleteBlock(block._id || block.id); } catch (e) { /* ignore */ }
+          }
+        }
+
+        if (page.content) {
+          await journalService.createBlock(page.backendId, {
+            type: 'text',
+            text: page.content,
+            position: { x: 0, y: 0 },
+            styles: {
+              fontFamily: page.preferences.fontFamily,
+              fontSize: page.preferences.fontSize,
+              color: page.preferences.textColor,
+              alignment: page.preferences.textAlign,
+              lineHeight: page.preferences.lineHeight
+            }
+          });
+        }
+      }
+
+      try { await journalService.updateWordCount(currentJournal._id); } catch (e) { /* ignore */ }
+
+      const updatedPages = pages.map(p => ({ ...p, lastSaved: new Date() }));
+      setPages(updatedPages);
+      setLastSavedState(JSON.stringify(updatedPages));
+      setHasUnsavedChanges(false);
+      setShowSaveSuccess(true);
+    } catch (error) {
+      console.error('Error saving journal:', error);
+      if (error.response?.status === 401) {
+        alert('Your session has expired. Please log in again.');
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      } else {
+        alert(`Failed to save: ${error.message || 'Unknown error'}`);
       }
     } finally {
       setSaving(false);
@@ -535,10 +649,9 @@ function Journal() {
         day: 'numeric',
         year: 'numeric'
       }),
-      // Each page gets its own independent preferences
       preferences: { 
         ...defaultPreferences,
-        pageColor: '#ffffff'
+        pageColor: '#ffffff'  // always white for new pages
       },
       wordCount: 0,
       lastSaved: null,
@@ -583,6 +696,16 @@ function Journal() {
     setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
   };
 
+  // Render success modal
+  if (showSaveSuccess) {
+    return (
+      <SaveSuccessModal
+        onClose={() => setShowSaveSuccess(false)}
+        onViewJournals={() => { setShowSaveSuccess(false); setShowJournalsList(true); setCurrentJournal(null); navigate('/journal/continue'); }}
+      />
+    );
+  }
+
   // Render warning modal
   if (showWarningModal) {
     return (
@@ -594,7 +717,7 @@ function Journal() {
   }
 
   // Render journals list for "Continue" mode
-  if (showJournalsList && isContinue) {
+  if (showJournalsList) {
     return (
       <JournalsList 
         onSelectJournal={handleJournalSelected}
@@ -686,18 +809,26 @@ function Journal() {
         </svg>
       </button>
 
-      {!currentJournal && selectedCover && pages.length > 0 && (
+      {pages.length > 0 && (selectedCover || currentJournal) && (
         <button
-          onClick={saveJournal}
+          onClick={currentJournal ? saveExistingJournal : saveJournal}
           disabled={saving}
-          title={saving ? 'Saving...' : 'Save Journal'}
+          title={saving ? 'Saving...' : hasUnsavedChanges ? 'Save Journal (unsaved changes)' : 'Save Journal'}
           className="journal-save-button"
+          style={hasUnsavedChanges ? { background: '#2f6b48' } : {}}
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-            <polyline points="17 21 17 13 7 13 7 21"></polyline>
-            <polyline points="7 3 7 8 15 8"></polyline>
-          </svg>
+          {saving ? (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: 'spin 1s linear infinite' }}>
+              <circle cx="12" cy="12" r="10" strokeOpacity="0.3"/>
+              <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/>
+            </svg>
+          ) : (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+          )}
         </button>
       )}
 

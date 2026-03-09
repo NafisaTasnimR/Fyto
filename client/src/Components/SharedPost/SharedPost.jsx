@@ -103,6 +103,12 @@ const SharedPost = () => {
     );
   };
 
+  const countAllComments = (commentsList) => {
+    return commentsList.reduce((total, comment) => {
+      return total + 1 + (comment.replies ? countAllComments(comment.replies) : 0);
+    }, 0);
+  };
+
   const displayComments = () => {
     if (!comments || comments.length === 0) {
       return <p className="no-comments">No comments yet. Be the first to comment!</p>;
@@ -255,7 +261,7 @@ const SharedPost = () => {
 
           {comments.length > 0 && (
             <div className="comments-section">
-              <h3>Comments ({comments.length})</h3>
+              <h3>Comments ({countAllComments(comments)})</h3>
               <div className="comments-list">{displayComments()}</div>
             </div>
           )}

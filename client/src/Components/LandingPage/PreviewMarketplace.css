@@ -178,7 +178,6 @@
 .preview-page-subtitle p {
   font-size: 14px;
   color: #8e8e8e;
-  margin: 0;
 }
 
 .preview-marketplace-loading,
@@ -203,6 +202,7 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
   margin-bottom: 32px;
+  margin-top: 32px;
 }
 
 .preview-marketplace-card {

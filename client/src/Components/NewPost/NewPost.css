@@ -542,7 +542,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  color: #191919;
+  color: #2f6b48;
 }
 
 .contact-type-btn:hover {
@@ -600,7 +600,7 @@
 }
 
 .submit-btn {
-  background-color: #30181d;
+  background-color: #2f6b48;
   color: white;
   box-shadow: 0 4px 12px rgba(48, 24, 29, 0.2);
 }

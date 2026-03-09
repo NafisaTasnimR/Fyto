@@ -313,6 +313,7 @@ export const getUserMarketplacePosts = async (req, res) => {
 
 
         const posts = await MarketplacePost.find(filter)
+            .populate('userId', 'name username email profilePic')
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(Number(limit));

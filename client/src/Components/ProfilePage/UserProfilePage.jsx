@@ -20,6 +20,8 @@ export default function UserProfilePage() {
   const [viewingImage, setViewingImage] = useState(null)
   const [showViewPostModal, setShowViewPostModal] = useState(false)
   const [viewingPost, setViewingPost] = useState(null)
+  const [showShareModal, setShowShareModal] = useState(false)
+  const [activeSharePost, setActiveSharePost] = useState(null)
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -108,12 +110,12 @@ export default function UserProfilePage() {
                   <div key={post._id} className="post">
                     <div className="post-header">
                       <img
-                        src={getProfilePic(user?.profilePic)}
-                        alt={user?.username || 'User'}
+                        src={getProfilePic(post.authorId?.profilePic || user?.profilePic)}
+                        alt={post.authorId?.username || user?.username || 'User'}
                         className="avatar"
                       />
                       <div className="header-info">
-                        <h3 className="username">{user?.username}</h3>
+                        <h3 className="username">{post.authorId?.username || post.authorId?.name || user?.username || 'Anonymous'}</h3>
                         <span className="timestamp">{formatTimestamp(post.createdAt)}</span>
                       </div>
                     </div>
@@ -133,7 +135,7 @@ export default function UserProfilePage() {
                       onClick={() => { setViewingPost(post); setShowViewPostModal(true) }}
                       style={{ cursor: 'pointer' }}
                     >
-                      <p><strong>{user?.username}</strong> {post.content}</p>
+                      <p><strong>{post.authorId?.username || post.authorId?.name || user?.username || 'Anonymous'}</strong> {post.content}</p>
                     </div>
 
                     <div className="post-actions">
@@ -143,9 +145,14 @@ export default function UserProfilePage() {
                       <button className="action-btn comment-btn">
                         <img src="/cmnt.png" alt="comment" className="action-icon" />
                       </button>
-                      <button className="action-btn share-btn">
-                        <img src="/send.png" alt="share" className="action-icon" />
-                      </button>
+                      {post.visibility !== 'private' && (
+                        <button
+                          className="action-btn share-btn"
+                          onClick={() => { setActiveSharePost(post); setShowShareModal(true) }}
+                        >
+                          <img src="/send.png" alt="share" className="action-icon" />
+                        </button>
+                      )}
                     </div>
 
                     <div className="likes-info">
@@ -308,6 +315,48 @@ export default function UserProfilePage() {
         </div>
       </div>
 
+      {/* Share Modal */}
+      {showShareModal && activeSharePost && (
+        <div className="modal-overlay" onClick={() => { setShowShareModal(false); setActiveSharePost(null) }}>
+          <div className="modal-content share-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="close-btn" onClick={() => { setShowShareModal(false); setActiveSharePost(null) }} title="Close">✕</button>
+            <div className="share-modal-header">
+              <img src="/postShareIcon.png" alt="share icon" className="share-icon" />
+              <h2>Share Post</h2>
+            </div>
+            <div className="share-modal-content">
+              <div className="share-preview">
+                <div className="share-preview-item">
+                  <strong>{activeSharePost.authorId?.username || user?.username || 'Anonymous'}</strong>
+                  <p>{(activeSharePost.content || '').substring(0, 100)}{activeSharePost.content?.length > 100 ? '...' : ''}</p>
+                  {activeSharePost.images && activeSharePost.images.length > 0 && (
+                    <img src={activeSharePost.images[0]} alt="post preview" className="share-preview-image" />
+                  )}
+                </div>
+              </div>
+              <div className="share-link-section">
+                <p className="share-link-label">Share Link:</p>
+                <div className="share-link-box">
+                  {`${window.location.origin}/post/${activeSharePost._id}`}
+                </div>
+              </div>
+              <div className="share-buttons-container">
+                <button
+                  className="share-btn-primary"
+                  onClick={() => {
+                    const link = `${window.location.origin}/post/${activeSharePost._id}`
+                    navigator.clipboard.writeText(link)
+                    alert('Link copied to clipboard!')
+                  }}
+                >
+                  Copy Link
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Full-Screen Image Viewer */}
       {showImageViewer && viewingImage && (
         <div
@@ -348,12 +397,12 @@ export default function UserProfilePage() {
             <div className="view-post-content">
               <div className="post-header">
                 <img
-                  src={getProfilePic(user?.profilePic)}
-                  alt={user?.username || 'User'}
+                  src={getProfilePic(viewingPost.authorId?.profilePic || user?.profilePic)}
+                  alt={viewingPost.authorId?.username || user?.username || 'User'}
                   className="post-avatar"
                 />
                 <div className="post-user-info">
-                  <strong className="post-username">{user?.username}</strong>
+                  <strong className="post-username">{viewingPost.authorId?.username || viewingPost.authorId?.name || user?.username || 'Anonymous'}</strong>
                   <span className="post-timestamp">{formatTimestamp(viewingPost.createdAt)}</span>
                 </div>
               </div>
@@ -373,7 +422,7 @@ export default function UserProfilePage() {
               )}
 
               <div className="post-caption">
-                <p><strong>{user?.username}</strong> {viewingPost.content}</p>
+                <p><strong>{viewingPost.authorId?.username || viewingPost.authorId?.name || user?.username || 'Anonymous'}</strong> {viewingPost.content}</p>
               </div>
 
               <div className="likes-info">
