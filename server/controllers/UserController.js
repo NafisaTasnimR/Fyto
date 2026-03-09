@@ -1,4 +1,5 @@
 import UserModel from "../models/User.js";
+import bcrypt from "bcrypt";
 
 const getCurrentUser = async (req, res) => {
     try {
@@ -133,7 +134,7 @@ const getUserProfile = async (req, res) => {
 const updateProfile = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { name, username, bio, profilePic } = req.body;
+        const { name, username, bio, profilePic, previousPassword, newPassword } = req.body;
 
         const user = await UserModel.findById(userId);
 
@@ -171,6 +172,16 @@ const updateProfile = async (req, res) => {
         // Update other fields
         if (bio !== undefined) user.bio = bio;
         if (profilePic) user.profilePic = profilePic;
+
+        // Handle password change
+        if (previousPassword && newPassword) {
+            const userWithHash = await UserModel.findById(userId);
+            const isMatch = await bcrypt.compare(previousPassword, userWithHash.passwordHash);
+            if (!isMatch) {
+                return res.status(400).json({ success: false, message: 'Current password is incorrect.' });
+            }
+            user.passwordHash = await bcrypt.hash(newPassword, 10);
+        }
 
         user.updatedAt = new Date();
         await user.save();
