@@ -23,6 +23,7 @@ const Post = ({
   toggleReply, openReply,
   replyInputs, handleReplyChange, submitReply,
   commentInputs, setCommentInputs, submitComment,
+  onLikesClick,
 }) => {
   return (
     <div className="post">
@@ -101,7 +102,11 @@ const Post = ({
       </div>
 
       <div className="likes-info">
-        <span className="likes-count">{post.likes} likes</span>
+        <span
+          className="likes-count"
+          onClick={() => post.likes > 0 && onLikesClick(post)}
+          style={post.likes > 0 ? { cursor: 'pointer' } : {}}
+        >{post.likes} likes</span>
       </div>
 
       <div className="add-comment">
@@ -159,6 +164,39 @@ const SocialPage = () => {
   const [reportingPost, setReportingPost] = useState(null);
   const [reportReason, setReportReason] = useState('');
   const [showReportSuccess, setShowReportSuccess] = useState(false);
+
+  const [showLikesModal, setShowLikesModal] = useState(false);
+  const [likersData, setLikersData] = useState([]);
+  const [likersLoading, setLikersLoading] = useState(false);
+
+  const openLikesModal = async (post) => {
+    setShowLikesModal(true);
+    if (!post.likerIds || post.likerIds.length === 0) {
+      setLikersData([]);
+      return;
+    }
+    setLikersLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const results = await Promise.all(
+        post.likerIds.map(async (userId) => {
+          try {
+            const res = await axios.get(
+              `${process.env.REACT_APP_API_URL}/api/users/${userId}/profile`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+            return res.data?.data?.user || null;
+          } catch {
+            return null;
+          }
+        })
+      );
+      setLikersData(results.filter(Boolean));
+    } catch {
+      setLikersData([]);
+    }
+    setLikersLoading(false);
+  };
 
   React.useEffect(() => {
     if (!showSearchResults && !showNotifications) {
@@ -232,6 +270,7 @@ const SocialPage = () => {
           authorUserId: post.authorId?._id || null,
           postImage: post.images && post.images.length > 0 ? post.images[0] : null,
           likes: post.likes?.length || 0,
+          likerIds: post.likes || [],
           caption: post.content || '',
           timestamp: formatTimestamp(post.createdAt),
           liked: post.likes?.includes(currentUserId) || false,
@@ -787,7 +826,7 @@ const SocialPage = () => {
           </div>
           <div className="search-results">
             {searchLoading ? (
-              <div className="search-message">Searching...</div>
+              <Loader size="small" message="Searching..." />
             ) : !searchQuery ? (
               <div className="search-message">Search for users and posts</div>
             ) : searchResults.length > 0 ? (
@@ -1138,6 +1177,7 @@ const SocialPage = () => {
                   commentInputs={commentInputs}
                   setCommentInputs={setCommentInputs}
                   submitComment={submitComment}
+                  onLikesClick={openLikesModal}
                 />
               ))
             )}
@@ -1245,6 +1285,38 @@ const SocialPage = () => {
                   Copy Link
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showLikesModal && (
+        <div className="modal-overlay" onClick={() => { setShowLikesModal(false); setLikersData([]); }}>
+          <div className="modal-content likes-list-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Liked by</h2>
+              <button className="close-btn" onClick={() => { setShowLikesModal(false); setLikersData([]); }} title="Close">✕</button>
+            </div>
+            <div className="likes-list-body">
+              {likersLoading ? (
+                <p className="likes-list-message">Loading...</p>
+              ) : likersData.length === 0 ? (
+                <p className="likes-list-message">No likes yet.</p>
+              ) : (
+                likersData.map((user) => (
+                  <div
+                    key={user._id}
+                    className="likes-list-item"
+                    onClick={() => { handleUserClick(user._id); setShowLikesModal(false); setLikersData([]); }}
+                  >
+                    <img src={getProfilePic(user.profilePic)} alt={user.username} className="likes-list-avatar" />
+                    <div className="likes-list-info">
+                      <span className="likes-list-name">{user.name}</span>
+                      <span className="likes-list-username">@{user.username}</span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

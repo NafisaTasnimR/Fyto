@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useConfirmedPosts } from '../Context/ConfirmedPostsContext';
 import './ProductDetail.css';
 import Header from '../Shared/Header.jsx';
+import Loader from '../Shared/Loader';
 
 const ProductDetail = () => {
   const [selectedOption, setSelectedOption] = useState('');
@@ -89,7 +90,7 @@ const ProductDetail = () => {
   if (loading) {
     return (
       <div className="product-detail-container">
-        <div className="loading-message">Loading product details...</div>
+        <Loader size="medium" message="Loading product details..." />
       </div>
     );
   }

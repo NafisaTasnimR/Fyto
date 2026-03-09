@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import Header from '../Shared/Header'
+import Loader from '../Shared/Loader'
 import { getProfilePic } from '../../utils/imageUtils'
 import './ProfilePage.css'
 import '../SocialPage/SocialPage.css'
@@ -234,8 +235,8 @@ export default function UserProfilePage() {
       <div className="profile-page">
         <Header />
         <div className="profile-content">
-          <div className="content-inner" style={{ textAlign: 'center', padding: '3rem', color: '#888' }}>
-            Loading profile...
+          <div className="content-inner">
+            <Loader size="medium" message="Loading profile..." />
           </div>
         </div>
       </div>

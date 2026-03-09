@@ -15,6 +15,9 @@ const SharedPost = () => {
   const [showImageViewer, setShowImageViewer] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('signup');
+  const [showLikesModal, setShowLikesModal] = useState(false);
+  const [likersData, setLikersData] = useState([]);
+  const [likersLoading, setLikersLoading] = useState(false);
 
   useEffect(() => {
     fetchSharedPost();
@@ -57,6 +60,41 @@ const SharedPost = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const openLikesModal = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setModalMode('signup');
+      setShowModal(true);
+      return;
+    }
+    setShowLikesModal(true);
+    const likerIds = post.likes || [];
+    if (likerIds.length === 0) {
+      setLikersData([]);
+      return;
+    }
+    setLikersLoading(true);
+    try {
+      const results = await Promise.all(
+        likerIds.map(async (userId) => {
+          try {
+            const res = await axios.get(
+              `${process.env.REACT_APP_API_URL}/api/users/${userId}/profile`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+            return res.data?.data?.user || null;
+          } catch {
+            return null;
+          }
+        })
+      );
+      setLikersData(results.filter(Boolean));
+    } catch {
+      setLikersData([]);
+    }
+    setLikersLoading(false);
   };
 
   const formatDate = (dateString) => {
@@ -256,7 +294,11 @@ const SharedPost = () => {
           </div>
 
           <div className="likes-info">
-            <span className="likes-count">{post.likesCount || 0} {(post.likesCount || 0) === 1 ? 'like' : 'likes'}</span>
+            <span
+              className="likes-count"
+              onClick={() => (post.likesCount || 0) > 0 && openLikesModal()}
+              style={(post.likesCount || 0) > 0 ? { cursor: 'pointer' } : {}}
+            >{post.likesCount || 0} {(post.likesCount || 0) === 1 ? 'like' : 'likes'}</span>
           </div>
 
           {comments.length > 0 && (
@@ -294,6 +336,34 @@ const SharedPost = () => {
             className="image-viewer-img"
             onClick={(e) => e.stopPropagation()}
           />
+        </div>
+      )}
+
+      {showLikesModal && (
+        <div className="likes-modal-overlay" onClick={() => { setShowLikesModal(false); setLikersData([]); }}>
+          <div className="likes-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="likes-modal-header">
+              <h2>Liked by</h2>
+              <button className="likes-modal-close" onClick={() => { setShowLikesModal(false); setLikersData([]); }} title="Close">✕</button>
+            </div>
+            <div className="likes-list-body">
+              {likersLoading ? (
+                <p className="likes-list-message">Loading...</p>
+              ) : likersData.length === 0 ? (
+                <p className="likes-list-message">No likes yet.</p>
+              ) : (
+                likersData.map((liker) => (
+                  <div key={liker._id} className="likes-list-item">
+                    <img src={getProfilePic(liker.profilePic)} alt={liker.username} className="likes-list-avatar" />
+                    <div className="likes-list-info">
+                      <span className="likes-list-name">{liker.name}</span>
+                      <span className="likes-list-username">@{liker.username}</span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>

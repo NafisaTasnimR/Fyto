@@ -696,16 +696,6 @@ function Journal() {
     setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
   };
 
-  // Render success modal
-  if (showSaveSuccess) {
-    return (
-      <SaveSuccessModal
-        onClose={() => setShowSaveSuccess(false)}
-        onViewJournals={() => { setShowSaveSuccess(false); setShowJournalsList(true); setCurrentJournal(null); navigate('/journal/continue'); }}
-      />
-    );
-  }
-
   // Render warning modal
   if (showWarningModal) {
     return (
@@ -868,6 +858,12 @@ function Journal() {
           />
         </main>
       </div>
+      {showSaveSuccess && (
+        <SaveSuccessModal
+          onClose={() => setShowSaveSuccess(false)}
+          onViewJournals={() => { setShowSaveSuccess(false); setShowJournalsList(true); setCurrentJournal(null); navigate('/journal/continue'); }}
+        />
+      )}
     </div>
   );
 }
