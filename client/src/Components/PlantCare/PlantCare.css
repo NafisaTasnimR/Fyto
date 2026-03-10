@@ -432,3 +432,257 @@
     width: 100%;
   }
 }
+
+@media (max-width: 768px) {
+  .plant-care-container {
+    padding: 1.5rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .search-section {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .search-section h1 {
+    font-size: 2rem;
+  }
+
+  .info-grid {
+    gap: 0.85rem;
+    margin-bottom: 2rem;
+  }
+
+  .info-card {
+    padding: 1rem 1.25rem;
+  }
+
+  .info-card h3 {
+    font-size: 1rem;
+  }
+
+  .timeline-section {
+    padding: 1.5rem;
+  }
+
+  .uploaded-image {
+    max-height: 220px;
+  }
+}
+
+@media (max-width: 480px) {
+  .plant-care-container {
+    padding: 1rem;
+  }
+
+  .page-title {
+    font-size: 1.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .search-section {
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    border-radius: 10px;
+  }
+
+  .search-section h1 {
+    font-size: 1.5rem;
+  }
+
+  .search-section p {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+
+  .search-form {
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 1rem;
+  }
+
+  .plant-input {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+
+  .search-button {
+    width: 100%;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+
+  .upload-box {
+    padding: 30px 15px;
+  }
+
+  .upload-icon {
+    width: 35px;
+    height: 35px;
+    margin-bottom: 10px;
+  }
+
+  .upload-text {
+    font-size: 0.9rem;
+    margin: 6px 0;
+  }
+
+  .upload-hint {
+    font-size: 0.8rem;
+  }
+
+  .image-display-section {
+    margin-bottom: 1.5rem;
+    padding: 1.25rem;
+  }
+
+  .uploaded-image {
+    max-width: 90%;
+    max-height: 180px;
+    margin-bottom: 1rem;
+  }
+
+  .change-image-btn {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+
+  .error-message {
+    padding: 12px;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .error-message p {
+    font-size: 0.9rem;
+  }
+
+  .identified-plant-info {
+    margin: 0.75rem 0;
+  }
+
+  .identified-plant-info h2 {
+    font-size: 1.35rem;
+  }
+
+  .identified-plant-info .scientific-name {
+    font-size: 0.85rem;
+  }
+
+  .identified-plant-info .confidence {
+    font-size: 0.75rem;
+  }
+
+  .results-section h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+  }
+
+  .info-grid {
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .info-card {
+    padding: 0.9rem 1rem;
+    border-radius: 10px;
+  }
+
+  .info-card h3 {
+    font-size: 0.95rem;
+    gap: 6px;
+  }
+
+  .card-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .section-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .info-card p {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .timeline-section {
+    padding: 1.25rem;
+  }
+
+  .loading-message {
+    padding: 30px 15px;
+    margin-bottom: 1.5rem;
+  }
+
+  .loading-message p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .plant-care-container {
+    padding: 0.75rem;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .search-section {
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+    border-radius: 8px;
+  }
+
+  .search-section h1 {
+    font-size: 1.3rem;
+  }
+
+  .search-section p {
+    font-size: 0.85rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .plant-input {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+
+  .search-button {
+    width: 100%;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+  }
+
+  .upload-box {
+    padding: 25px 12px;
+    border-radius: 6px;
+  }
+
+  .info-card {
+    padding: 0.8rem 0.9rem;
+    border-radius: 8px;
+  }
+
+  .info-card h3 {
+    font-size: 0.9rem;
+  }
+
+  .info-card p {
+    font-size: 0.85rem;
+  }
+
+  .timeline-section {
+    padding: 1rem;
+  }
+}

@@ -743,6 +743,263 @@
   }
 }
 
+@media (max-width: 480px) {
+  .feed-container {
+    max-width: 100%;
+    padding: 0;
+    margin-top: 0;
+  }
+
+  .create-post-section {
+    padding: 12px;
+    gap: 8px;
+    border-radius: 0;
+    margin-bottom: 12px;
+  }
+
+  .create-post-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .create-post-input {
+    padding: 10px 12px;
+    font-size: 13px;
+    border-radius: 20px;
+  }
+
+  .create-post-btn {
+    padding: 8px 16px;
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .post {
+    border-radius: 0;
+    border: none;
+    margin-bottom: 0;
+    box-shadow: none;
+  }
+
+  .avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .post-header {
+    padding: 12px;
+  }
+
+  .username {
+    font-size: 14px;
+  }
+
+  .timestamp {
+    font-size: 12px;
+  }
+
+  .post-image {
+    max-height: 280px;
+  }
+
+  .post-actions {
+    padding: 8px 12px;
+    gap: 16px;
+  }
+
+  .action-btn {
+    font-size: 12px;
+    padding: 6px 0;
+  }
+
+  .action-count {
+    font-size: 12px;
+  }
+
+  .post-caption {
+    padding: 0 12px;
+  }
+
+  .post-caption p {
+    font-size: 13px;
+  }
+
+  .add-comment {
+    padding: 12px;
+  }
+
+  .comment-input {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .post-comment-btn {
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+
+  .sidebar {
+    width: 60px;
+  }
+
+  .sidebar:hover {
+    width: 60px;
+  }
+
+  .nav-item {
+    padding: 8px 0;
+    margin: 0 4px;
+    gap: 0;
+  }
+
+  .nav-label {
+    display: none;
+  }
+
+  .sidebar:hover .nav-label {
+    display: none;
+  }
+
+  .search-panel {
+    width: 200px !important;
+  }
+
+  .search-input1 {
+    font-size: 13px;
+  }
+
+  .notifications-panel {
+    width: 280px;
+  }
+
+  .notification-item {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .feed-container {
+    max-width: 100%;
+  }
+
+  .create-post-section {
+    padding: 10px;
+    gap: 6px;
+  }
+
+  .create-post-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .create-post-input {
+    padding: 9px 10px;
+    font-size: 12px;
+  }
+
+  .create-post-btn {
+    padding: 7px 14px;
+    font-size: 11px;
+  }
+
+  .post-header {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .username {
+    font-size: 13px;
+  }
+
+  .timestamp {
+    font-size: 11px;
+  }
+
+  .post-actions {
+    padding: 8px 10px;
+    gap: 12px;
+  }
+
+  .action-btn {
+    font-size: 11px;
+    padding: 4px 0;
+  }
+
+  .action-count {
+    font-size: 11px;
+  }
+
+  .post-caption p {
+    font-size: 12px;
+  }
+
+  .comment {
+    font-size: 12px;
+  }
+
+  .comment-avatar-inline {
+    width: 28px;
+    height: 28px;
+  }
+
+  .add-comment {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .comment-input {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .post-comment-btn {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+
+  .reply-btn {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+
+  .sidebar {
+    width: 50px;
+    top: 50px;
+  }
+
+  .nav-icon {
+    font-size: 18px;
+  }
+
+  .search-panel {
+    width: 100% !important;
+  }
+
+  .notifications-panel {
+    width: 100%;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-width: 95%;
+    max-height: 90vh;
+  }
+
+  .modal-header h2 {
+    font-size: 16px;
+  }
+
+  .status-textarea {
+    font-size: 13px;
+    padding: 10px;
+  }
+}
+
 /* Sidebar Styles */
 .sidebar {
   position: fixed;
