@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import LoginSignup from '../LoginSignup/LoginSignup';
+import Loader from '../Shared/Loader';
 import './PreviewSocialPage.css';
 
 const PreviewSocialPage = () => {
@@ -107,9 +108,7 @@ const PreviewSocialPage = () => {
       </div>
 
       {loading ? (
-        <div className="preview-loading">
-          <p>Loading posts...</p>
-        </div>
+        <Loader size="large" message="Loading posts..." />
       ) : error ? (
         <div className="preview-error">
           <p>{error}</p>
