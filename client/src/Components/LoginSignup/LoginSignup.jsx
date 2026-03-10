@@ -106,7 +106,13 @@ const LoginSignup = ({ mode = 'login', onClose, onModeChange }) => {
         setError(data.message || 'Something went wrong');
       }
     } catch (err) {
-      setError('Failed to connect to server. Please try again.');
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message);
+      } else if (err.response && err.response.status === 401) {
+        setError('Invalid email or password.');
+      } else {
+        setError('Failed to connect to server. Please try again.');
+      }
       console.error('Error:', err);
     } finally {
       setIsLoading(false);
@@ -208,7 +214,7 @@ const LoginSignup = ({ mode = 'login', onClose, onModeChange }) => {
             <img src="/2.png" alt="Fyto Logo" className="logo-image" />
             <span className="logo-text">Fyto</span>
           </div>
-          <h2>{isLogin ? 'Login' : 'Sign In'}</h2>
+          <h2>{isLogin ? 'Login' : 'Sign Up'}</h2>
 
           {error && <div className="error-message">{error}</div>}
           {successMessage && <div className="success-message">{successMessage}</div>}
@@ -262,7 +268,7 @@ const LoginSignup = ({ mode = 'login', onClose, onModeChange }) => {
                 required
               />
               <span
-                className="password-toggle"
+                className="password-toggle1"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 <img
@@ -298,7 +304,7 @@ const LoginSignup = ({ mode = 'login', onClose, onModeChange }) => {
                   required
                 />
                 <span
-                  className="password-toggle"
+                  className="password-toggle1"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   <img
@@ -327,7 +333,7 @@ const LoginSignup = ({ mode = 'login', onClose, onModeChange }) => {
           <p className="toggle-text">
             {isLogin ? "Don't have an account? " : "Already have an account? "}
             <span onClick={toggleMode} className="toggle-link">
-              {isLogin ? 'Sign In' : 'Login'}
+              {isLogin ? 'Sign Up' : 'Login'}
             </span>
           </p>
         </div>

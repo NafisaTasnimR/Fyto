@@ -68,7 +68,7 @@ const PreviewPlantInfo = () => {
 
           <nav className="nav-buttons">
             <button className="nav-btn1" onClick={() => { setModalMode('login'); setShowModal(true); }}>Login</button>
-            <button className="nav-btn1 signup-btn1" onClick={() => { setModalMode('signup'); setShowModal(true); }}>Sign In</button>
+            <button className="nav-btn1 signup-btn1" onClick={() => { setModalMode('signup'); setShowModal(true); }}>Sign Up</button>
           </nav>
         </div>
       </header>
@@ -144,12 +144,12 @@ const PreviewPlantInfo = () => {
 
               <div className="preview-plant-cta">
                 <h3>Want full plant details?</h3>
-                <p>Sign in to access care guides, watering schedules, and track your plants!</p>
+                <p>Sign up to access care guides, watering schedules, and track your plants!</p>
                 <button
                   className="preview-plant-cta-btn"
                   onClick={() => { setModalMode('signup'); setShowModal(true); }}
                 >
-                  Sign In to Explore
+                  Sign Up to Explore
                 </button>
               </div>
             </>

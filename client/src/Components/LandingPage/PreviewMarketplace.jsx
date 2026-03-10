@@ -80,7 +80,7 @@ const PreviewMarketplace = () => {
 
           <nav className="nav-buttons">
             <button className="nav-btn1" onClick={() => { setModalMode('login'); setShowModal(true); }}>Login</button>
-            <button className="nav-btn1 signup-btn1" onClick={() => { setModalMode('signup'); setShowModal(true); }}>Sign In</button>
+            <button className="nav-btn1 signup-btn1" onClick={() => { setModalMode('signup'); setShowModal(true); }}>Sign Up</button>
           </nav>
         </div>
       </header>
@@ -138,7 +138,7 @@ const PreviewMarketplace = () => {
             <h3>Ready to buy or sell plants?</h3>
             <p>Join our marketplace to find exclusive plants, tools, and connect with fellow plant enthusiasts!</p>
             <button className="preview-marketplace-btn-cta" onClick={() => { setModalMode('signup'); setShowModal(true); }}>
-              Sign In Now
+              Sign Up Now
             </button>
           </div>
         </>
