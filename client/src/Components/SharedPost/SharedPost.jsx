@@ -165,7 +165,7 @@ const SharedPost = () => {
             </div>
             <nav className="nav-buttons">
               <button className="nav-btn1" onClick={() => { setModalMode('login'); setShowModal(true); }}>Login</button>
-              <button className="nav-btn1 signup-btn1" onClick={() => { setModalMode('signup'); setShowModal(true); }}>Sign In</button>
+              <button className="nav-btn1 signup-btn1" onClick={() => { setModalMode('signup'); setShowModal(true); }}>Sign Up</button>
             </nav>
           </div>
         </header>
@@ -189,7 +189,7 @@ const SharedPost = () => {
             </div>
             <nav className="nav-buttons">
               <button className="nav-btn1" onClick={() => { setModalMode('login'); setShowModal(true); }}>Login</button>
-              <button className="nav-btn1 signup-btn1" onClick={() => { setModalMode('signup'); setShowModal(true); }}>Sign In</button>
+              <button className="nav-btn1 signup-btn1" onClick={() => { setModalMode('signup'); setShowModal(true); }}>Sign Up</button>
             </nav>
           </div>
         </header>
@@ -215,7 +215,7 @@ const SharedPost = () => {
             </div>
             <nav className="nav-buttons">
               <button className="nav-btn1" onClick={() => { setModalMode('login'); setShowModal(true); }}>Login</button>
-              <button className="nav-btn1 signup-btn1" onClick={() => { setModalMode('signup'); setShowModal(true); }}>Sign In</button>
+              <button className="nav-btn1 signup-btn1" onClick={() => { setModalMode('signup'); setShowModal(true); }}>Sign Up</button>
             </nav>
           </div>
         </header>
@@ -238,7 +238,7 @@ const SharedPost = () => {
           </div>
           <nav className="nav-buttons">
             <button className="nav-btn1" onClick={() => { setModalMode('login'); setShowModal(true); }}>Login</button>
-            <button className="nav-btn1 signup-btn1" onClick={() => { setModalMode('signup'); setShowModal(true); }}>Sign In</button>
+            <button className="nav-btn1 signup-btn1" onClick={() => { setModalMode('signup'); setShowModal(true); }}>Sign Up</button>
           </nav>
         </div>
       </header>

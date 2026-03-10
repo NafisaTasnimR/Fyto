@@ -96,7 +96,7 @@ const PreviewSocialPage = () => {
 
           <nav className="nav-buttons">
             <button className="nav-btn1" onClick={() => { setModalMode('login'); setShowModal(true); }}>Login</button>
-            <button className="nav-btn1 signup-btn1" onClick={() => { setModalMode('signup'); setShowModal(true); }}>Sign In</button>
+            <button className="nav-btn1 signup-btn1" onClick={() => { setModalMode('signup'); setShowModal(true); }}>Sign Up</button>
           </nav>
         </div>
       </header>
@@ -158,9 +158,9 @@ const PreviewSocialPage = () => {
 
           <div className="preview-signup-cta">
             <h3>Want to join the conversation?</h3>
-            <p>Sign in to share your plant journey, like posts, and connect with other plant lovers!</p>
+            <p>Sign up to share your plant journey, like posts, and connect with other plant lovers!</p>
             <button className="preview-signup-btn-cta" onClick={() => { setModalMode('signup'); setShowModal(true); }}>
-              Sign In to Join
+              Sign Up to Join
             </button>
           </div>
         </>

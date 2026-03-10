@@ -984,11 +984,14 @@
   position: relative;
 }
 
+.password-group .form-input {
+  padding-right: 40px;
+}
+
 .password-toggle {
   position: absolute;
-  right: 16px;
-  margin-top: 3%;
-  transform: translateY(-50%);
+  right: 12px;
+  bottom: 13px;
   cursor: pointer;
   user-select: none;
   display: flex;
