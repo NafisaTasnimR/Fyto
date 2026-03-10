@@ -5,7 +5,7 @@ import './Store.css';
 import Header from '../Shared/Header';
 import Loader from '../Shared/Loader';
 import EmptyState from '../Shared/EmptyState';
-import { useConfirmedPosts } from '../Context/ConfirmedPostsContext'; 
+import { useConfirmedPosts } from '../Context/ConfirmedPostsContext';
 
 const Store = () => {
   const [activeTab, setActiveTab] = useState(() => {
@@ -17,19 +17,18 @@ const Store = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showFilterModal, setShowFilterModal] = useState(false);
-  
- 
+
+
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
   const [availabilityFilter, setAvailabilityFilter] = useState('all');
-  const [favouriteIds, setFavouriteIds] = useState([]);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [reportModal, setReportModal] = useState({ open: false, postId: null });
   const [reportReason, setReportReason] = useState('');
   const [reportSubmitting, setReportSubmitting] = useState(false);
   const [showReportSuccess, setShowReportSuccess] = useState(false);
-  
+
   const navigate = useNavigate();
-  const { isPostConfirmed } = useConfirmedPosts(); 
+  const { isPostConfirmed } = useConfirmedPosts();
 
   const tabs = ['For you', 'Buy', 'Exchange', 'Donate', 'Favourites'];
 
@@ -46,7 +45,7 @@ const Store = () => {
     } else {
       fetchMarketplacePosts(activeTab);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   const fetchMarketplacePosts = async (tab = activeTab) => {
@@ -104,7 +103,6 @@ const Store = () => {
       if (response.data.success) {
         const posts = response.data.posts || [];
         setMarketplacePosts(posts);
-        setFavouriteIds(posts.map(p => p._id));
       }
       setLoading(false);
     } catch (err) {
@@ -117,7 +115,7 @@ const Store = () => {
   const getFilteredProjects = () => {
     let filtered = marketplacePosts;
 
-    
+
     if (searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(post =>
@@ -128,7 +126,7 @@ const Store = () => {
       );
     }
 
-    
+
     if (priceRange.min !== '' || priceRange.max !== '') {
       filtered = filtered.filter(post => {
         const price = post.price || 0;
@@ -138,25 +136,25 @@ const Store = () => {
       });
     }
 
-    
+
     if (availabilityFilter === 'available') {
       filtered = filtered.filter(post => {
-        
-        const isBackendUnavailable = post.status === 'confirmed' || 
-                                     post.status === 'sold' || 
-                                     post.status === 'unavailable';
+
+        const isBackendUnavailable = post.status === 'confirmed' ||
+          post.status === 'sold' ||
+          post.status === 'unavailable';
         const isContextConfirmed = isPostConfirmed(post._id);
-        
+
         return !isBackendUnavailable && !isContextConfirmed;
       });
     } else if (availabilityFilter === 'unavailable') {
       filtered = filtered.filter(post => {
-        
-        const isBackendUnavailable = post.status === 'confirmed' || 
-                                     post.status === 'sold' ||
-                                     post.status === 'unavailable';
+
+        const isBackendUnavailable = post.status === 'confirmed' ||
+          post.status === 'sold' ||
+          post.status === 'unavailable';
         const isContextConfirmed = isPostConfirmed(post._id);
-        
+
         return isBackendUnavailable || isContextConfirmed;
       });
     }
@@ -245,7 +243,7 @@ const Store = () => {
     <div className="store-page">
       <Header />
 
-      
+
       <div className="marketplace-navbar-wrapper">
         <div className="marketplace-tabs-container">
           {tabs.map((tab) => (
@@ -281,12 +279,12 @@ const Store = () => {
         </div>
       </div>
 
-     
+
       <div className="store-content">
         {loading ? (
           <Loader size="medium" message="Loading marketplace posts..." />
         ) : error ? (
-          <EmptyState 
+          <EmptyState
             title="Error Loading Posts"
             message={error}
             iconSrc="/images/no-posts-cat.png"
@@ -295,13 +293,13 @@ const Store = () => {
           <>
             <div className="store-grid">
               {displayedProjects.map((post) => {
-                
-                const isBackendUnavailable = post.status === 'confirmed' || 
-                                            post.status === 'sold' ||
-                                            post.status === 'unavailable';
+
+                const isBackendUnavailable = post.status === 'confirmed' ||
+                  post.status === 'sold' ||
+                  post.status === 'unavailable';
                 const isContextConfirmed = isPostConfirmed(post._id);
                 const isConfirmed = isBackendUnavailable || isContextConfirmed;
-                
+
                 return (
                   <div
                     key={post._id}
@@ -329,15 +327,15 @@ const Store = () => {
                           )}
                         </div>
                         <span className="store-card-badge">
-                          {post.postType === 'sell' ? 'Buy' : 
-                           post.postType === 'exchange' ? 'Exchange' : 
-                           post.postType === 'donate' ? 'Donate' : 'Buy'}
+                          {post.postType === 'sell' ? 'Buy' :
+                            post.postType === 'exchange' ? 'Exchange' :
+                              post.postType === 'donate' ? 'Donate' : 'Buy'}
                         </span>
                       </div>
 
                       {isConfirmed && (
                         <div className="confirmed-overlay">
-                          
+
                           <div className="unavailable-text">NO LONGER AVAILABLE</div>
                         </div>
                       )}
@@ -366,7 +364,7 @@ const Store = () => {
             )}
           </>
         ) : (
-          <EmptyState 
+          <EmptyState
             title="No Marketplace Posts"
             message="No marketplace posts found matching your criteria. Try adjusting your filters or search!"
             iconSrc="/alert.png"
@@ -374,7 +372,7 @@ const Store = () => {
         )}
       </div>
 
-      
+
       <button className="store-fab" onClick={handleNewPost} title="Create new post">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
           <line x1="12" y1="5" x2="12" y2="19" />
@@ -382,7 +380,7 @@ const Store = () => {
         </svg>
       </button>
 
-      
+
       {showFilterModal && (
         <div className="filter-modal-overlay" onClick={() => setShowFilterModal(false)}>
           <div className="filter-modal" onClick={(e) => e.stopPropagation()}>
@@ -392,7 +390,7 @@ const Store = () => {
             </div>
 
             <div className="filter-modal-content">
-             
+
               <div className="filter-section">
                 <h4>Price Range (৳)</h4>
                 <div className="price-inputs">
@@ -414,7 +412,7 @@ const Store = () => {
                 </div>
               </div>
 
-              
+
               <div className="filter-section">
                 <h4>Availability</h4>
                 <div className="radio-group">
