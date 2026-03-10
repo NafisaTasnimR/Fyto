@@ -215,6 +215,7 @@ const SocialPage = () => {
 
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [visibleNotifications, setVisibleNotifications] = useState(3);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [postsError, setPostsError] = useState(null);
@@ -787,6 +788,7 @@ const SocialPage = () => {
               const opening = !showNotifications;
               setShowNotifications(opening);
               setShowSearchResults(false);
+              if (opening) setVisibleNotifications(3);
               if (opening && unreadCount > 0) markAllNotificationsRead();
             }}
           >
@@ -1066,20 +1068,30 @@ const SocialPage = () => {
           </div>
           <div className="notifications-list">
             {notifications.length > 0 ? (
-              notifications.map((notif) => (
-                <div
-                  key={notif._id}
-                  className={`notification-item ${notif.isRead ? 'read' : 'unread'} ${notif.postId ? 'clickable' : ''}`}
-                  onClick={() => notif.postId && handleNotificationClick(notif)}
-                  style={notif.postId ? { cursor: 'pointer' } : {}}
-                >
-                  <img src={getProfilePic(notif.senderId?.profilePic)} alt={notif.senderId?.username || 'User'} className="notif-avatar" />
-                  <div className="notif-content">
-                    <p><strong>{notif.senderId?.username || 'Someone'}</strong> {notif.message}</p>
-                    <span className="notif-timestamp">{formatTimestamp(notif.createdAt)}</span>
+              <>
+                {notifications.slice(0, visibleNotifications).map((notif) => (
+                  <div
+                    key={notif._id}
+                    className={`notification-item ${notif.isRead ? 'read' : 'unread'} ${notif.postId ? 'clickable' : ''}`}
+                    onClick={() => notif.postId && handleNotificationClick(notif)}
+                    style={notif.postId ? { cursor: 'pointer' } : {}}
+                  >
+                    <img src={getProfilePic(notif.senderId?.profilePic)} alt={notif.senderId?.username || 'User'} className="notif-avatar" />
+                    <div className="notif-content">
+                      <p><strong>{notif.senderId?.username || 'Someone'}</strong> {notif.message}</p>
+                      <span className="notif-timestamp">{formatTimestamp(notif.createdAt)}</span>
+                    </div>
                   </div>
-                </div>
-              ))
+                ))}
+                {visibleNotifications < notifications.length && (
+                  <button
+                    className="notif-load-more-btn"
+                    onClick={() => setVisibleNotifications(prev => prev + 3)}
+                  >
+                    Load more
+                  </button>
+                )}
+              </>
             ) : (
               <div className="notifications-empty"><p>No notifications yet</p></div>
             )}
