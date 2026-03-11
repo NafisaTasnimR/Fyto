@@ -389,9 +389,70 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .plant-info-container {
+    padding: 24px 18px;
+    max-width: 100%;
+  }
+
+  .search-section {
+    padding: 1.75rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .search-section h1 {
+    font-size: 2.2rem;
+  }
+
+  .plant-input {
+    width: 70%;
+  }
+
+  .plant-results-grid {
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 20px;
+  }
+
+  .plant-card-img-wrapper {
+    height: 200px;
+  }
+}
+
 @media (max-width: 768px) {
   .plant-info-container {
     padding: 20px 16px;
+  }
+
+  .search-section {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 10px;
+  }
+
+  .search-section h1 {
+    font-size: 2rem;
+    margin-bottom: 6px;
+  }
+
+  .search-section p {
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .search-form {
+    gap: 8px;
+    flex-direction: column;
+  }
+
+  .plant-input {
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 0.95rem;
+  }
+
+  .search-button {
+    width: 100%;
+    padding: 11px 20px;
   }
 
   .plant-info-header h1 {
@@ -411,8 +472,20 @@
     gap: 16px;
   }
 
+  .plant-card {
+    border-radius: 14px;
+  }
+
   .plant-card-img-wrapper {
     height: 180px;
+  }
+
+  .plant-card-name {
+    font-size: 16px;
+  }
+
+  .plant-card-scientific {
+    font-size: 12px;
   }
 
   .plant-info-card {
@@ -433,9 +506,88 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .plant-info-container {
     padding: 16px 12px;
+  }
+
+  .search-section {
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .search-section h1 {
+    font-size: 1.75rem;
+  }
+
+  .search-section p {
+    font-size: 0.9rem;
+  }
+
+  .plant-input {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+
+  .search-button {
+    width: 100%;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+  }
+
+  .plant-results-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+
+  .plant-card-img-wrapper {
+    height: 150px;
+  }
+
+  .plant-card-body {
+    padding: 12px 14px 16px;
+  }
+
+  .plant-card-name {
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+
+  .plant-card-scientific {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .plant-info-container {
+    padding: 14px 10px;
+  }
+
+  .search-section {
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .search-section h1 {
+    font-size: 1.5rem;
+  }
+
+  .search-section p {
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  .plant-input {
+    width: 100%;
+    padding: 9px 11px;
+    font-size: 0.85rem;
+  }
+
+  .search-button {
+    width: 100%;
+    padding: 9px 16px;
+    font-size: 0.85rem;
   }
 
   .plant-info-header h1 {
@@ -447,7 +599,7 @@
   }
 
   .plant-info-name {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   .plant-info-details-section {
@@ -455,12 +607,103 @@
   }
 
   .plant-search-input {
-    font-size: 14px;
-    padding: 10px 12px;
+    font-size: 13px;
+    padding: 9px 11px;
   }
 
   .plant-search-btn {
-    padding: 10px 16px;
+    padding: 9px 14px;
+    font-size: 12px;
+  }
+
+  .plant-results-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+
+  .plant-card {
+    border-radius: 12px;
+  }
+
+  .plant-card-img-wrapper {
+    height: 130px;
+  }
+
+  .plant-card-body {
+    padding: 10px 12px 14px;
+  }
+
+  .plant-card-name {
     font-size: 13px;
+  }
+
+  .plant-card-scientific {
+    font-size: 10px;
+  }
+
+  .plant-card-badge {
+    font-size: 10px;
+    padding: 4px 10px;
+  }
+
+  .plant-info-message {
+    padding: 30px 15px;
+  }
+
+  .plant-info-message p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .plant-info-container {
+    padding: 10px 8px;
+  }
+
+  .search-section {
+    padding: 0.85rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+  }
+
+  .search-section h1 {
+    font-size: 1.3rem;
+  }
+
+  .plant-input {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+
+  .search-button {
+    width: 100%;
+    padding: 8px 14px;
+    font-size: 0.8rem;
+  }
+
+  .plant-results-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+  }
+
+  .plant-card {
+    border-radius: 10px;
+  }
+
+  .plant-card-img-wrapper {
+    height: 110px;
+  }
+
+  .plant-card-body {
+    padding: 8px 10px 12px;
+  }
+
+  .plant-card-name {
+    font-size: 12px;
+  }
+
+  .plant-card-scientific {
+    font-size: 9px;
   }
 }

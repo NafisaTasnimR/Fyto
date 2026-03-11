@@ -326,3 +326,488 @@
 .leaderboard::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+/* ════════════════════════════════════
+   Responsive Design
+   ════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  .leaderboard {
+    padding: 25px 12px;
+  }
+
+  .leaderboard-title h2 {
+    font-size: 20px;
+  }
+
+  .podium-container {
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .podium-medal {
+    width: 55px;
+    height: 55px;
+    border-width: 3px;
+  }
+
+  .podium-medal-img {
+    width: 55px;
+    height: 55px;
+  }
+
+  .podium-item.first .podium-medal-img {
+    width: 65px;
+    height: 65px;
+  }
+
+  .podium-item.second .podium-medal-img {
+    width: 58px;
+    height: 58px;
+  }
+
+  .podium-item.third .podium-medal-img {
+    width: 52px;
+    height: 52px;
+  }
+
+  .podium-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .podium-name {
+    font-size: 12px;
+  }
+
+  .podium-points {
+    font-size: 12px;
+    padding: 3px 10px;
+  }
+
+  .leaderboard-item {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .rank-number {
+    font-size: 16px;
+    min-width: 18px;
+  }
+
+  .user-avatar-img {
+    width: 35px;
+    height: 35px;
+  }
+
+  .user-name {
+    font-size: 14px;
+  }
+
+  .user-points {
+    font-size: 12px;
+  }
+
+  .tab-button {
+    padding: 9px 16px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .leaderboard {
+    padding: 20px 10px;
+  }
+
+  .leaderboard-title h2 {
+    font-size: 18px;
+    letter-spacing: 1px;
+  }
+
+  .subtitle {
+    font-size: 11px;
+  }
+
+  .podium-container {
+    gap: 6px;
+    margin-bottom: 18px;
+    padding: 0 5px;
+  }
+
+  .podium-item {
+    gap: 6px;
+  }
+
+  .podium-medal {
+    width: 50px;
+    height: 50px;
+    border-width: 3px;
+  }
+
+  .podium-medal-img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .podium-item.first .podium-medal-img {
+    width: 58px;
+    height: 58px;
+  }
+
+  .podium-item.second .podium-medal-img {
+    width: 52px;
+    height: 52px;
+  }
+
+  .podium-item.third .podium-medal-img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .medal-number {
+    font-size: 24px;
+  }
+
+  .podium-medal.silver .medal-number,
+  .podium-medal.bronze .medal-number {
+    font-size: 20px;
+  }
+
+  .podium-avatar {
+    width: 38px;
+    height: 38px;
+    border-width: 2px;
+  }
+
+  .podium-name {
+    font-size: 11px;
+  }
+
+  .podium-points {
+    font-size: 11px;
+    padding: 2px 8px;
+  }
+
+  .leaderboard-tabs {
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 3px;
+  }
+
+  .tab-button {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .leaderboard-section {
+    margin-bottom: 20px;
+  }
+
+  .leaderboard-header {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+  }
+
+  .leaderboard-header h3 {
+    font-size: 14px;
+  }
+
+  .leaderboard-list {
+    gap: 6px;
+  }
+
+  .leaderboard-item {
+    padding: 9px;
+    gap: 7px;
+    border-radius: 10px;
+  }
+
+  .rank-number {
+    font-size: 15px;
+    min-width: 16px;
+  }
+
+  .user-avatar-img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 11px;
+  }
+
+  .user-name {
+    font-size: 13px;
+  }
+
+  .user-points {
+    font-size: 11px;
+  }
+
+  .medal-icon {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .leaderboard {
+    padding: 16px 8px;
+  }
+
+  .leaderboard-title {
+    margin-bottom: 16px;
+  }
+
+  .leaderboard-title h2 {
+    font-size: 16px;
+    letter-spacing: 0.5px;
+  }
+
+  .subtitle {
+    font-size: 10px;
+    margin-top: 3px;
+  }
+
+  .podium-container {
+    gap: 4px;
+    margin-bottom: 16px;
+    padding: 0;
+  }
+
+  .podium-item {
+    gap: 4px;
+  }
+
+  .podium-medal {
+    width: 44px;
+    height: 44px;
+    border-width: 2px;
+  }
+
+  .podium-medal-img {
+    width: 44px;
+    height: 44px;
+  }
+
+  .podium-item.first .podium-medal-img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .podium-item.second .podium-medal-img {
+    width: 46px;
+    height: 46px;
+  }
+
+  .podium-item.third .podium-medal-img {
+    width: 42px;
+    height: 42px;
+  }
+
+  .medal-number {
+    font-size: 20px;
+  }
+
+  .podium-medal.silver .medal-number,
+  .podium-medal.bronze .medal-number {
+    font-size: 16px;
+  }
+
+  .podium-avatar {
+    width: 34px;
+    height: 34px;
+    border-width: 2px;
+  }
+
+  .podium-name {
+    font-size: 10px;
+  }
+
+  .podium-points {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+
+  .leaderboard-tabs {
+    gap: 6px;
+    margin-bottom: 14px;
+    padding: 2px;
+  }
+
+  .tab-button {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+
+  .leaderboard-section {
+    margin-bottom: 16px;
+  }
+
+  .leaderboard-header {
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+  }
+
+  .leaderboard-header h3 {
+    font-size: 13px;
+  }
+
+  .leaderboard-list {
+    gap: 5px;
+  }
+
+  .leaderboard-item {
+    padding: 8px;
+    gap: 6px;
+    border-radius: 9px;
+  }
+
+  .rank-number {
+    font-size: 13px;
+    min-width: 14px;
+  }
+
+  .user-avatar-img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .user-avatar {
+    width: 30px;
+    height: 30px;
+    font-size: 10px;
+  }
+
+  .user-info {
+    gap: 2px;
+  }
+
+  .user-name {
+    font-size: 12px;
+  }
+
+  .user-points {
+    font-size: 10px;
+  }
+
+  .medal-icon {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 360px) {
+  .leaderboard {
+    padding: 12px 6px;
+  }
+
+  .leaderboard-title {
+    margin-bottom: 12px;
+  }
+
+  .leaderboard-title h2 {
+    font-size: 14px;
+  }
+
+  .podium-container {
+    gap: 2px;
+    margin-bottom: 12px;
+  }
+
+  .podium-item {
+    gap: 3px;
+  }
+
+  .podium-medal {
+    width: 40px;
+    height: 40px;
+  }
+
+  .podium-medal-img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .podium-item.first .podium-medal-img {
+    width: 45px;
+    height: 45px;
+  }
+
+  .podium-item.second .podium-medal-img {
+    width: 42px;
+    height: 42px;
+  }
+
+  .podium-item.third .podium-medal-img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .medal-number {
+    font-size: 18px;
+  }
+
+  .podium-avatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  .podium-name {
+    font-size: 9px;
+  }
+
+  .podium-points {
+    font-size: 9px;
+    padding: 2px 5px;
+  }
+
+  .leaderboard-tabs {
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+
+  .tab-button {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .leaderboard-section {
+    margin-bottom: 12px;
+  }
+
+  .leaderboard-item {
+    padding: 7px;
+    gap: 5px;
+  }
+
+  .rank-number {
+    font-size: 12px;
+  }
+
+  .user-avatar-img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 9px;
+  }
+
+  .user-name {
+    font-size: 11px;
+  }
+
+  .user-points {
+    font-size: 9px;
+  }
+
+  .medal-icon {
+    width: 28px;
+    height: 28px;
+  }
+}

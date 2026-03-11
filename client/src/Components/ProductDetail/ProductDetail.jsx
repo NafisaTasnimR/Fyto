@@ -13,6 +13,7 @@ const ProductDetail = () => {
   const [error, setError] = useState(null);
   const [showImageViewer, setShowImageViewer] = useState(false);
   const [showContactCard, setShowContactCard] = useState(false);
+  const [showSaveCard, setShowSaveCard] = useState(false);
   const [savedToFavourites, setSavedToFavourites] = useState(false);
 
   const navigate = useNavigate();
@@ -82,8 +83,7 @@ const ProductDetail = () => {
       setShowContactCard(true);
     } else if (selectedOption === 'save') {
       await saveToFavourites();
-      alert('Saved to Favourites! You can find it in the Favourites tab.');
-      navigate('/store');
+      setShowSaveCard(true);
     }
   };
 
@@ -135,7 +135,7 @@ const ProductDetail = () => {
           <div className="post-type-badge-container">
             <span className={`post-type-badge ${post.postType}`}>
               {post.postType === 'sell' ? (
-                <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>For Sale</>
+                <><span style={{ fontSize: '16px', fontWeight: 700 }}>৳</span>For Sale</>
               ) : post.postType === 'exchange' ? (
                 <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 3l4 4-4 4"/><path d="M20 7H4"/><path d="M8 21l-4-4 4-4"/><path d="M4 17h16"/></svg>For Exchange</>
               ) : (
@@ -301,6 +301,31 @@ const ProductDetail = () => {
               onClick={() => { setShowContactCard(false); navigate('/store'); }}
             >
               OK
+            </button>
+          </div>
+        </div>
+      )}
+      {/* ── Save to Favourites card modal ────────────────────────────────── */}
+      {showSaveCard && (
+        <div className="pd-save-overlay" onClick={() => { setShowSaveCard(false); navigate('/store'); }}>
+          <div className="pd-save-card" onClick={(e) => e.stopPropagation()}>
+            <button className="pd-contact-close" onClick={() => { setShowSaveCard(false); navigate('/store'); }}>✕</button>
+
+            <div className="pd-save-img-wrap">
+              <img src="/added-favourites.png" alt="Saved" className="pd-save-img" />
+            </div>
+
+            <h3 className="pd-save-title">Added to Favourites!</h3>
+            <p className="pd-save-subtitle">
+              <strong>{post.treeName}</strong> has been saved.<br />
+              You can find it in the Favourites tab.
+            </p>
+
+            <button
+              className="pd-contact-ok-btn"
+              onClick={() => { setShowSaveCard(false); navigate('/store'); }}
+            >
+              Go to Store
             </button>
           </div>
         </div>

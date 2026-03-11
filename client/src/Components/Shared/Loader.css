@@ -55,3 +55,66 @@
   width: 100%;
   min-height: 300px;
 }
+
+/* ════════════════════════════════════
+   Responsive Design
+   ════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .loader-container {
+    padding: 30px 15px;
+    gap: 12px;
+  }
+
+  .loader-small .spinner {
+    width: 25px;
+    height: 25px;
+  }
+
+  .loader-medium .spinner {
+    width: 45px;
+    height: 45px;
+  }
+
+  .loader-large .spinner {
+    width: 60px;
+    height: 60px;
+  }
+
+  .loader-message {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .loader-container {
+    padding: 20px 10px;
+    gap: 10px;
+  }
+
+  .loader-small .spinner {
+    width: 22px;
+    height: 22px;
+    border-width: 3px;
+  }
+
+  .loader-medium .spinner {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+  }
+
+  .loader-large .spinner {
+    width: 50px;
+    height: 50px;
+    border-width: 3px;
+  }
+
+  .loader-container.full-width {
+    min-height: 200px;
+  }
+
+  .loader-message {
+    font-size: 12px;
+  }
+}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import LoginSignup from '../LoginSignup/LoginSignup';
+import Loader from '../Shared/Loader';
 import './PreviewMarketplace.css';
 
 const PreviewMarketplace = () => {
@@ -92,9 +93,7 @@ const PreviewMarketplace = () => {
       </div>
 
       {loading ? (
-        <div className="preview-marketplace-loading">
-          <p>Loading marketplace items...</p>
-        </div>
+        <Loader size="large" message="Loading marketplace items..." />
       ) : error ? (
         <div className="preview-marketplace-error">
           <p>{error}</p>

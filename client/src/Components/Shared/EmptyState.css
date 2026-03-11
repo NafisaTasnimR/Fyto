@@ -69,6 +69,31 @@
 }
 
 /* Responsive */
+@media (max-width: 900px) {
+  .empty-state-container {
+    min-height: 280px;
+    padding: 35px 18px;
+  }
+
+  .empty-state-icon {
+    width: 110px;
+    height: 110px;
+  }
+
+  .empty-state-title {
+    font-size: 19px;
+  }
+
+  .empty-state-message {
+    font-size: 13px;
+  }
+
+  .empty-state-action button {
+    padding: 9px 20px;
+    font-size: 13px;
+  }
+}
+
 @media (max-width: 768px) {
   .empty-state-container {
     min-height: 250px;
@@ -78,6 +103,7 @@
   .empty-state-icon {
     width: 100px;
     height: 100px;
+    margin-bottom: 8px;
   }
 
   .empty-state-title {
@@ -86,5 +112,114 @@
 
   .empty-state-message {
     font-size: 13px;
+  }
+
+  .empty-state-action button {
+    padding: 9px 20px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 600px) {
+  .empty-state-container {
+    min-height: 220px;
+    padding: 25px 14px;
+  }
+
+  .empty-state-content {
+    gap: 14px;
+    max-width: 350px;
+  }
+
+  .empty-state-icon {
+    width: 90px;
+    height: 90px;
+    margin-bottom: 6px;
+  }
+
+  .empty-state-title {
+    font-size: 16px;
+    margin: 0;
+  }
+
+  .empty-state-message {
+    font-size: 12px;
+  }
+
+  .empty-state-action {
+    margin-top: 12px;
+  }
+
+  .empty-state-action button {
+    padding: 8px 18px;
+    font-size: 12px;
+    border-radius: 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .empty-state-container {
+    min-height: 200px;
+    padding: 20px 12px;
+  }
+
+  .empty-state-content {
+    gap: 12px;
+    max-width: 280px;
+  }
+
+  .empty-state-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 5px;
+  }
+
+  .empty-state-title {
+    font-size: 15px;
+  }
+
+  .empty-state-message {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .empty-state-action {
+    margin-top: 10px;
+  }
+
+  .empty-state-action button {
+    padding: 7px 16px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 360px) {
+  .empty-state-container {
+    min-height: 180px;
+    padding: 16px 10px;
+  }
+
+  .empty-state-content {
+    gap: 10px;
+    max-width: 250px;
+  }
+
+  .empty-state-icon {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 4px;
+  }
+
+  .empty-state-title {
+    font-size: 14px;
+  }
+
+  .empty-state-message {
+    font-size: 10px;
+  }
+
+  .empty-state-action button {
+    padding: 6px 14px;
+    font-size: 10px;
   }
 }
